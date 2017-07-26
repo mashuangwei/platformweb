@@ -1,45 +1,119 @@
+<style scoped>
+  .content {
+    /*自行添加样式即可*/
+  }
+
+  #main {
+    height: 500px;
+  }
+</style>
 <template>
-  <div class="echarts">
-      <div id="mychart" :style="{width:'300px',height:'300px'}"/>
-      test......
+  <div class="content">
+    <div id="main"></div>
   </div>
 </template>
-
 <script>
-//  import echarts from 'echarts'
-  // 引入 ECharts 主模块
-  var echarts = require('echarts/lib/echarts')
-  // 引入柱状图
-  require('echarts/lib/chart/bar')
-  // 引入提示框和标题组件
-  require('echarts/lib/component/tooltip')
-  require('echarts/lib/component/title')
+  import echarts from 'echarts'
+  import $ from 'jquery'
+
   export default {
-    components: {
-      echarts
+    data () {
+      return {
+        // 初始化空对象
+        chart: null,
+        // 初始化图表配置
+        opinion: ['高富帅', '矮富帅', '高富挫', '矮富挫', '女生'],
+        opinionData: [{
+          value: 26,
+          name: '高富帅'
+        }, {
+          value: 31,
+          name: '矮富帅'
+        }, {
+          value: 18,
+          name: '高富挫'
+        }, {
+          value: 28,
+          name: '矮富挫'
+        }, {
+          value: 21,
+          name: '女生'
+        }]
+      }
     },
-    name: 'chart',
-    options: {
-      title: {
-        text: 'ECharts 入门示例'
-      },
-      tooltip: {},
-      legend: {
-        data: ['销量']
-      },
-      xAxis: {
-        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', ' 袜子']
-      },
-      yAxis: {},
-      series: [{
-        name: '销量',
-        type: 'bar',
-        data: [5, 20, 36, 10, 10, 20]
-      }]
+    methods: {
+      drawGraph (id) {
+        this.chart = echarts.init(document.getElementById(id))
+        this.chart.showLoading()
+        var that = this
+        $.ajax({
+          type: 'GET',
+          async: true,
+          url: 'xxx',
+          dataType: 'json',
+          success: function (result) {
+            that.opinionData = result
+          },
+          error: function (errorMsg) {
+            console.log(errorMsg)
+          }
+        })
+        this.chart.setOption({
+          title: {
+            text: '女生喜欢的男生种类',
+            subtext: '纯属扯犊子',
+            x: 'center'
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            x: 'center',
+            y: 'bottom',
+            data: this.opinion
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              mark: {
+                show: true
+              },
+              dataView: {
+                show: true,
+                readOnly: false
+              },
+              magicType: {
+                show: true,
+                type: ['pie']
+              },
+              restore: {
+                show: true
+              },
+              saveAsImage: {
+                show: true
+              }
+            }
+          },
+          calculable: true,
+          series: [{
+            name: '种类',
+            type: 'pie',
+            radius: [30, 100],
+            center: ['50%', '50%'],
+            roseType: 'area',
+            data: this.opinionData
+
+          }]
+        })
+        this.chart.hideLoading()
+      }
     },
     mounted () {
-      let myChart = this.$echarts.init(document.getElementById('myChart'))
-      myChart.setOption(this.options)
+      this.$nextTick(function () {
+        this.drawGraph('main')
+      })
     }
   }
 </script>
+

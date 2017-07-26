@@ -5,6 +5,13 @@
   .active {
     color: #2d8cf0;
   }
+  .ivu-menu-vertical .ivu-menu-item {
+    padding: 0;
+  }
+  .ivu-menu li.ivu-menu-item a {
+    display: block;
+    padding: 14px 24px;
+  }
   .vertical-center-modal {
     display: flex;
     align-items: center;
@@ -147,18 +154,39 @@
               </router-link>
             </Menu-item>
             <Menu-item name="3">
+              <router-link to="/asr">
               <Icon type="heart-broken"></Icon>
               性能测试
+              </router-link>
             </Menu-item>
             <Menu-item name="4">
+              <router-link to="/report">
               <Icon type="chatbubbles"></Icon>
               测试报告
+              </router-link>
             </Menu-item>
             <Menu-item name="5">
+              <router-link to="/environment">
               <Icon type="stats-bars"></Icon>
               环境配置
+            </router-link>
+            </Menu-item>
+            <Menu-item name="6">
+              <router-link to="/nlp">
+                <Icon type="stats-bars"></Icon>
+                NLP
+              </router-link>
+            </Menu-item>
+
+            <Menu-item name="7">
+              <router-link to="/highcharts">
+                <Icon type="stats-bars"></Icon>
+                Highcharts
+              </router-link>
             </Menu-item>
           </Menu>
+
+
         </i-col>
         <i-col span="19">
           <div class="layout-content-main">
@@ -166,6 +194,7 @@
           </div>
         </i-col>
       </Row>
+
     </div>
 
     <div class="layout-copy">
@@ -195,7 +224,12 @@
       return {
         activeMenu: {
           '/api': '1',
-          '/test': '2'
+          '/test': '2',
+          '/asr': '3',
+          '/report': '4',
+          '/environment': '5',
+          '/nlp': '6',
+          '/highcharts': '7'
         }
       }
     }

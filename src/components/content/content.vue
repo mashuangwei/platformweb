@@ -14,7 +14,7 @@
     </Row>
 
     <row>
-      <Table :columns="columns7" :data="apiCaselist" height="580" :border="showBorder" :stripe="showStripe"
+      <Table :columns="columns7" :data="apiCaselist" width="1200" height="580" :border="showBorder" :stripe="showStripe"
              :show-header="showHeader" :showIndex="true"></Table>
     </row>
     <br>
@@ -76,7 +76,7 @@
             <label>Param参数</label>
           </div>
         </i-col>
-        <i-col span="2" offset="17">
+        <i-col span="2" offset="19">
           <div>
             <Button type="primary" @click="parameditmodal = true" style="margin-bottom:6px; margin-top: 10px">
               新增
