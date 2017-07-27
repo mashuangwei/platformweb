@@ -137,7 +137,7 @@
       </div>
     </Menu>
 
-    <div class="layout-content">
+    <div class="layout-content" height="760px">
       <Row>
         <i-col span="4">
           <Menu :active-name="activeMenu[$route.path]" theme="light" width="auto">
@@ -155,8 +155,8 @@
             </Menu-item>
             <Menu-item name="3">
               <router-link to="/asr">
-              <Icon type="heart-broken"></Icon>
-              性能测试
+                <Icon type="android-globe"></Icon>
+                性能测试
               </router-link>
             </Menu-item>
             <Menu-item name="4">
@@ -173,28 +173,26 @@
             </Menu-item>
             <Menu-item name="6">
               <router-link to="/nlp">
-                <Icon type="stats-bars"></Icon>
+                <Icon type="star"></Icon>
                 NLP
               </router-link>
             </Menu-item>
 
             <Menu-item name="7">
               <router-link to="/highcharts">
-                <Icon type="stats-bars"></Icon>
+                <Icon type="gear-b"></Icon>
                 Highcharts
               </router-link>
             </Menu-item>
           </Menu>
 
-
         </i-col>
-        <i-col span="19">
+        <i-col span="20">
           <div class="layout-content-main">
             <router-view></router-view>
           </div>
         </i-col>
       </Row>
-
     </div>
 
     <div class="layout-copy">

@@ -2,7 +2,7 @@
   <div>
     <Row>
       <i-col span="2">
-        <Button type="primary" @click="editmodal = true" style="margin-bottom:15px;">新增</Button>
+        <Button type="primary" @click="addPlatformCase" style="margin-bottom:15px;">新增</Button>
       </i-col>
       <i-col span="3" offset="15">
         <Input v-model="searchStr" icon="ios-search-strong" placeholder="请输入..."
@@ -14,99 +14,180 @@
     </Row>
 
     <row>
-      <Table :columns="columns7" :data="apiCaselist" width="1200" height="580" :border="showBorder" :stripe="showStripe"
+      <Table :columns="casetable" :data="casedata" width="1370" height="640" :border="showBorder" :stripe="showStripe"
              :show-header="showHeader" :showIndex="true"></Table>
     </row>
     <br>
+    <!-- 分页 -->
     <row>
-      <i-col span="19" offset="4">
-          <Page :total="100" size="small" show-elevator show-sizer show-total placement="top"></Page>
+      <i-col span="14" offset="10">
+        <Page :total="100" size="small" show-elevator show-sizer show-total placement="top"></Page>
       </i-col>
     </row>
-    <!-- case列表页面表格 -->
+
+    <!-- case新增页面 -->
     <Modal
-      @on-ok="addOrSaveApiCase"
-      @on-cancel="addApiCancel"
+      @on-ok="addOrSaveCaseEvent"
+      @on-cancel="addCaseCancelEvent"
       :mask-closable="false"
-      width="800"
-      title="新增用例"
+      :width="caseModelWidth"
+      :title=casemodeltitle
       :okText=okButtonText
-      v-model="editmodal"
+      v-model="addcasemodal"
       :styles="{top: '20px'}">
       <row>
-        <i-col span="4" offset="1">
+        <i-col span="2" offset="0">
           <div style="line-height: 32px;"><label>用例名称：</label></div>
         </i-col>
         <i-col span="3" offset="1">
           <div>
-            <Input v-model="newCase.name" placeholder="请输入..." style="width: 200px"></Input>
+            <Input v-model="addcase.name" placeholder="请输入..." style="width: 420px"></Input>
           </div>
         </i-col>
       </row>
       <br>
       <row>
-        <i-col span="4" offset="1">
-          <div style="line-height: 32px;"><label>http请求方式：</label></div>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>用例描述：</label></div>
         </i-col>
         <i-col span="3" offset="1">
-          <Select v-model="newCase.httpType" style="width:200px" @on-change="selectEvent">
-            <Option v-for="item in httpTypeList" :value="item.value" :key="item"></Option>
-          </Select>
+          <div>
+            <Input v-model="addcase.description" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
         </i-col>
       </row>
-      <br/>
+      <br>
+
       <row>
-        <i-col span="4" offset="1">
+        <i-col span="2" offset="0">
           <div style="line-height: 32px;"><label>接口名称：</label></div>
         </i-col>
         <i-col span="3" offset="1">
           <div>
-            <Input v-model="newCase.apiName" placeholder="请输入..." style="width: 200px"></Input>
+            <Input v-model="addcase.apiname" placeholder="请输入..." style="width: 420px"></Input>
           </div>
         </i-col>
       </row>
-
-      <div class="border-bt editor-wrap">
+      <div class="border-bt editor-wrap" v-show="preCaseAddFlag">
       </div>
-
-      <row>
+      <row v-show="preCaseAddFlag">
         <i-col span="3">
           <div
             style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
-            <label>Param参数</label>
+            <label>步骤</label>
           </div>
         </i-col>
         <i-col span="2" offset="19">
           <div>
-            <Button type="primary" @click="parameditmodal = true" style="margin-bottom:6px; margin-top: 10px">
+            <Button type="primary" @click="addSteps" style="margin-bottom:6px; margin-top: 10px">
               新增
             </Button>
           </div>
         </i-col>
       </row>
-      <row>
-        <Table border :columns="paramsUrl" :data="paramsUrllist"></Table>
+      <row v-show="preCaseAddFlag">
+        <Table :columns="stepstable" :data="stepslist" width="980" height="400" :border="showBorder"
+               :stripe="showStripe"
+               :show-header="showHeader" :showIndex="true"></Table>
       </row>
 
-      <div class="border-bt editor-wrap" v-show="editJsonComponentShow">
-      </div>
-
-
-      <div v-show="editJsonComponentShow"
-           style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
-        <label>Json参数</label>
-      </div>
-      <div v-show="editJsonComponentShow">
-        <editor id="j_intentEditor" :content="editorInitJson" :height="'150px'" :width="'100%'"
-                :lang="'javascript'" :sync="true"></editor>
-      </div>
     </Modal>
-    <!-- 添加用例model页面 -->
+
+    <!-- 步骤列表页面表格 -->
+    <Modal
+    @on-ok="addStep"
+    @on-cancel="addStepCancel"
+    :mask-closable="false"
+    width="800"
+    :title=titlesteps
+    :okText=stepokButtonText
+    v-model="addStepModel"
+    :styles="{top: '20px'}">
+    <row>
+      <i-col span="4" offset="1">
+        <div style="line-height: 32px;"><label>步骤名称：</label></div>
+      </i-col>
+      <i-col span="3" offset="1">
+        <div>
+          <Input v-model="caseStep.name" placeholder="请输入..." style="width: 200px"></Input>
+        </div>
+      </i-col>
+    </row>
+    <br>
+    <row>
+      <i-col span="4" offset="1">
+        <div style="line-height: 32px;"><label>http请求方式：</label></div>
+      </i-col>
+      <i-col span="3" offset="1">
+        <Select v-model="caseStep.httpType" style="width:200px" @on-change="selectEvent">
+          <Option v-for="item in httpTypeList" :value="item.value" :key="item"></Option>
+        </Select>
+      </i-col>
+    </row>
+    <br/>
+    <row>
+      <i-col span="4" offset="1">
+        <div style="line-height: 32px;"><label>平台：</label></div>
+      </i-col>
+      <i-col span="3" offset="1">
+        <Select v-model="caseStep.platform" style="width:200px" @on-change="selectPlatform">
+          <Option v-for="item in platformlist" :value="item.value" :key="item"></Option>
+        </Select>
+      </i-col>
+    </row>
+    <br/>
+    <row>
+      <i-col span="4" offset="1">
+        <div style="line-height: 32px;"><label>接口名称：</label></div>
+      </i-col>
+      <i-col span="3" offset="1">
+        <div>
+          <Input v-model="caseStep.apiname" placeholder="请输入..." style="width: 200px"></Input>
+        </div>
+      </i-col>
+    </row>
+
+    <div class="border-bt editor-wrap">
+    </div>
+
+    <row>
+      <i-col span="3">
+        <div
+          style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
+          <label>Param参数</label>
+        </div>
+      </i-col>
+      <i-col span="2" offset="19">
+        <div>
+          <Button type="primary" @click="addParamModel" style="margin-bottom:6px; margin-top: 10px">
+            新增
+          </Button>
+        </div>
+      </i-col>
+    </row>
+    <row>
+      <Table border :columns="paramsUrl" :data="paramsUrllist"></Table>
+    </row>
+
+    <div class="border-bt editor-wrap" v-show="editJsonComponentShow">
+    </div>
+
+
+    <div v-show="editJsonComponentShow"
+         style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
+      <label>Json参数</label>
+    </div>
+    <div v-show="editJsonComponentShow">
+      <editor id="j_intentEditor" :content="editorInitJson" :height="'150px'" :width="'100%'"
+              :lang="'javascript'" :sync="true"></editor>
+    </div>
+    </Modal>
+    <!-- 添加步骤url参数model页面 -->
     <Modal
       @on-ok="addParamValue"
       :mask-closable="false"
       width="400"
-      title="新增参数"
+      :title=paramtitle
       v-model="parameditmodal"
       :styles="{top: '20px'}">
       <row>
@@ -154,6 +235,7 @@
     data () {
       return {
         editJsonComponentShow: false,
+        index: 0,
         editorInitJson: JSON.stringify({'a': 1, 'b': 2}, null, '\t'),
         editorJson: '',
         showBorder: true,
@@ -161,7 +243,38 @@
         showHeader: true,
         fixedHeader: true,
         editAndAddFlag: true,
+        addCaseButtunFlag: true,
+        addStepsButtunFlag: true,
         okButtonText: '添加',
+        casemodeltitle: '新增用例',
+        titlesteps: '新增步骤',
+        stepokButtonText: '添加',
+        paramtitle: '新增参数',
+        paramAddOrSaveButtonFlag: true,
+        preCaseAddFlag: false,
+        caseModelWidth: 800,
+        stepslist: [],
+        platformlist: [
+          {
+            value: 'skill'
+          },
+          {
+            value: 'voice'
+          },
+          {
+            value: 'account'
+          }
+        ],
+        addcase: {
+          name: '',
+          description: '',
+          platform: 'skill',
+          apiname: '',
+          createtime: null,
+          updatetime: null,
+          result: '',
+          cellClassName: {}
+        },
         httpTypeList: [
           {
             value: 'get'
@@ -176,20 +289,22 @@
             value: 'delete'
           }
         ],
-        newCase: {
+        caseStep: {
           name: '',
-          apiName: '',
+          platform: 'skill',
           httpType: 'get',
           result: '',
+          response: '',
           cellClassName: {}
         },
         newParamsValue: {
           paramName: '',
           paramValue: ''
         },
-        editmodal: false,
+        addStepModel: false,
+        caseEditmodal: false,
+        addcasemodal: false,
         parameditmodal: false,
-        value4: '',
         searchStr: '',
         paramsUrl: [
           {
@@ -240,49 +355,46 @@
             }
           }
         ],
-        columns7: [
+        stepstable: [
           {
             type: 'selection',
             width: 60,
             align: 'center'
           },
           {
-            title: '用例名称',
+            title: '步骤名称',
+            width: 160,
             key: 'name'
           },
           {
-            title: '接口',
-            key: 'apiName'
+            title: 'httpType',
+            width: 100,
+            key: 'httpType'
           },
           {
-            title: 'http请求方式',
-            key: 'httpType',
-            width: 120
+            title: '平台',
+            key: 'platform',
+            width: 100
           },
           {
-            title: '执行结果',
-            width: 120,
+            title: 'url参数',
+            width: 140,
+            key: 'param'
+          },
+          {
+            title: 'response',
+            width: 160,
+            key: 'response'
+          },
+          {
+            title: 'result',
+            width: 80,
             key: 'result'
-          },
-          {
-            title: '作者',
-            width: 120,
-            key: 'author',
-            render: (h, params) => {
-              return h('div', [
-                h('Icon', {
-                  props: {
-                    type: 'person'
-                  }
-                }),
-                h('strong', params.row.name)
-              ])
-            }
           },
           {
             title: '操作',
             key: 'action',
-            width: 270,
+            width: 200,
             align: 'center',
             render: (h, params) => {
               return h('div', [
@@ -296,8 +408,7 @@
                   },
                   on: {
                     click: () => {
-                      this.editCaseModel(params.index)
-//                      this.show(params.index)
+                      this.editSteps(params.index)
                     }
                   }
                 }, '编辑'),
@@ -308,7 +419,87 @@
                   },
                   on: {
                     click: () => {
-                      this.remove(params.index)
+                      this.removeStep(params.index)
+                    }
+                  }
+                }, '删除')
+              ])
+            }
+          }
+        ],
+        casetable: [
+          {
+            type: 'selection',
+            width: 60,
+            align: 'center'
+          },
+          {
+            title: '用例名称',
+            width: 310,
+            key: 'name',
+            align: 'center'
+          },
+          {
+            title: '用例描述',
+            width: 230,
+            key: 'description',
+            align: 'center'
+          },
+          {
+            title: '接口名称',
+            width: 150,
+            key: 'apiname',
+            align: 'center'
+          },
+          {
+            title: '创建时间',
+            width: 155,
+            key: 'createtime',
+            align: 'center'
+          },
+          {
+            title: '更新时间',
+            width: 155,
+            key: 'updatetime',
+            align: 'center'
+          },
+          {
+            title: '执行结果',
+            width: 120,
+            key: 'result',
+            align: 'center'
+          },
+          {
+            title: '操作',
+            key: 'action',
+            width: 220,
+            align: 'center',
+            render: (h, params) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '7px'
+                  },
+                  on: {
+                    click: () => {
+                      this.preCaseAddFlag = true
+                      this.caseModelWidth = 1000
+                      this.editCase(params.index)
+                    }
+                  }
+                }, '编辑'),
+                h('Button', {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => {
+                      this.removeCase(params.index)
                     }
                   }
                 }, '删除'),
@@ -322,7 +513,7 @@
                   },
                   on: {
                     click: () => {
-                      this.remove(params.index)
+                      this.executeCase(params.index)
                     }
                   }
                 }, '执行')
@@ -331,6 +522,7 @@
           }
         ],
         apiCaselist: [],
+        casedata: [],
         paramsUrllist: [
           {
             'paramName': 'appid',
@@ -358,26 +550,40 @@
           this.editorJson = content
         }
       },
+      addSteps () {
+        this.titlesteps = '新增步骤'
+        this.stepokButtonText = '添加'
+        this.addStepModel = true
+      },
       selectEvent () {
-        if (this.newCase.httpType === 'get' || this.newCase.httpType === 'delete') {
+        if (this.caseStep.httpType === 'get' || this.caseStep.httpType === 'delete') {
           this.editJsonComponentShow = false
         } else {
           this.editJsonComponentShow = true
         }
       },
-      editCaseModel (index) {
-        this.editmodal = true
-        this.editAndAddFlag = false
-        this.okButtonText = '保存'
-        this.newCase.name = this.apiCaselist[index].name
-        this.newCase.httpType = this.apiCaselist[index].httpType
-        this.newCase.apiName = this.apiCaselist[index].apiName
+      selectPlatform () {
+        if (this.addcase.platform === 'skill') {
+        } else {
+        }
       },
+      editSteps (index) {
+        this.titlesteps = '编辑步骤'
+        this.stepokButtonText = '保存'
+        this.addStepModel = true
+        this.caseStep.name = this.stepslist[index].name
+        this.caseStep.httpType = this.stepslist[index].httpType
+        this.caseStep.result = this.stepslist[index].result
+        this.caseStep.platform = this.stepslist[index].platform
+        this.caseStep.param = this.stepslist[index].param
+      },
+
       editParams (index) {
-        this.$Modal.info({
-          title: '用户信息',
-          content: `参数名称：${this.paramsUrllist[index].paramName}<br>参数值：${this.paramsUrllist[index].paramValue}<br>`
-        })
+        this.paramAddOrSaveButtonFlag = false
+        this.paramtitle = '编辑参数'
+        this.parameditmodal = true
+        this.newParamsValue.paramName = this.paramsUrllist[index].paramName
+        this.newParamsValue.paramValue = this.paramsUrllist[index].paramValue
       },
       show (index) {
         this.$Modal.info({
@@ -385,35 +591,91 @@
           content: `用例名称：${this.apiCaselist[index].name}<br>http请求方式：${this.apiCaselist[index].httpType}<br>执行结果：${this.apiCaselist[index].result}`
         })
       },
+      editCase (index) {
+        this.index = index
+        this.casemodeltitle = '编辑用例'
+        this.okButtonText = '保存'
+        this.addcasemodal = true
+        this.addCaseButtunFlag = false
+        this.addcase.name = this.casedata[index].name
+        this.addcase.description = this.casedata[index].description
+        this.addcase.apiname = this.casedata[index].apiname
+        this.addcase.platform = this.casedata[index].platform
+      },
+      addPlatformCase () {
+        this.caseModelWidth = 800
+        this.casemodeltitle = '添加用例'
+        this.addcasemodal = true
+        this.addCaseButtunFlag = true
+        this.okButtonText = '添加'
+      },
       remove (index) {
         this.apiCaselist.splice(index, 1)
+      },
+      removeCase (index) {
+        this.casedata.splice(index, 1)
+      },
+      removeStep (index) {
+        this.stepslist.splice(index, 1)
       },
       removeParamValue (index) {
         this.paramsUrllist.splice(index, 1)
       },
-      addOrSaveApiCase () {
-        if (this.editAndAddFlag) {
-          this.newCase.cellClassName = {result: 'table-info-cell-result-success'}
-          this.newCase.result = 'success'
-          this.apiCaselist.push(this.newCase)
+      addStep () {
+        if (this.addStepsButtunFlag) {
+          this.stepslist.push(this.caseStep)
         } else {
-          console.log(1)
+          this.stepslist[this.index].name = this.caseStep.name
+          this.stepslist[this.index].httpType = this.caseStep.httpType
+          this.stepslist[this.index].apiname = this.caseStep.apiname
+          this.stepslist[this.index].platform = this.caseStep.platform
         }
-        this.editAndAddFlag = true
-        this.okButtonText = '添加'
-        this.newCase = {name: '', httpType: 'get', result: '', apiName: '', cellClassName: {}}
+        this.caseStep = {name: '', httpType: 'get', apiname: '', platform: 'skill'}
       },
-      addApiCancel () {
+      getDateTime () {
+        var date = new Date()
+        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+      },
+      addOrSaveCaseEvent () {
+        if (this.addCaseButtunFlag) {
+          this.addcase.createtime = this.getDateTime()
+          this.addcase.updatetime = this.getDateTime()
+          this.addcase.cellClassName = {result: 'table-info-cell-result-success'}
+          this.casedata.push(this.addcase)
+        } else {
+          this.casedata[this.index].name = this.addcase.name
+          this.casedata[this.index].description = this.addcase.description
+          this.casedata[this.index].apiname = this.addcase.apiname
+          this.casedata[this.index].updatetime = this.getDateTime()
+        }
+        this.addcase = {name: '', description: '', result: '', apiName: '', cellClassName: {}}
+        this.preCaseAddFlag = false
+        this.caseModelWidth = 600
+      },
+      addStepCancel () {
         this.editAndAddFlag = false
-        this.okButtonText = '添加'
-        this.newCase = {name: '', httpType: 'get', result: '', apiName: '', cellClassName: {}}
+        this.caseStep = {name: '', httpType: 'get', result: '', cellClassName: {}, platform: 'skill', apiname: ''}
+      },
+      addCaseCancelEvent () {
+        this.addcase = {name: '', description: '', result: '', apiName: '', cellClassName: {}}
+        this.preCaseAddFlag = false
+      },
+      addParamModel () {
+        this.paramAddOrSaveButtonFlag = true
+        this.parameditmodal = true
+        this.paramtitle = '添加参数'
       },
       addParamValue () {
-        this.paramsUrllist.push(this.newParamsValue)
+        if (this.paramAddOrSaveButtonFlag) {
+          this.paramsUrllist.push(this.newParamsValue)
+        } else {
+          this.paramsUrllist[this.index].paramName = this.newParamsValue.paramName
+          this.paramsUrllist[this.index].paramValue = this.newParamsValue.paramValue
+        }
         this.newParamsValue = {paramName: '', paramValue: ''}
       },
       getCase () {
-        fetch('http://localhost:10000/info', {
+        fetch('http://localhost:80/platform/caselist', {
           method: 'POST',
           body: JSON.stringify({
             name: this.searchStr
@@ -424,7 +686,7 @@
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.apiCaselist = json
+            this.casedata = json
 //            console.log(json[0])
 //            console.log(this.searchStr)
           })
@@ -434,7 +696,6 @@
       }
     }
   }
-
 </script>
 <style lang="less" rel="stylesheet/less">
   .vertical-center-modal {
