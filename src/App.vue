@@ -184,8 +184,21 @@
                 Highcharts
               </router-link>
             </Menu-item>
-          </Menu>
 
+            <Menu-item name="8">
+              <router-link to="/asr">
+                <Icon type="star"></Icon>
+                ASR
+              </router-link>
+            </Menu-item>
+
+            <Menu-item name="9">
+              <router-link to="/tts">
+                <Icon type="gear-b"></Icon>
+                TTS
+              </router-link>
+            </Menu-item>
+          </Menu>
         </i-col>
         <i-col span="20">
           <div class="layout-content-main">
@@ -227,7 +240,9 @@
           '/report': '4',
           '/environment': '5',
           '/nlp': '6',
-          '/highcharts': '7'
+          '/highcharts': '7',
+          '/asr': '8',
+          '/tts': '9'
         }
       }
     }

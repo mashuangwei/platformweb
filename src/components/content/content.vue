@@ -14,7 +14,7 @@
     </Row>
 
     <row>
-      <Table :columns="casetable" :data="casedata" width="1370" height="640" :border="showBorder" :stripe="showStripe"
+      <Table :columns="casetable" :data="casedata" width="1370" height="590" :border="showBorder" :stripe="showStripe"
              :show-header="showHeader" :showIndex="true"></Table>
     </row>
     <br>
@@ -182,6 +182,7 @@
               :lang="'javascript'" :sync="true"></editor>
     </div>
     </Modal>
+
     <!-- 添加步骤url参数model页面 -->
     <Modal
       @on-ok="addParamValue"
@@ -521,7 +522,6 @@
             }
           }
         ],
-        apiCaselist: [],
         casedata: [],
         paramsUrllist: [
           {
@@ -585,12 +585,6 @@
         this.newParamsValue.paramName = this.paramsUrllist[index].paramName
         this.newParamsValue.paramValue = this.paramsUrllist[index].paramValue
       },
-      show (index) {
-        this.$Modal.info({
-          title: '用户信息',
-          content: `用例名称：${this.apiCaselist[index].name}<br>http请求方式：${this.apiCaselist[index].httpType}<br>执行结果：${this.apiCaselist[index].result}`
-        })
-      },
       editCase (index) {
         this.index = index
         this.casemodeltitle = '编辑用例'
@@ -608,9 +602,6 @@
         this.addcasemodal = true
         this.addCaseButtunFlag = true
         this.okButtonText = '添加'
-      },
-      remove (index) {
-        this.apiCaselist.splice(index, 1)
       },
       removeCase (index) {
         this.casedata.splice(index, 1)
@@ -650,7 +641,6 @@
         }
         this.addcase = {name: '', description: '', result: '', apiName: '', cellClassName: {}}
         this.preCaseAddFlag = false
-        this.caseModelWidth = 600
       },
       addStepCancel () {
         this.editAndAddFlag = false
