@@ -14,7 +14,7 @@
     </Row>
 
     <row>
-      <Table :columns="casetable" :data="casedata" width="1370" height="590" :border="showBorder" :stripe="showStripe"
+      <Table :columns="casetable" :data="casedata" width="1370" height="690" :border="showBorder" :stripe="showStripe"
              :show-header="showHeader" :showIndex="true"></Table>
     </row>
     <br>
@@ -716,77 +716,4 @@
     padding-top: 15px;
   }
 
-  .layout {
-    border: 1px solid #d7dde4;
-    background: #f5f7f9;
-  }
-
-  .layout-logo {
-    width: 100px;
-    height: 30px;
-    background: #5b6270;
-    border-radius: 3px;
-    float: left;
-    position: relative;
-    top: 15px;
-    left: 20px;
-  }
-
-  .layout-nav {
-    width: 420px;
-    margin: 0 auto;
-  }
-
-  .layout-assistant {
-    width: 300px;
-    margin: 0 auto;
-    height: inherit;
-  }
-
-  .layout-breadcrumb {
-    padding: 10px 15px 0;
-  }
-
-  .layout-content {
-    height: 710px;
-    min-height: 710px;
-    padding: 1px;
-    overflow: hidden;
-    background: #fff;
-    border-radius: 4px;
-  }
-
-  .layout-content-main {
-    padding: 10px;
-    font-family: "Helvetica Neue";
-    font-size: 16px;
-    color: #3399ff;
-  }
-
-  .layout-copy {
-    text-align: center;
-    padding: 10px 0 20px;
-    color: #9ea7b4;
-    text-align: left;
-  }
-
-  .layout {
-
-    .layout-nav {
-      margin: 0;
-    }
-
-    .ivu-row {
-      height: 100%;
-    }
-
-    .ivu-col-span-4 {
-      height: 100%;
-    }
-
-    .layout-content .ivu-menu {
-      height: 100%;
-    }
-
-  }
 </style>

@@ -1,19 +1,78 @@
-<style scoped>
-  .content {
-    /*自行添加样式即可*/
+<style lang="less" rel="stylesheet/less">
+  .vertical-center-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .ivu-modal {
+      top: 0;
+    }
   }
 
-  #main {
-    height: 400px;
+  .ivu-table .table-info-cell-result-success {
+    /*background-color: #19be6b;*/
+    color: #19be6b;
   }
+
+  .ivu-table .table-info-cell-result-fail {
+    /*background-color: #19be6b;*/
+    color: #ed3f14;
+  }
+
+  .border-bt {
+    border-bottom: 1px solid #e9eaec;
+  }
+
+  .editor-wrap {
+    width: 100%;
+    padding-top: 15px;
+  }
+
+
+  .demo-upload-list{
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    position: relative;
+    box-shadow: 0 1px 1px rgba(0,0,0,.2);
+    margin-right: 4px;
+  }
+  .demo-upload-list img{
+    width: 100%;
+    height: 100%;
+  }
+  .demo-upload-list-cover{
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #5cadff;
+  }
+  .demo-upload-list:hover .demo-upload-list-cover{
+    display: block;
+  }
+  .demo-upload-list-cover i{
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    margin: 0 2px;
+  }
+
 </style>
 <template>
   <div>
     <Row>
       <i-col span="2">
-        <Button type="primary" @click="addPlatformCase" style="margin-bottom:15px;">新增</Button>
+        <Button type="primary" @click="addAsrCase" style="margin-bottom:15px;">新增</Button>
       </i-col>
-      <i-col span="3" offset="15">
+      <i-col span="3" offset="12">
         <Input v-model="searchStr" icon="ios-search-strong" placeholder="请输入..."
                style="width: 200px"></Input>
       </i-col>
@@ -23,7 +82,7 @@
     </Row>
 
     <row>
-      <Table :columns="casetable" :data="casedata" width="1370" height="590" :border="showBorder" :stripe="showStripe"
+      <Table :columns="casetable" :data="casedata" width="1170" height="690" :border="showBorder" :stripe="showStripe"
              :show-header="showHeader" :showIndex="true"></Table>
     </row>
     <br>
@@ -33,18 +92,214 @@
         <Page :total="100" size="small" show-elevator show-sizer show-total placement="top"></Page>
       </i-col>
     </row>
+
+    <!-- case新增页面 -->
+    <Modal
+      @on-ok="addOrSaveCaseEvent"
+      @on-cancel="addCaseCancelEvent"
+      :mask-closable="false"
+      width="780"
+      :title=casemodeltitle
+      :okText=okButtonText
+      v-model="addcasemodal"
+      :styles="{top: '20px'}">
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>用例名称：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.name" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>返回语句：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.ttstext" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>Url：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.url" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>key：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.authkey" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>secret：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.secret" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>deviceId：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.deviceId" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>deviceTypeId：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.deviceTypeId" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>codec：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.codec" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>语言：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.asrlanguage" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>版本：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="addcase.version" placeholder="请输入..." style="width: 420px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="2" offset="0">
+          <div style="line-height: 32px;"><label>Asr文件：</label></div>
+        </i-col>
+        <i-col span="7" offset="1">
+          <div>
+            <!--<Input v-model="addcase.ttstext" placeholder="请输入..." style="width: 420px"></Input>-->
+            <!--<Upload-->
+              <!--multiple-->
+              <!--type="drag"-->
+              <!--:on-success="handleSuccess"-->
+              <!--action="http://localhost:8000/upload/fileUpload">-->
+              <!--<div style="padding: 20px 0">-->
+                <!--<Icon type="ios-cloud-upload" size="42" style="color: #3399ff"></Icon>-->
+                <!--<p>点击或将文件拖拽到这里上传</p>-->
+              <!--</div>-->
+            <!--</Upload>-->
+            <div class="demo-upload-list" v-for="item in uploadList">
+              <template v-if="item.status === 'finished'">
+                <div class="demo-upload-list-cover">
+                  <Icon type="ios-cloud-download" @click.native="handleView(item.name)"></Icon>
+                  <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+                </div>
+              </template>
+              <template v-else>
+                <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
+              </template>
+            </div>
+            <template v-if="uploadList.length > 0">
+              {{uploadList[0].name}}
+            </template>
+            <Upload
+              ref="upload"
+              :show-upload-list="false"
+              v-show="uploadShowFlag"
+              :default-file-list="defaultList"
+              :on-success="handleSuccess"
+              :format="['pcm','pdf','jpg', 'jpeg', 'png']"
+              :max-size="20480"
+              :on-format-error="handleFormatError"
+              :on-exceeded-size="handleMaxSize"
+              :before-upload="handleBeforeUpload"
+              multiple
+              type="drag"
+              action="http://localhost:8000/upload/fileUpload"
+              style="display: inline-block;width:58px;">
+              <div style="width: 58px;height:58px;line-height: 58px;">
+                <Icon type="ios-cloud-upload" size="20"></Icon>
+              </div>
+            </Upload>
+          </div>
+        </i-col>
+      </row>
+      <br>
+    </Modal>
   </div>
 </template>
 <script>
   import $ from 'jquery'
-
   export default {
+    components: {
+      'name': 'asr'
+    },
     data () {
       return {
+        uploadShowFlag: true,
+        fileName: '',
+        visible: false,
+        uploadList: [],
+        defaultList: [],
         showBorder: true,
         showStripe: true,
         showHeader: true,
         fixedHeader: true,
+        addcasemodal: false,
+        okButtonText: '添加',
+        casemodeltitle: '添加用例',
         searchStr: '',
         addcase: {
           name: '',
@@ -55,7 +310,7 @@
           version: '1.0',
           asrlanguage: 'zh',
           url: '',
-          codec: '',
+          codec: 'pcm',
           secret: '',
           createtime: '1.0',
           result: '',
@@ -69,44 +324,32 @@
           },
           {
             title: '用例名称',
-            width: 310,
+            width: 410,
             key: 'name',
             align: 'center'
           },
           {
-            title: '用例描述',
-            width: 230,
-            key: 'description',
-            align: 'center'
-          },
-          {
-            title: '接口名称',
-            width: 150,
-            key: 'apiname',
-            align: 'center'
-          },
-          {
             title: '创建时间',
-            width: 155,
+            width: 160,
             key: 'createtime',
             align: 'center'
           },
           {
             title: '更新时间',
-            width: 155,
+            width: 160,
             key: 'updatetime',
             align: 'center'
           },
           {
             title: '执行结果',
-            width: 120,
+            width: 130,
             key: 'result',
             align: 'center'
           },
           {
             title: '操作',
             key: 'action',
-            width: 220,
+            width: 250,
             align: 'center',
             render: (h, params) => {
               return h('div', [
@@ -120,8 +363,6 @@
                   },
                   on: {
                     click: () => {
-                      this.preCaseAddFlag = true
-                      this.caseModelWidth = 1000
                       this.editCase(params.index)
                     }
                   }
@@ -155,12 +396,16 @@
             }
           }
         ],
-        casedata: [],
-
-
+        casedata: []
       }
     },
     methods: {
+      handleSuccess (res, file, fileList) {
+        this.uploadShowFlag = false
+        console.log(res)
+        console.log(file)
+        console.log(fileList)
+      },
       editCase (index) {
         this.index = index
         this.casemodeltitle = '编辑用例'
@@ -168,12 +413,17 @@
         this.addcasemodal = true
         this.addCaseButtunFlag = false
         this.addcase.name = this.casedata[index].name
-        this.addcase.description = this.casedata[index].description
-        this.addcase.apiname = this.casedata[index].apiname
-        this.addcase.platform = this.casedata[index].platform
+        this.addcase.ttstext = this.casedata[index].ttstext
+        this.addcase.deviceId = this.casedata[index].deviceId
+        this.addcase.deviceTypeId = this.casedata[index].deviceTypeId
+        this.addcase.authkey = this.casedata[index].authkey
+        this.addcase.version = this.casedata[index].version
+        this.addcase.asrlanguage = this.casedata[index].asrlanguage
+        this.addcase.url = this.casedata[index].url
+        this.addcase.codec = this.casedata[index].codec
+        this.addcase.secret = this.casedata[index].secret
       },
-      addPlatformCase () {
-        this.caseModelWidth = 800
+      addAsrCase () {
         this.casemodeltitle = '添加用例'
         this.addcasemodal = true
         this.addCaseButtunFlag = true
@@ -185,19 +435,48 @@
       addOrSaveCaseEvent () {
         if (this.addCaseButtunFlag) {
           this.addcase.createtime = this.getDateTime()
-          this.addcase.updatetime = this.getDateTime()
           this.addcase.cellClassName = {result: 'table-info-cell-result-success'}
           this.casedata.push(this.addcase)
         } else {
           this.casedata[this.index].name = this.addcase.name
-          this.casedata[this.index].description = this.addcase.description
-          this.casedata[this.index].apiname = this.addcase.apiname
-          this.casedata[this.index].updatetime = this.getDateTime()
+          this.casedata[this.index].ttstext = this.addcase.ttstext
+          this.casedata[this.index].deviceId = this.addcase.deviceId
+          this.casedata[this.index].deviceTypeId = this.addcase.deviceTypeId
+          this.casedata[this.index].authkey = this.addcase.authkey
+          this.casedata[this.index].version = this.addcase.version
+          this.casedata[this.index].asrlanguage = this.addcase.asrlanguage
+          this.casedata[this.index].url = this.addcase.url
+          this.casedata[this.index].codec = this.addcase.codec
+          this.casedata[this.index].secret = this.addcase.secret
         }
-        this.addcase = {name: '', description: '', result: '', apiName: '', cellClassName: {}}
+        this.addcase = {name: '', ttstext: '', codec: '', secret: '', deviceId: '', deviceTypeId: '', authkey: '', url: '', version: '', asrlanguage: '', cellClassName: {}}
       },
       addCaseCancelEvent () {
-        this.addcase = {name: '', description: '', result: '', apiName: '', cellClassName: {}}
+        this.addcase = {name: '', ttstext: '', codec: '', secret: '', deviceId: '', deviceTypeId: '', authkey: '', url: '', version: '', asrlanguage: '', cellClassName: {}}
+      },
+      getDateTime () {
+        var date = new Date()
+        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+      },
+      getCase () {
+        fetch('http://localhost:80/platform/caselist', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: this.searchStr
+          }),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.casedata = json
+//            console.log(json[0])
+//            console.log(this.searchStr)
+          })
+        }).catch((e) => {
+          e.toString()
+        })
       },
       drawGraph () {
         $.ajax({
@@ -211,9 +490,47 @@
             console.log(errorMsg)
           }
         })
+      },
+      handleView (name) {
+        this.fileName = name
+        this.visible = true
+      },
+      handleRemove (file) {
+        // 从 upload 实例删除数据
+        this.uploadShowFlag = true
+        const fileList = this.$refs.upload.fileList
+        this.$refs.upload.fileList.splice(fileList.indexOf(file), 1)
+      },
+//      handleSuccess (res, file) {
+//        // 因为上传过程为实例，这里模拟添加 url
+//        file.url = 'https://o5wwk8baw.qnssl.com/7eb99afb9d5f317c912f08b5212fd69a/avatar'
+//        file.name = '7eb99afb9d5f317c912f08b5212fd69a'
+//      },
+      handleFormatError (file) {
+        this.$Notice.warning({
+          title: '文件格式不正确',
+          desc: '文件 ' + file.name + ' 格式不正确，请上传后缀为pcm文件'
+        })
+      },
+      handleMaxSize (file) {
+        this.$Notice.warning({
+          title: '超出文件大小限制',
+          desc: '文件 ' + file.name + ' 太大，不能超过 20M。'
+        })
+      },
+      handleBeforeUpload () {
+        const check = this.uploadList.length < 1
+        if (!check) {
+          this.$Notice.warning({
+            title: '最多只能上传 1 个pcm文件。'
+          })
+        }
+        return check
       }
     },
     mounted () {
+      this.$on('editor-update', this.onEditIntents)
+      this.uploadList = this.$refs.upload.fileList
     }
   }
 </script>

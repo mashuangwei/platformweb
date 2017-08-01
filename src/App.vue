@@ -72,7 +72,7 @@
   }
 
   .layout-content {
-    height: 710px;
+    height: 850px;
     min-height: 710px;
     padding: 1px;
     overflow: hidden;
@@ -156,7 +156,7 @@
             <Menu-item name="3">
               <router-link to="/asr">
                 <Icon type="android-globe"></Icon>
-                性能测试
+                Asr
               </router-link>
             </Menu-item>
             <Menu-item name="4">
@@ -186,13 +186,6 @@
             </Menu-item>
 
             <Menu-item name="8">
-              <router-link to="/asr">
-                <Icon type="star"></Icon>
-                ASR
-              </router-link>
-            </Menu-item>
-
-            <Menu-item name="9">
               <router-link to="/tts">
                 <Icon type="gear-b"></Icon>
                 TTS
@@ -221,14 +214,11 @@
   import ICol from 'iview/src/components/grid/col'
   import Row from 'iview/src/components/grid/row'
   import editor from 'vue2-ace-editor-new'
-  //  import content from './content/content.vue'
   export default {
     components: {
       Row,
       ICol,
       editor
-//      ,
-//      'v-content': content
     },
     name: 'index',
     data () {
@@ -241,8 +231,7 @@
           '/environment': '5',
           '/nlp': '6',
           '/highcharts': '7',
-          '/asr': '8',
-          '/tts': '9'
+          '/tts': '8'
         }
       }
     }
