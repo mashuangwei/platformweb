@@ -8,6 +8,7 @@ import nlp from '@/components/content/nlp.vue'
 import highcharts from '@/components/content/highcharts.vue'
 import asr from '@/components/content/asr.vue'
 import tts from '@/components/content/tts.vue'
+import skill from '@/components/content/skill.vue'
 
 Vue.use(Router)
 
@@ -54,6 +55,11 @@ export default new Router({
       path: '/tts',
       name: 'tts',
       component: tts
+    },
+    {
+      path: '/skill',
+      name: 'skill',
+      component: skill
     }
   ]
 })

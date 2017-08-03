@@ -309,7 +309,7 @@
           authkey: null,
           version: '1.0',
           asrlanguage: 'zh',
-          url: '',
+          url: 'wss://apigwws-dev.open.rokid.com/api',
           codec: 'pcm',
           secret: '',
           createtime: '1.0',

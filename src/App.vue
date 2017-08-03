@@ -12,6 +12,11 @@
     display: block;
     padding: 14px 24px;
   }
+  .ivu-menu li.ivu-menu-item a.db {
+    padding: 0;
+    display: inline-block;
+    color: #fff;
+  }
   .vertical-center-modal {
     display: flex;
     align-items: center;
@@ -119,20 +124,20 @@
     <Menu mode="horizontal" theme="primary" active-name="1">
       <div class="layout-nav">
         <Menu-item name="11">
-          <Icon type="ios-navigate"></Icon>
+          <Icon type="home"></Icon>
           首页
         </Menu-item>
         <Menu-item name="12">
           <Icon type="ios-keypad"></Icon>
-          Rokid
+          <a href="https://ngrinder.rokid-inc.com/login" class="db" target="_Blank">Ngrinder</a>
         </Menu-item>
         <Menu-item name="13">
           <Icon type="ios-analytics"></Icon>
-          系统
+          <a href="http://test-35:11000/jenkins/login?" class="db" target="_Blank">Jekins</a>
         </Menu-item>
         <Menu-item name="14">
           <Icon type="ios-paper"></Icon>
-          维护
+          <a href="https://sonar.rokid-inc.com" class="db" target="_Blank">Sonar</a>
         </Menu-item>
       </div>
     </Menu>
@@ -187,10 +192,18 @@
 
             <Menu-item name="8">
               <router-link to="/tts">
-                <Icon type="gear-b"></Icon>
+                <Icon type="fireball"></Icon>
                 TTS
               </router-link>
             </Menu-item>
+
+            <Menu-item name="9">
+              <router-link to="/skill">
+                <Icon type="flag"></Icon>
+                Skill模板
+              </router-link>
+            </Menu-item>
+
           </Menu>
         </i-col>
         <i-col span="20">
@@ -231,7 +244,8 @@
           '/environment': '5',
           '/nlp': '6',
           '/highcharts': '7',
-          '/tts': '8'
+          '/tts': '8',
+          '/skill': '9'
         }
       }
     }
