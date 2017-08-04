@@ -101,23 +101,33 @@
       </i-col>
     </row>
 
-    <!-- case新增页面 -->
+    <!-- skill新增页面 -->
     <Modal
       @on-ok="addOrSaveEvent"
       @on-cancel="addCancelEvent"
       :mask-closable="false"
-      width="780"
+      width="880"
       :title=skillmodeltitle
       :okText=okButtonText
       v-model="addTemplateModal"
       :styles="{top: '20px'}">
+
       <row>
         <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>模板名称：</label></div>
+          <div style="line-height: 32px;"><label>用户名：</label></div>
         </i-col>
         <i-col span="3" offset="1">
           <div>
-            <Input v-model="skilltemplate.templatename" placeholder="请输入..." style="width: 420px"></Input>
+            <Input v-model="skilltemplate.username" placeholder="请输入..." style="width: 220px"></Input>
+          </div>
+        </i-col>
+
+        <i-col span="2" offset="6">
+          <div style="line-height: 32px;"><label>密 码：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="skilltemplate.password" placeholder="请输入..." style="width: 220px"></Input>
           </div>
         </i-col>
       </row>
@@ -125,35 +135,20 @@
 
       <row>
         <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>skill名称：</label></div>
+          <div style="line-height: 32px;"><label>技能名称：</label></div>
         </i-col>
         <i-col span="3" offset="1">
           <div>
-            <Input v-model="skilltemplate.skillname" placeholder="请输入..." style="width: 420px"></Input>
+            <Input v-model="skilltemplate.skillname" placeholder="请输入..." style="width: 220px"></Input>
           </div>
         </i-col>
-      </row>
-      <br>
 
-      <row>
-        <i-col span="2" offset="0">
+        <i-col span="2" offset="6">
           <div style="line-height: 32px;"><label>激活词：</label></div>
         </i-col>
         <i-col span="3" offset="1">
           <div>
-            <Input v-model="skilltemplate.activeWords" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
-
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>slot：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="skilltemplate.slot" placeholder="请输入..." style="width: 420px"></Input>
+            <Input v-model="skilltemplate.activeWords" placeholder="请输入..." style="width: 220px"></Input>
           </div>
         </i-col>
       </row>
@@ -164,8 +159,17 @@
           <div style="line-height: 32px;"><label>技能属性：</label></div>
         </i-col>
         <i-col span="3" offset="1">
-          <Select v-model="skilltemplate.appProperty" style="width:200px" @on-change="selectAppProerty">
+          <Select v-model="skilltemplate.appProperty" style="width:220px" @on-change="selectAppProerty">
             <Option v-for="item in appPropertyList" :value="item.value" :key="item"></Option>
+          </Select>
+        </i-col>
+
+        <i-col span="2" offset="6">
+          <div style="line-height: 32px;"><label>技能类型：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <Select v-model="skilltemplate.type" style="width:220px" @on-change="selectType">
+            <Option v-for="item in typeList" :value="item.value" :key="item"></Option>
           </Select>
         </i-col>
       </row>
@@ -176,7 +180,7 @@
           <div style="line-height: 32px;"><label>作用域：</label></div>
         </i-col>
         <i-col span="3" offset="1">
-          <Select v-model="skilltemplate.appScope" style="width:200px" @on-change="selectAppScope">
+          <Select v-model="skilltemplate.appScope" style="width:220px" @on-change="selectAppScope">
             <Option v-for="item in appScopeList" :value="item.value" :key="item"></Option>
           </Select>
         </i-col>
@@ -185,12 +189,18 @@
 
       <row>
         <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>技能类型：</label></div>
+          <div style="line-height: 32px;"><label>slot：</label></div>
         </i-col>
         <i-col span="3" offset="1">
-          <Select v-model="skilltemplate.type" style="width:200px" @on-change="selectType">
-            <Option v-for="item in typeList" :value="item.value" :key="item"></Option>
+          <Select v-model="skilltemplate.slot" style="width:220px" @on-change="selectAppSlot">
+            <Option v-for="item in appSlotList" :value="item.name" :key="item"></Option>
           </Select>
+        </i-col>
+        <i-col span="2" offset="4">
+          <Button type="primary" icon="plus-circled">添加</Button>
+        </i-col>
+        <i-col span="2" offset="1">
+          <Button type="primary" icon="edit">编辑</Button>
         </i-col>
       </row>
       <br>
@@ -199,14 +209,14 @@
         <i-col span="2" offset="0">
           <div style="line-height: 32px;"><label>后端服务：</label></div>
         </i-col>
-        <i-col span="17" offset="1">
+        <i-col span="19" offset="1">
           <Radio-group v-model="serviceType" @on-change="selectService">
             <Radio label="JsEngine">
-              <Icon type="leaf"></Icon>
+              <!--<Icon type="leaf"></Icon>-->
               <span>JsEngine</span>
             </Radio>
             <Radio label="Https">
-              <Icon type="earth"></Icon>
+              <!--<Icon type="earth"></Icon>-->
               <span>Https</span>
             </Radio>
           </Radio-group>
@@ -226,7 +236,7 @@
         <i-col span="2" offset="0">
           <div style="line-height: 32px;"><label>intents：</label></div>
         </i-col>
-        <i-col span="17" offset="1">
+        <i-col span="19" offset="1">
           <div v-show="true" style="padding-top:8px">
             <editor id="j_intentEditor" :content="skilltemplate.intents" :height="'150px'" :width="'100%'"
                     :lang="'javascript'" :sync="true"></editor>
@@ -245,6 +255,7 @@
   import editor from 'vue2-ace-editor-new'
   import 'brace/mode/javascript'
   import 'brace/theme/chrome'
+
   export default {
     components: {
       Row,
@@ -299,9 +310,12 @@
         skilldatalist: [],
         appScopeList: [{value: '云端'}, {value: '本地'}],
         appPropertyList: [{value: '公有'}, {value: '私有'}],
+        appSlotList: [{value: '歌曲', name: '音乐'}, {value: '电视节目', name: '电影'}],
         typeList: [{value: '自定义技能'}, {value: '预定义技能'}, {value: '核心技能'}],
         skilltemplate: {
-          templatename: '',
+          username: '',
+          password: '',
+          appId: '',
           activeWords: '',
           skillname: '',
           type: '自定义技能',
@@ -331,15 +345,15 @@
             align: 'center'
           },
           {
-            title: '模板名称',
-            width: 410,
-            key: 'templatename',
+            title: '技能名称',
+            width: 350,
+            key: 'skillname',
             align: 'center'
           },
           {
-            title: '技能名称',
-            width: 230,
-            key: 'skillname',
+            title: 'AppId',
+            width: 290,
+            key: 'appId',
             align: 'center'
           },
           {
@@ -416,6 +430,7 @@
           this.appScopeShow = false
         }
       },
+      selectAppSlot () {},
       editTemplate (index) {
         this.index = index
         this.skillmodeltitle = '编辑SKILL模板'
@@ -484,7 +499,7 @@
 //          })
 //        }
         this.skilltemplate = {
-          templatename: '',
+          appId: '',
           activeWords: '',
           skillname: '',
           backServiceType: 'https',
@@ -544,7 +559,7 @@
       },
       addCancelEvent () {
         this.skilltemplate = {
-          templatename: '',
+          appId: '',
           activeWords: '',
           skillname: '',
           backServiceType: 'https',
