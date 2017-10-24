@@ -85,8 +85,8 @@
     </Row>
 
     <row>
-      <Table :loading="loading" :columns="casetable" :data="casedata" width="1370" height="690" :border="showBorder" :stripe="showStripe"
-             :show-header="showHeader" :showIndex="true"></Table>
+      <Table  :columns="casetable" :data="casedata" width="1370" height="690" :border="showBorder" :stripe="showStripe"
+              :loading="loading" :show-header="showHeader" :showIndex="true"></Table>
     </row>
     <br>
     <!-- 分页 -->
@@ -250,6 +250,7 @@
     },
     data () {
       return {
+        loading: false,
         fileName: '',
         voiceFlag: false,
         index: 0,
@@ -439,7 +440,7 @@
         this.okButtonText = '添加'
       },
       removeCase (index) {
-        fetch('http://localhost:8000/tts/delete/' + this.casedata[index].id, {
+        fetch('http://localhost:8000/speech/delete/' + this.casedata[index].id, {
           method: 'DELETE',
           headers: {
             'Accept': 'application/json',
@@ -456,7 +457,7 @@
       },
       addOrSaveCaseEvent () {
         if (this.addCaseButtunFlag === false) {
-          fetch('http://localhost:8000/tts/update/' + this.casedata[this.index].id, {
+          fetch('http://localhost:8000/speech/update/' + this.casedata[this.index].id, {
             method: 'PUT',
             body: JSON.stringify(this.addcase),
             headers: {
@@ -471,7 +472,7 @@
             e.toString()
           })
         } else {
-          fetch('http://localhost:8000/tts/add', {
+          fetch('http://localhost:8000/speech/add', {
             method: 'POST',
             body: JSON.stringify(this.addcase),
             headers: {
@@ -502,7 +503,8 @@
         }
       },
       getAllCase () {
-        fetch('http://localhost:8000/tts/getAllTts', {
+        this.loading = true
+        fetch('http://localhost:8000/speech/getAllSpeech', {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -516,6 +518,7 @@
               this.casedata[i].createTime = this.formatTime(this.casedata[i].createTime)
               this.casedata[i].updateTime = this.formatTime(this.casedata[i].updateTime)
             }
+            this.loading = false
           })
         }).catch((e) => {
           e.toString()
@@ -565,7 +568,7 @@
         return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
       },
       searchCase () {
-        fetch('http://localhost:8000/tts/search?' + 'condition=' + this.condition, {
+        fetch('http://localhost:8000/speech/search?' + 'condition=' + this.condition, {
           method: 'GET'
         }).then((res) => {
           res.json().then((json) => {
@@ -580,8 +583,8 @@
       },
       executeCase (index) {
         this.$set(this.casedata[index], 'result', 'testing')
-        fetch('http://localhost:8000/tts/send/' + this.casedata[index].id, {
-          method: 'PUT',
+        fetch('http://localhost:8000/speech/sendVoice/' + this.casedata[index].id, {
+          method: 'POST',
           headers: {
             'Accept': 'application/json'
           }

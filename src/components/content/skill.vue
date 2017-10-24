@@ -103,7 +103,7 @@
 
     <!-- skill新增页面 -->
     <Modal
-      @on-ok="addOrSaveEvent"
+      @on-ok="addOrSaveSkill"
       @on-cancel="addCancelEvent"
       :mask-closable="false"
       width="880"
@@ -159,7 +159,7 @@
           <div style="line-height: 32px;"><label>技能属性：</label></div>
         </i-col>
         <i-col span="3" offset="1">
-          <Select v-model="skilltemplate.appProperty" style="width:220px" @on-change="selectAppProerty">
+          <Select v-model="appProperty" style="width:220px" @on-change="selectAppProerty">
             <Option v-for="item in appPropertyList" :value="item.value" :key="item"></Option>
           </Select>
         </i-col>
@@ -168,7 +168,7 @@
           <div style="line-height: 32px;"><label>技能类型：</label></div>
         </i-col>
         <i-col span="3" offset="1">
-          <Select v-model="skilltemplate.type" style="width:220px" @on-change="selectType">
+          <Select v-model="skilltype" style="width:220px" @on-change="selectType">
             <Option v-for="item in typeList" :value="item.value" :key="item"></Option>
           </Select>
         </i-col>
@@ -180,7 +180,7 @@
           <div style="line-height: 32px;"><label>作用域：</label></div>
         </i-col>
         <i-col span="3" offset="1">
-          <Select v-model="skilltemplate.appScope" style="width:220px" @on-change="selectAppScope">
+          <Select v-model="appScope" style="width:220px" @on-change="selectAppScope">
             <Option v-for="item in appScopeList" :value="item.value" :key="item"></Option>
           </Select>
         </i-col>
@@ -189,19 +189,33 @@
 
       <row>
         <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>slot：</label></div>
+          <div style="line-height: 32px;"><label>SlotName：</label></div>
         </i-col>
         <i-col span="3" offset="1">
-          <Select v-model="skilltemplate.slot" style="width:220px" @on-change="selectAppSlot">
-            <Option v-for="item in appSlotList" :value="item.name" :key="item"></Option>
-          </Select>
+          <div>
+            <Input v-model="skilltemplate.slotName" placeholder="词条名称..." style="width: 220px"></Input>
+          </div>
         </i-col>
-        <i-col span="2" offset="4">
-          <Button type="primary" icon="plus-circled">添加</Button>
+
+        <i-col span="2" offset="6">
+          <div style="line-height: 32px;"><label>SlotValue：</label></div>
         </i-col>
-        <i-col span="2" offset="1">
-          <Button type="primary" icon="edit">编辑</Button>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="slotValue" placeholder="词条内容，以逗号分隔，比如1,2" style="width: 220px"></Input>
+          </div>
         </i-col>
+        <!--<i-col span="3" offset="1">-->
+          <!--<Select v-model="skilltemplate.slotName" style="width:220px" @on-change="selectAppSlot">-->
+            <!--<Option v-for="item in appSlotList" :value="item.name" :key="item"></Option>-->
+          <!--</Select>-->
+        <!--</i-col>-->
+        <!--<i-col span="2" offset="4">-->
+          <!--<Button type="primary" icon="plus-circled">添加</Button>-->
+        <!--</i-col>-->
+        <!--<i-col span="2" offset="1">-->
+          <!--<Button type="primary" icon="edit">编辑</Button>-->
+        <!--</i-col>-->
       </row>
       <br>
 
@@ -293,6 +307,12 @@
         ].join('\n'),
         jsOrHttps: true,
         serviceType: 'Https',
+        ttsd: '{' +
+        '\t"context": {' +
+        '\t\t"application": {' +
+        '\t\t\t"applicationId": "RF11C1A62E0E4E3FAD79300DB12484A7"' +
+        '\t\t},' +
+        '\t\t"devic',
         fileName: '',
         voiceFlag: false,
         index: 0,
@@ -312,17 +332,21 @@
         appPropertyList: [{value: '公有'}, {value: '私有'}],
         appSlotList: [{value: '歌曲', name: '音乐'}, {value: '电视节目', name: '电影'}],
         typeList: [{value: '自定义技能'}, {value: '预定义技能'}, {value: '核心技能'}],
+        skilltype: 0,
+        appScope: 0,
+        appProperty: 0,
+        slotValue: '',
         skilltemplate: {
           username: '',
           password: '',
           appId: '',
           activeWords: '',
           skillname: '',
-          type: '自定义技能',
-          appScope: '本地',
-          appProperty: '公有',
-          backServiceType: 'https',
-          backService: 'wss://apigwws-dev.open.rokid.com/api',
+          type: '',
+          appScope: '',
+          appProperty: '',
+          backServiceType: '',
+          backService: '',
           intents: '{\n' +
           '\t"intents": [\n' +
           '\t\t{\n' +
@@ -333,7 +357,8 @@
           '\t\t}\n' +
           '\t]\n' +
           '}',
-          slot: '',
+          slotName: '',
+          slotValue: [],
           domainId: '',
           createTime: '',
           updateTime: ''
@@ -413,21 +438,39 @@
       handleSuccess (res, file, fileList) {
         this.uploadShowFlag = false
       },
-      selectAppScope () {},
-      selectType () {},
+      selectAppScope () {
+        if (this.appScope === '云端') {
+          this.skilltemplate.appScope = 0
+        } else {
+          this.skilltemplate.appScope = 1
+        }
+      },
+      selectType () {
+        if (this.skilltype === '自定义技能') {
+          this.skilltemplate.type = 0
+        } else if (this.skilltype === '预定义技能') {
+          this.skilltemplate.type = 1
+        } else {
+          this.skilltemplate.type = 2
+        }
+      },
       selectService () {
         if (this.serviceType === 'Https') {
           this.jsOrHttps = true
+          this.skilltemplate.backServiceType = 0
         } else {
           this.jsOrHttps = false
+          this.skilltemplate.backServiceType = 1
         }
         console.log(this.editorInitJson)
       },
       selectAppProerty () {
-        if (this.skilltemplate.appProperty === '私有') {
+        if (this.appProperty === '私有') {
           this.appScopeShow = true
+          this.skilltemplate.appProperty = 1
         } else {
           this.appScopeShow = false
+          this.skilltemplate.appProperty = 0
         }
       },
       selectAppSlot () {},
@@ -464,8 +507,10 @@
 //        })
         this.skilldatalist.splice(index, 1)
       },
-      addOrSaveEvent () {
+      addOrSaveSkill () {
         this.skilldatalist.push(this.skilltemplate)
+        this.skilltemplate.slotValue = this.slotValue.split(',')
+        console.log(this.skilltemplate.slotValue)
 //        if (this.addTemplateButtunFlag === false) {
 //          fetch('http://localhost:8000/tts/update/' + this.skilldatalist[this.index].id, {
 //            method: 'PUT',
@@ -500,15 +545,18 @@
 //        }
         this.skilltemplate = {
           appId: '',
+          username: '',
+          password: '',
           activeWords: '',
           skillname: '',
-          backServiceType: 'https',
-          type: '预定义',
-          appScope: '本地',
-          appProperty: '公有',
-          backService: 'wss://apigwws-dev.open.rokid.com/api',
-          intents: 'intent',
-          slot: '',
+          backServiceType: '0',
+          type: '0',
+          appScope: '0',
+          appProperty: '0',
+          backService: '',
+          intents: '',
+          slotName: '',
+          slotValue: '',
           createTime: '',
           updateTime: ''
         }
@@ -563,12 +611,13 @@
           activeWords: '',
           skillname: '',
           backServiceType: 'https',
-          type: '预定义',
-          appScope: '本地',
-          appProperty: '公有',
-          backService: 'wss://apigwws-dev.open.rokid.com/api',
-          intents: 'intent',
-          slot: '',
+          type: '0',
+          appScope: '0',
+          appProperty: '0',
+          backService: '',
+          intents: '',
+          slotName: '',
+          slotValue: '',
           createTime: '',
           updateTime: ''
         }

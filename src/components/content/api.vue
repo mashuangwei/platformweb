@@ -14,7 +14,8 @@
     </Row>
 
     <row>
-      <Table :columns="casetable" :data="casedata" width="1370" height="690" :border="showBorder" :stripe="showStripe"
+      <Table :loading="loading" :columns="casetable" :data="casedata" width="1370" height="690" :border="showBorder"
+             :stripe="showStripe"
              :show-header="showHeader" :showIndex="true"></Table>
     </row>
     <br>
@@ -95,92 +96,97 @@
 
     <!-- 步骤列表页面表格 -->
     <Modal
-    @on-ok="addStep"
-    @on-cancel="addStepCancel"
-    :mask-closable="false"
-    width="800"
-    :title=titlesteps
-    :okText=stepokButtonText
-    v-model="addStepModel"
-    :styles="{top: '20px'}">
-    <row>
-      <i-col span="4" offset="1">
-        <div style="line-height: 32px;"><label>步骤名称：</label></div>
-      </i-col>
-      <i-col span="3" offset="1">
-        <div>
-          <Input v-model="caseStep.name" placeholder="请输入..." style="width: 200px"></Input>
-        </div>
-      </i-col>
-    </row>
-    <br>
-    <row>
-      <i-col span="4" offset="1">
-        <div style="line-height: 32px;"><label>http请求方式：</label></div>
-      </i-col>
-      <i-col span="3" offset="1">
-        <Select v-model="caseStep.httpType" style="width:200px" @on-change="selectEvent">
-          <Option v-for="item in httpTypeList" :value="item.value" :key="item"></Option>
-        </Select>
-      </i-col>
-    </row>
-    <br/>
-    <row>
-      <i-col span="4" offset="1">
-        <div style="line-height: 32px;"><label>平台：</label></div>
-      </i-col>
-      <i-col span="3" offset="1">
-        <Select v-model="caseStep.platform" style="width:200px" @on-change="selectPlatform">
-          <Option v-for="item in platformlist" :value="item.value" :key="item"></Option>
-        </Select>
-      </i-col>
-    </row>
-    <br/>
-    <row>
-      <i-col span="4" offset="1">
-        <div style="line-height: 32px;"><label>接口名称：</label></div>
-      </i-col>
-      <i-col span="3" offset="1">
-        <div>
-          <Input v-model="caseStep.apiname" placeholder="请输入..." style="width: 200px"></Input>
-        </div>
-      </i-col>
-    </row>
+      @on-ok="addStep"
+      @on-cancel="addStepCancel"
+      :mask-closable="false"
+      width="800"
+      :title=titlesteps
+      :okText=stepokButtonText
+      v-model="addStepModel"
+      :styles="{top: '20px'}">
+      <row>
+        <i-col span="4" offset="1">
+          <div style="line-height: 32px;"><label>步骤名称：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="caseStep.name" placeholder="请输入..." style="width: 200px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+      <row>
+        <i-col span="4" offset="1">
+          <div style="line-height: 32px;"><label>http请求方式：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <Select v-model="caseStep.httpType" style="width:200px" @on-change="selectEvent">
+            <Option v-for="item in httpTypeList" :value="item.value" :key="item"></Option>
+          </Select>
+        </i-col>
+      </row>
+      <br/>
+      <row>
+        <i-col span="4" offset="1">
+          <div style="line-height: 32px;"><label>平台：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <Select v-model="caseStep.platform" style="width:200px" @on-change="selectPlatform">
+            <Option v-for="item in platformlist" :value="item.value" :key="item"></Option>
+          </Select>
+        </i-col>
+      </row>
+      <br/>
+      <row>
+        <i-col span="4" offset="1">
+          <div style="line-height: 32px;"><label>接口名称：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="caseStep.apiname" placeholder="请输入..." style="width: 200px"></Input>
+          </div>
+        </i-col>
+      </row>
 
-    <div class="border-bt editor-wrap">
-    </div>
+      <div class="border-bt editor-wrap">
+      </div>
 
-    <row>
-      <i-col span="3">
-        <div
-          style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
-          <label>Param参数</label>
-        </div>
-      </i-col>
-      <i-col span="2" offset="19">
-        <div>
-          <Button type="primary" @click="addParamModel" style="margin-bottom:6px; margin-top: 10px">
-            新增
-          </Button>
-        </div>
-      </i-col>
-    </row>
-    <row>
-      <Table border :columns="paramsUrl" :data="paramsUrllist"></Table>
-    </row>
+      <row>
+        <i-col span="3">
+          <div
+            style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
+            <label>Param参数</label>
+          </div>
+        </i-col>
+        <i-col span="2" offset="19">
+          <div>
+            <Button type="primary" @click="addParamModel" style="margin-bottom:6px; margin-top: 10px">
+              新增
+            </Button>
+          </div>
+        </i-col>
+      </row>
+      <row>
+        <Table border :columns="paramsUrl" :data="paramsUrllist"></Table>
+      </row>
 
-    <div class="border-bt editor-wrap" v-show="editJsonComponentShow">
-    </div>
-
-
-    <div v-show="editJsonComponentShow"
-         style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
-      <label>Json参数</label>
-    </div>
-    <div v-show="editJsonComponentShow">
-      <editor id="j_intentEditor" :content="editorInitJson" :height="'150px'" :width="'100%'"
-              :lang="'javascript'" :sync="true"></editor>
-    </div>
+      <row>
+        <i-col span="3">
+          <div
+            style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
+            <label>期望结果</label>
+          </div>
+        </i-col>
+      </row>
+      <br>
+      <Monaco
+        language="json"
+        :code="codeContent"
+        theme="vs"
+        @mounted="onMounted"
+        @codeChange="onCodeChange"
+      >
+      </Monaco>
     </Modal>
 
     <!-- 添加步骤url参数model页面 -->
@@ -224,17 +230,20 @@
   import editor from 'vue2-ace-editor-new'
   import 'brace/mode/javascript'
   import 'brace/theme/chrome'
+  import Monaco from 'monaco-editor-forvue'
 
   export default {
     components: {
       Row,
       ICol,
       editor,
+      Monaco,
       'name': 'content'
     },
     name: 'home',
     data () {
       return {
+        loading: false,
         editJsonComponentShow: false,
         index: 0,
         editorInitJson: JSON.stringify({'a': 1, 'b': 2}, null, '\t'),
@@ -532,28 +541,33 @@
             'paramName': 'domainid',
             'paramValue': '333333'
           }
-        ]
+        ],
+        codeContent: '{}'
       }
     },
+
     mounted () {
-//      var vm = this
-//      vm.$parent.$emit('editor-update', editor.getValue(), vm)
       this.$on('editor-update', this.onEditIntents)
     },
     created () {
       this.getCase()
     },
     methods: {
-      onEditIntents (content, vm) {
-        // intent 编辑器
-        if (vm.$el.id === 'j_intentEditor') {
-          this.editorJson = content
-        }
+
+      onMounted (editor) {
+        this.editor = editor
+      },
+      onCodeChange (editor) {
+        this.codeContent = this.editor.getValue()
       },
       addSteps () {
         this.titlesteps = '新增步骤'
         this.stepokButtonText = '添加'
         this.addStepModel = true
+        this.editor.layout({
+          width: 770,
+          height: 200
+        })
       },
       selectEvent () {
         if (this.caseStep.httpType === 'get' || this.caseStep.httpType === 'delete') {
@@ -665,7 +679,8 @@
         this.newParamsValue = {paramName: '', paramValue: ''}
       },
       getCase () {
-        fetch('http://localhost:80/platform/caselist', {
+//        this.loading = true
+        fetch('http://localhost:8000/platform/caselist', {
           method: 'POST',
           body: JSON.stringify({
             name: this.searchStr
@@ -680,6 +695,7 @@
 //            console.log(json[0])
 //            console.log(this.searchStr)
           })
+          this.loading = false
         }).catch((e) => {
           e.toString()
         })

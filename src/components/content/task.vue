@@ -73,19 +73,24 @@
   <div>
     <Row>
       <i-col span="2">
-        <Button type="primary" @click="addAsrCase" style="margin-bottom:15px;">新增</Button>
+        <Select v-model="SelectProjectModel" style="width:150px">
+          <Option v-for="item in projectList" :value="item.value" :key="item.value"></Option>
+        </Select>
       </i-col>
-      <i-col span="3" offset="12">
+      <i-col span="2" offset="1">
+        <Button type="primary" @click="addTaskData" style="margin-bottom:15px;">新增</Button>
+      </i-col>
+      <i-col span="3" offset="10">
         <Input v-model="condition" icon="ios-search-strong" placeholder="请输入..."
                style="width: 200px"></Input>
       </i-col>
-      <i-col span="1" offset="2">
-        <Button type="primary" icon="ios-search" @click="searchCase">搜索</Button>
+      <i-col span="1" offset="1">
+        <Button type="primary" icon="ios-search" @click="searchTask">搜索</Button>
       </i-col>
     </Row>
 
     <row>
-      <Table :loading="loading" :columns="casetable" :data="casedata" width="1370" height="690" :border="showBorder" :stripe="showStripe"
+      <Table :loading="loading" :columns="tasktable" :data="taskTableData" width="1370" height="690" :border="showBorder" :stripe="showStripe"
              :show-header="showHeader" :showIndex="true"></Table>
     </row>
     <br>
@@ -96,197 +101,127 @@
       </i-col>
     </row>
 
-    <!-- case新增页面 -->
+    <!-- task新增页面 -->
     <Modal
-      @on-ok="addOrSaveCaseEvent"
-      @on-cancel="addCaseCancelEvent"
+      @on-ok="addOrSaveTask"
+      @on-cancel="addTaskCancelEvent"
       :mask-closable="false"
       width="780"
-      :title=casemodeltitle
+      :title=taskmodeltitle
       :okText=okButtonText
-      v-model="addcasemodal"
+      v-model="addtaskmodal"
       :styles="{top: '20px'}">
       <row>
         <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>用例名称：</label></div>
+          <div style="line-height: 32px;"><label>task名称：</label></div>
         </i-col>
         <i-col span="3" offset="1">
           <div>
-            <Input v-model="addcase.name" placeholder="请输入..." style="width: 420px"></Input>
+            <Input v-model="addTask.name" placeholder="请输入..." style="width: 420px"></Input>
           </div>
         </i-col>
       </row>
       <br>
 
       <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>返回语句：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.ttstext" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
+        <Tag  color="blue">测试模块选择</Tag>
       </row>
       <br>
 
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>Url：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.serverUrl" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
+      <Transfer
+        :titles="transerTitles"
+        :data="projectData"
+        :target-keys="targetKeys3"
+        :list-style="listStyle"
+        :render-format="render3"
+        :operations="['向左移动','向右移动']"
+        filterable
+        @on-change="handleChange3">
+        <div :style="{float: 'right', margin: '5px'}">
+          <Button type="ghost" size="small" @click="reloadMockData">刷新</Button>
+        </div>
+      </Transfer>
 
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>key：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.authkey" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
 
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>secret：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.secret" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
-
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>deviceId：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.deviceid" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
-
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>deviceTypeId：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.devicetypeid" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
-
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>codec：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.codec" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
-
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>语言：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.declaimer" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
-
-      <row>
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>版本：</label></div>
-        </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="addcase.version" placeholder="请输入..." style="width: 420px"></Input>
-          </div>
-        </i-col>
-      </row>
-      <br>
-
-      <row v-show="voiceFlag">
-        <i-col span="2" offset="0">
-          <div style="line-height: 32px;"><label>语音文件：</label></div>
-        </i-col>
-        <i-col span="7" offset="1">
-          <div>
-            <!--<Input v-model="addcase.ttstext" placeholder="请输入..." style="width: 420px"></Input>-->
-
-          </div>
-        </i-col>
-      </row>
-      <br>
     </Modal>
   </div>
 </template>
 <script>
   import $ from 'jquery'
+  import ICol from '../../../node_modules/iview/src/components/grid/col.vue'
+  import Row from '../../../node_modules/iview/src/components/grid/row.vue'
 
   export default {
     components: {
+      Row,
+      ICol,
       'name': 'asr'
     },
     data () {
       return {
+        projectData: this.getMockData(),
+        targetKeys3: this.getTargetKeys(),
+        listStyle: {
+          width: '250px',
+          height: '300px'
+        },
+        transerTitles: ['模块', '测试模块'],
+        projectList: [
+          {
+            value: 'nlp',
+            label: 'nlp'
+          },
+          {
+            value: 'speech',
+            label: 'speech'
+          },
+          {
+            value: 'asr',
+            label: 'asr'
+          },
+          {
+            value: 'tts',
+            label: 'tts'
+          },
+          {
+            value: 'api',
+            label: 'api'
+          },
+          {
+            value: 'ui',
+            label: 'ui'
+          }
+        ],
+        SelectProjectModel: 'nlp',
         fileName: '',
         voiceFlag: false,
         index: 0,
+        loading: false,
         visible: false,
         showBorder: true,
         showStripe: true,
         showHeader: true,
         fixedHeader: true,
-        addcasemodal: false,
+        addtaskmodal: false,
         okButtonText: '添加',
-        casemodeltitle: '添加用例',
-        addCaseButtunFlag: true,
+        taskmodeltitle: '添加Task',
+        addTaskButtunFlag: true,
         condition: '',
-        addcase: {
+        addTask: {
           name: '',
-          ttstext: '',
-          deviceid: '',
-          devicetypeid: '',
-          authkey: '',
-          version: '1.0',
-          declaimer: 'zh',
-          serverUrl: 'wss://apigwws-dev.open.rokid.com/api',
-          codec: 'pcm',
-          secret: '',
-          createTime: '',
-          updateTime: '',
-          result: '',
+          module: null,
+          createTime: null,
+          updateTime: null,
           cellClassName: {}
         },
-        casetable: [
+        tasktable: [
           {
             type: 'selection',
             width: 60,
             align: 'center'
           },
           {
-            title: '用例名称',
+            title: 'task名称',
             width: 410,
             key: 'name',
             align: 'center'
@@ -321,7 +256,7 @@
             }
           },
           {
-            title: 'PCM文件',
+            title: '测试详情',
             width: 185,
             key: 'fileurl',
             align: 'center',
@@ -338,10 +273,10 @@
                   },
                   on: {
                     click: () => {
-//                      this.editCase(params.index)
+//                      this.editTask(params.index)
                     }
                   }
-                }, '下载'),
+                }, '查看'),
                 h('Button', {
                   props: {
                     type: 'primary',
@@ -352,10 +287,10 @@
                   },
                   on: {
                     click: () => {
-//                      this.executeCase(params.index)
+//                      this.executeTask(params.index)
                     }
                   }
-                }, '删除')
+                }, '历史记录')
               ])
             }
           },
@@ -376,7 +311,7 @@
                   },
                   on: {
                     click: () => {
-                      this.editCase(params.index)
+                      this.editTask(params.index)
                     }
                   }
                 }, '编辑'),
@@ -387,7 +322,7 @@
                   },
                   on: {
                     click: () => {
-                      this.removeCase(params.index)
+                      this.removeTask(params.index)
                     }
                   }
                 }, '删除'),
@@ -401,7 +336,7 @@
                   },
                   on: {
                     click: () => {
-                      this.executeCase(params.index)
+                      this.executeTask(params.index)
                     }
                   }
                 }, '执行')
@@ -409,11 +344,11 @@
             }
           }
         ],
-        casedata: []
+        taskTableData: []
       }
     },
     created () {
-      this.getAllCase()
+      this.getTaskList()
     },
     methods: {
       handleSuccess (res, file, fileList) {
@@ -422,24 +357,24 @@
         console.log(file)
         console.log(fileList)
       },
-      editCase (index) {
+      editTask (index) {
         this.index = index
-        this.casemodeltitle = '编辑用例'
+        this.taskmodeltitle = '编辑Task'
         this.okButtonText = '保存'
-        this.addcasemodal = true
-        this.addCaseButtunFlag = false
-        this.addcase = Object.assign({}, this.addcase, this.casedata[index])
-        this.addcase.createTime = null
-        this.addcase.updateTime = null
+        this.addtaskmodal = true
+        this.addTaskButtunFlag = false
+        this.addTask = Object.assign({}, this.addTask, this.taskTableData[index])
+        this.addTask.createTime = null
+        this.addTask.updateTime = null
       },
-      addAsrCase () {
-        this.casemodeltitle = '添加用例'
-        this.addcasemodal = true
-        this.addCaseButtunFlag = true
+      addTaskData () {
+        this.taskmodeltitle = '添加Task'
+        this.addtaskmodal = true
+        this.addTaskButtunFlag = true
         this.okButtonText = '添加'
       },
-      removeCase (index) {
-        fetch('http://localhost:8000/tts/delete/' + this.casedata[index].id, {
+      removeTask (index) {
+        fetch('http://localhost:8000/tts/delete/' + this.taskTableData[index].id, {
           method: 'DELETE',
           headers: {
             'Accept': 'application/json',
@@ -448,60 +383,69 @@
         }).then((res) => {
           res.json().then((json) => {
             console.log(json)
-            this.getAllCase()
+            this.getAllTask()
           })
         }).catch((e) => {
           e.toString()
         })
       },
-      addOrSaveCaseEvent () {
-        if (this.addCaseButtunFlag === false) {
-          fetch('http://localhost:8000/tts/update/' + this.casedata[this.index].id, {
-            method: 'PUT',
-            body: JSON.stringify(this.addcase),
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
-          }).then((res) => {
-            res.json().then((json) => {
-              this.getAllCase()
-            })
-          }).catch((e) => {
-            e.toString()
-          })
-        } else {
-          fetch('http://localhost:8000/tts/add', {
-            method: 'POST',
-            body: JSON.stringify(this.addcase),
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
-          }).then((res) => {
-            res.json().then((json) => {
-              console.log(json)
-              this.getAllCase()
-            })
-          }).catch((e) => {
-            e.toString()
-          })
-        }
-        this.addcase = {
+      getAllTask () {
+        this.taskTableData.push(this.addTask)
+        this.addTask = {
           name: '',
-          ttstext: '',
-          codec: 'pcm',
-          secret: '',
-          deviceid: '',
-          devicetypeid: '',
-          authkey: '',
-          serverUrl: 'wss://apigwws-dev.open.rokid.com/api',
-          version: '1.0',
-          declaimer: 'zh',
+          module: null,
+          createTime: null,
+          updateTime: null,
           cellClassName: {}
         }
       },
-      getAllCase () {
+      addOrSaveTask () {
+        if (this.addTaskButtunFlag === false) {
+          this.$set(this.taskTableData[this.index], this.addTask)
+          this.taskTableData[this.index] = this.addTask
+//          console.log(this.taskTableData[this.index])
+//          fetch('http://localhost:8000/tts/update/' + this.taskTableData[this.index].id, {
+//            method: 'PUT',
+//            body: JSON.stringify(this.addTask),
+//            headers: {
+//              'Accept': 'application/json',
+//              'Content-Type': 'application/json'
+//            }
+//          }).then((res) => {
+//            res.json().then((json) => {
+//              this.getAllTask()
+//            })
+//          }).catch((e) => {
+//            e.toString()
+//          })
+        } else {
+          this.taskTableData.push(this.addTask)
+          this.addTask = {}
+//          fetch('http://localhost:8000/tts/add', {
+//            method: 'POST',
+//            body: JSON.stringify(this.addTask),
+//            headers: {
+//              'Accept': 'application/json',
+//              'Content-Type': 'application/json'
+//            }
+//          }).then((res) => {
+//            res.json().then((json) => {
+//              console.log(json)
+//              this.getAllTask()
+//            })
+//          }).catch((e) => {
+//            e.toString()
+//          })
+        }
+        this.addTask = {
+          name: '',
+          module: null,
+          createTime: null,
+          updateTime: null,
+          cellClassName: {}
+        }
+      },
+      getTaskList () {
         fetch('http://localhost:8000/tts/getAllTts', {
           method: 'GET',
           headers: {
@@ -510,11 +454,11 @@
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.casedata = json
-            for (var i = 0; i < this.casedata.length; i++) {
-              this.$set(this.casedata[i], 'result', '')
-              this.casedata[i].createTime = this.formatTime(this.casedata[i].createTime)
-              this.casedata[i].updateTime = this.formatTime(this.casedata[i].updateTime)
+            this.taskTableData = json
+            for (var i = 0; i < this.taskTableData.length; i++) {
+              this.$set(this.taskTableData[i], 'result', '')
+              this.taskTableData[i].createTime = this.formatTime(this.taskTableData[i].createTime)
+              this.taskTableData[i].updateTime = this.formatTime(this.taskTableData[i].updateTime)
             }
           })
         }).catch((e) => {
@@ -545,18 +489,12 @@
         }
         return time.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + sconds
       },
-      addCaseCancelEvent () {
-        this.addcase = {
+      addTaskCancelEvent () {
+        this.addTask = {
           name: '',
-          ttstext: '',
-          codec: 'pcm',
-          secret: '',
-          deviceid: '',
-          devicetypeid: '',
-          authkey: '',
-          serverUrl: 'wss://apigwws-dev.open.rokid.com/api',
-          version: '1.0',
-          declaimer: 'zh',
+          module: null,
+          createTime: null,
+          updateTime: null,
           cellClassName: {}
         }
       },
@@ -564,34 +502,65 @@
         var date = new Date()
         return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
       },
-      searchCase () {
+      searchTask () {
         fetch('http://localhost:8000/tts/search?' + 'condition=' + this.condition, {
           method: 'GET'
         }).then((res) => {
           res.json().then((json) => {
-            this.casedata = json
-            for (var i = 0; i < this.casedata.length; i++) {
-              this.$set(this.casedata[i], 'result', '')
+            this.taskTableData = json
+            for (var i = 0; i < this.taskTableData.length; i++) {
+              this.$set(this.taskTableData[i], 'result', '')
             }
           })
         }).catch((e) => {
           e.toString()
         })
       },
-      executeCase (index) {
-        this.$set(this.casedata[index], 'result', 'testing')
-        fetch('http://localhost:8000/tts/send/' + this.casedata[index].id, {
+      executeTask (index) {
+        this.$set(this.taskTableData[index], 'result', 'testing')
+        fetch('http://localhost:8000/tts/send/' + this.taskTableData[index].id, {
           method: 'PUT',
           headers: {
             'Accept': 'application/json'
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.$set(this.casedata[index], 'result', json.data.result)
+            this.$set(this.taskTableData[index], 'result', json.data.result)
           })
         }).catch((e) => {
           e.toString()
         })
+      },
+      getMockData () {
+        let mockData = []
+        for (let i = 1; i <= 20; i++) {
+          mockData.push({
+            key: i.toString(),
+            label: '内容' + i,
+            description: '内容' + i + '的描述信息'
+//            disabled: Math.random() * 3 < 1
+          })
+        }
+        return mockData
+      },
+      getTargetKeys () {
+//        return this.getMockData()
+//          .filter(() => Math.random() * 2 > 1)
+//          .map(item => item.key)
+      },
+      handleChange3 (newTargetKeys) {
+        this.targetKeys3 = newTargetKeys
+        var len = this.targetKeys3.length
+        for (let i = 0; i < len; i++) {
+          console.log('key: ' + newTargetKeys[i])
+        }
+      },
+      render3 (item) {
+        return item.label + ' - ' + item.description
+      },
+      reloadMockData () {
+        this.projectData = this.getMockData()
+        this.targetKeys3 = this.getTargetKeys()
       },
       drawGraph () {
         $.ajax({
@@ -608,7 +577,7 @@
       }
     },
     mounted () {
-      this.$on('editor-update', this.onEditIntents)
+//      this.$on('editor-update', this.onEditIntents)
     }
   }
 </script>

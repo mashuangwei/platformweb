@@ -165,42 +165,65 @@
               </router-link>
             </Menu-item>
             <Menu-item name="4">
-              <router-link to="/report">
+              <router-link to="/speech">
               <Icon type="chatbubbles"></Icon>
-              测试报告
+              Speech
               </router-link>
             </Menu-item>
             <Menu-item name="5">
-              <router-link to="/environment">
+              <router-link to="/nlp">
               <Icon type="stats-bars"></Icon>
-              环境配置
+              NLP
             </router-link>
             </Menu-item>
+
             <Menu-item name="6">
-              <router-link to="/nlp">
-                <Icon type="star"></Icon>
-                NLP
-              </router-link>
-            </Menu-item>
-
-            <Menu-item name="7">
-              <router-link to="/highcharts">
-                <Icon type="gear-b"></Icon>
-                Highcharts
-              </router-link>
-            </Menu-item>
-
-            <Menu-item name="8">
               <router-link to="/tts">
                 <Icon type="fireball"></Icon>
                 TTS
               </router-link>
             </Menu-item>
 
-            <Menu-item name="9">
+            <Menu-item name="7">
               <router-link to="/skill">
-                <Icon type="flag"></Icon>
+                <Icon type="paper-airplane"></Icon>
                 Skill模板
+              </router-link>
+            </Menu-item>
+
+            <Menu-item name="8">
+              <router-link to="/task">
+                <Icon type="cube"></Icon>
+                task
+              </router-link>
+            </Menu-item>
+
+            <Menu-item name="9">
+              <router-link to="/report">
+                <Icon type="star"></Icon>
+                report
+              </router-link>
+            </Menu-item>
+
+            <Menu-item name="10">
+              <router-link to="/highcharts">
+                <Icon type="gear-b"></Icon>
+                Highcharts
+              </router-link>
+            </Menu-item>
+
+
+            <Menu-item name="11">
+              <router-link to="/environment">
+                <Icon type="flag"></Icon>
+                图表
+              </router-link>
+            </Menu-item>
+
+            <Menu-item name="12">
+              <router-link to="/chartdemo">
+                <Icon type="scissors"></Icon>
+                动态图表
               </router-link>
             </Menu-item>
 
@@ -240,15 +263,19 @@
           '/api': '1',
           '/test': '2',
           '/asr': '3',
-          '/report': '4',
-          '/environment': '5',
-          '/nlp': '6',
-          '/highcharts': '7',
-          '/tts': '8',
-          '/skill': '9'
+          '/speech': '4',
+          '/nlp': '5',
+          '/tts': '6',
+          '/skill': '7',
+          '/task': '8',
+          '/report': '9',
+          '/highcharts': '10',
+          '/environment': '11',
+          '/chartdemo': '12'
         }
       }
-    }
+    },
+    methods: {}
   }
 </script>
 

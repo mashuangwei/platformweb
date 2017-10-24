@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import api from '@/components/content/content.vue'
+import api from '@/components/content/api.vue'
 import test from '@/components/content/test.vue'
 import report from '@/components/content/report.vue'
 import environment from '@/components/content/environment.vue'
@@ -9,6 +9,9 @@ import highcharts from '@/components/content/highcharts.vue'
 import asr from '@/components/content/asr.vue'
 import tts from '@/components/content/tts.vue'
 import skill from '@/components/content/skill.vue'
+import speech from '@/components/content/speech.vue'
+import task from '@/components/content/task.vue'
+import chartdemo from '@/components/content/chartdemo.vue'
 
 Vue.use(Router)
 
@@ -60,6 +63,21 @@ export default new Router({
       path: '/skill',
       name: 'skill',
       component: skill
+    },
+    {
+      path: '/speech',
+      name: 'speech',
+      component: speech
+    },
+    {
+      path: '/task',
+      name: 'task',
+      component: task
+    },
+    {
+      path: '/chartdemo',
+      name: 'chartdemo',
+      component: chartdemo
     }
   ]
 })
