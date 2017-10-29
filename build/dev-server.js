@@ -9,7 +9,7 @@ var opn = require('opn')
 var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
-var proxyMiddleware = require('http-proxy-middleware')
+
 var webpackConfig = require('./webpack.dev.conf')
 
 // default port where dev server listens for incoming traffic
@@ -18,7 +18,7 @@ var port = process.env.PORT || config.dev.port
 var autoOpenBrowser = !!config.dev.autoOpenBrowser
 // Define HTTP proxies to your custom API backend
 // https://github.com/chimurai/http-proxy-middleware
-var proxyTable = config.dev.proxyTable
+
 
 var app = express()
 var compiler = webpack(webpackConfig)
@@ -39,13 +39,20 @@ compiler.plugin('compilation', function (compilation) {
   })
 })
 
+var proxyMiddleware = require('http-proxy-middleware')
+var proxyTable = config.dev.proxyTable
+
 // proxy api requests
 Object.keys(proxyTable).forEach(function (context) {
   var options = proxyTable[context]
+console.log('options:', options);
   if (typeof options === 'string') {
-    options = { target: options }
+    options = {
+      target: options,
+      changeOrigin: true
+    }
   }
-  app.use(proxyMiddleware(options.filter || context, options))
+  app.use(context, proxyMiddleware(options))
 })
 
 // handle fallback for HTML5 history API
@@ -64,26 +71,20 @@ app.use(staticPath, express.static('./static'))
 
 var uri = 'http://localhost:' + port
 
-var _resolve
-var readyPromise = new Promise(resolve => {
-  _resolve = resolve
-})
-
 console.log('> Starting dev server...')
 devMiddleware.waitUntilValid(() => {
-  console.log('> Listening at ' + uri + '\n')
-  // when env is testing, don't need open it
-  if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
-    opn(uri)
-  }
-  _resolve()
+
 })
 
-var server = app.listen(port)
+var fs = require('fs');
+var https = require('https');
 
-module.exports = {
-  ready: readyPromise,
-  close: () => {
-    server.close()
-  }
-}
+var privateKey  = fs.readFileSync(path.join(__dirname, 'private.pem'), 'utf8');
+var certificate = fs.readFileSync(path.join(__dirname, 'file.crt'), 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+
+var httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen('443', function() {
+  console.log('HTTPS Server is running on: https://localhost:443');
+});

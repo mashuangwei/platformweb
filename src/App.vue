@@ -247,13 +247,14 @@
   </div>
 </template>
 <script>
-  import ICol from 'iview/src/components/grid/col'
-  import Row from 'iview/src/components/grid/row'
+  import { Col, Row } from 'iview'
+//  import ICol from 'iview/src/components/grid/col'
+//  import Row from 'iview/src/components/grid/row'
   import editor from 'vue2-ace-editor-new'
   export default {
     components: {
       Row,
-      ICol,
+      'i-col': Col,
       editor
     },
     name: 'index',

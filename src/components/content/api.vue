@@ -225,8 +225,9 @@
 </template>
 
 <script>
-  import ICol from '../../../node_modules/iview/src/components/grid/col'
-  import Row from '../../../node_modules/iview/src/components/grid/row.vue'
+  import { Col, Row } from 'iview'
+//  import ICol from 'iview/src/components/grid/col.vue'
+//  import Row from 'iview/src/components/grid/row.vue'
   import editor from 'vue2-ace-editor-new'
   import 'brace/mode/javascript'
   import 'brace/theme/chrome'
@@ -235,7 +236,7 @@
   export default {
     components: {
       Row,
-      ICol,
+      'i-col': Col,
       editor,
       Monaco,
       'name': 'content'
@@ -680,7 +681,7 @@
       },
       getCase () {
 //        this.loading = true
-        fetch('http://localhost:8000/platform/caselist', {
+        fetch(window.serverurl + '/platform/caselist', {
           method: 'POST',
           body: JSON.stringify({
             name: this.searchStr

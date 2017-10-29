@@ -264,8 +264,9 @@
 </template>
 <script>
   import $ from 'jquery'
-  import ICol from '../../../node_modules/iview/src/components/grid/col'
-  import Row from '../../../node_modules/iview/src/components/grid/row.vue'
+  import { Col, Row } from 'iview'
+//  import ICol from 'iview/src/components/grid/col.vue'
+//  import Row from 'iview/src/components/grid/row.vue'
   import editor from 'vue2-ace-editor-new'
   import 'brace/mode/javascript'
   import 'brace/theme/chrome'
@@ -273,7 +274,7 @@
   export default {
     components: {
       Row,
-      ICol,
+      'i-col': Col,
       editor,
       'name': 'skill'
     },

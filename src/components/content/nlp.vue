@@ -14,14 +14,16 @@
     </Row>
 
     <row>
-      <Table :loading="loading" :columns="casetable" :data="casedata" width="1370" height="690" :border="showBorder" :stripe="showStripe"
-             :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent" ></Table>
+      <Table :loading="loading" :columns="casetable" :data="casedata" width="1370" height="664" :border="showBorder"
+             :stripe="showStripe"
+             :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
     </row>
     <br>
     <!-- 分页 -->
     <row>
-      <i-col span="14" offset="10">
-        <Page :total="100" size="small" show-elevator show-sizer show-total placement="top"></Page>
+      <i-col span="14" offset="8">
+        <Page :total="pageHelp.totalNum"  show-elevator show-sizer show-total placement="top" :current="pageHelp.curPage"
+              :page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize" :page-size-opts="pageSizeOptions"></Page>
       </i-col>
     </row>
 
@@ -81,7 +83,7 @@
         <i-col span="3" offset="1">
           <div>
             <Select v-model="addcase.moduleName" style="width:350px" @on-change="selectDomain">
-              <Option v-for="item in moduleList" :value="item" :key="item"></Option>
+              <Option v-for="(item, idx) in moduleList" :value="item" :key="idx"></Option>
             </Select>
           </div>
         </i-col>
@@ -94,8 +96,8 @@
         </i-col>
         <i-col span="3" offset="1">
           <div>
-            <Select v-model="addcase.projectName" style="width:200px" @on-change="selectDomain">
-              <Option v-for="item in projectList" :value="item.projectName" :key="item.projectName"></Option>
+            <Select v-model="addcase.projectId" style="width:200px" @on-change="selectProject" :label-in-value="true">
+              <Option v-for="(item, index) in projectList" :value="item.id" :key="index">{{item.projectName}}</Option>
             </Select>
           </div>
         </i-col>
@@ -139,7 +141,8 @@
         </i-col>
       </row>
       <row v-show="preCaseAddFlag">
-        <Table :columns="stepstable" :data="stepslist" width="980" height="300" :border="showBorder"
+        <Table :loading="stepsTableDataLoading" :columns="stepstable" :data="stepslist" width="980" height="300"
+               :border="showBorder"
                :stripe="showStripe"
                :show-header="showHeader" :showIndex="true"></Table>
       </row>
@@ -174,7 +177,7 @@
         </i-col>
         <i-col span="2" offset="0">
           <Select v-model="caseStep.action" style="width:200px" @on-change="selectExecuteMethod">
-            <Option v-for="item in methodlist" :value="item.value" :key="item"></Option>
+            <Option v-for="(item, index) in methodlist" :value="item.value" :key="index"></Option>
           </Select>
         </i-col>
       </row>
@@ -186,8 +189,8 @@
         </i-col>
         <i-col span="2" offset="0">
           <div>
-            <Select v-model="caseStep.responseType" style="width:200px" >
-              <Option v-for="item in returnTypeList" :value="item.value" :key="item.value"></Option>
+            <Select v-model="caseStep.responseType" style="width:200px">
+              <Option v-for="(item, index) in returnTypeList" :value="item.value" :key="index"></Option>
             </Select>
           </div>
         </i-col>
@@ -211,10 +214,10 @@
         </i-col>
       </row>
 
-      <div class="border-bt editor-wrap">
+      <div class="border-bt editor-wrap" v-show="paramShow">
       </div>
 
-      <row>
+      <row v-show="paramShow">
         <i-col span="3">
           <div
             style="margin-top: 10px; margin-bottom:10px; font-family:Helvetica Neue; font-size: 15px;font-weight: bold; color: rgb(70, 76, 91);">
@@ -229,8 +232,8 @@
           </div>
         </i-col>
       </row>
-      <row>
-        <Table height="200" border :columns="paramsData" :data="paramslist"></Table>
+      <row v-show="paramShow">
+        <Table :loading="paramTableDataLoading" height="200" border :columns="paramsData" :data="paramslist"></Table>
       </row>
 
     </Modal>
@@ -271,19 +274,18 @@
 </template>
 
 <script>
-  import ICol from '../../../node_modules/iview/src/components/grid/col'
-  import Row from '../../../node_modules/iview/src/components/grid/row.vue'
-  import editor from 'vue2-ace-editor-new'
-  import 'brace/mode/javascript'
-  import 'brace/theme/chrome'
+  /* eslint-disable no-unused-vars */
+  import $ from 'jquery'
+  import { Col, Row } from 'iview'
+//  import ICol from 'iview/src/components/grid/col.vue'
+//  import Row from 'iview/src/components/grid/row.vue'
   import Monaco from 'monaco-editor-forvue'
   import expandRow from './table-expand.vue'
 
   export default {
     components: {
       Row,
-      ICol,
-      editor,
+      'i-col': Col,
       Monaco,
       expandRow,
       'name': 'content'
@@ -291,7 +293,18 @@
     name: 'home',
     data () {
       return {
-        serverurl: 'http://10.88.128.140:8080',
+        pageHelp: {
+          curPage: 1,
+          endIndex: 10,
+          pageSize: 13,
+          startIndex: 0,
+          totalNum: 1950,
+          totalPageNum: 195
+        },
+        pageSizeOptions: [13, 26, 39, 52],
+        paramShow: false,
+        stepsTableDataLoading: false,
+        paramTableDataLoading: false,
         returnTypeList: [{value: 'xml'}, {value: 'txt'}],
         intentSelectValue: '2',
         projectList: [],
@@ -640,6 +653,13 @@
 //      this.$on('editor-update', this.onEditIntents)
     },
     created () {
+//      if (window.localStorage.getItem('nlp') === null) {
+//        console.log('null')
+//        window.localStorage.setItem('nlp', 'case')
+//      } else {
+//        console.log(window.localStorage.getItem('nlp'))
+//        window.localStorage.removeItem('nlp')
+//      }
       this.getCase()
     },
     methods: {
@@ -652,11 +672,57 @@
       executeStepsTest () {
         // 执行步骤测试
       },
+      selectProject (status) {
+        this.addcase.projectId = status.value
+      },
+      executeCase (index) {
+        this.$set(this.casedata[index], 'result', 'testing')
+        fetch(window.serverurl + '/task/one', {
+          method: 'POST',
+          body: 'taskId=' + this.casedata[index].id + '&projectId=' + this.casedata[index].projectId,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.$set(this.casedata[index], 'result', json.result.msg)
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      getPageIndex (pageIndex) {
+        this.pageHelp.curPage = pageIndex
+        this.loading = true
+        fetch(window.serverurl + '/case/list?curPage=' + pageIndex + '&pageSize=' + this.pageHelp.pageSize, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.casedata = json.result.data.result
+            this.pageHelp.totalNum = json.result.data.page.totalNum
+            this.loading = false
+          })
+        }).catch((e) => {
+          console.log(e)
+          e.toString()
+        })
+      },
+      getPageSize (pageSize) {
+        console.log('pageSize: ' + pageSize)
+        this.pageHelp.pageSize = pageSize
+      },
       addSteps () {
+        this.editor.setValue('')
+        this.addStepsButtunFlag = true
         this.titlesteps = '新增步骤'
         this.stepokButtonText = '添加'
         this.addStepModel = true
-
+        this.paramShow = false
         this.editor.layout({
           width: 600,
           height: 200
@@ -677,11 +743,11 @@
 //        }
       },
       selectDomain () {
-        console.log(this.addcase.moduleName)
+//        console.log(this.addcase.moduleName)
         this.getProjectList(this.addcase.moduleName)
       },
       getProjectList (domainName) {
-        fetch(this.serverurl + '/project/projectList?moduleName=' + domainName, {
+        fetch(window.serverurl + '/project/projectList?moduleName=' + domainName, {
           method: 'GET',
 //          body: JSON.stringify({
 //            name: this.searchStr
@@ -704,6 +770,8 @@
 //        }
       },
       editSteps (index) {
+        this.addStepsButtunFlag = false
+        this.paramShow = true
         this.titlesteps = '编辑步骤'
         this.stepokButtonText = '保存'
         this.addStepModel = true
@@ -723,7 +791,8 @@
         this.getParamTableData()
       },
       getParamTableData () {
-        fetch(this.serverurl + '/dataParams/dataParamsList?stepId=' + this.caseStep.id, {
+        this.paramTableDataLoading = true
+        fetch(window.serverurl + '/dataParams/dataParamsList?stepId=' + this.caseStep.id, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -732,8 +801,10 @@
         }).then((res) => {
           res.json().then((json) => {
             this.paramslist = json.result.data
+            this.paramTableDataLoading = false
           })
         }).catch((e) => {
+          this.paramTableDataLoading = false
           e.toString()
         })
       },
@@ -774,7 +845,7 @@
         this.getModuleList()
       },
       getModuleList () {
-        fetch(this.serverurl + '/project/moduleList', {
+        fetch(window.serverurl + '/project/moduleList', {
           method: 'GET',
 //          body: JSON.stringify({
 //            name: this.searchStr
@@ -793,16 +864,17 @@
         })
       },
       removeCase (index) {
-        this.casedata.splice(index, 1)
-        fetch(this.serverurl + '/case/delete', {
+//        this.casedata.splice(index, 1)
+        fetch(window.serverurl + '/case/delete', {
           method: 'POST',
-          body: JSON.stringify(this.addcase),
+          body: 'id=' + this.casedata[index].id,
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
           res.json().then((json) => {
+//            console.log('deleteCase: ' + JSON.stringify(json))
             this.getCase()
           })
         }).catch((e) => {
@@ -810,14 +882,31 @@
         })
       },
       removeStep (index) {
-        this.stepslist.splice(index, 1)
+//        this.stepslist.splice(index, 1)
+        this.deleteStepFunction(this.stepslist[index].id)
       },
       removeParamValue (index) {
-        this.paramslist.splice(index, 1)
+        fetch(window.serverurl + '/dataParams/deleteRow', {
+          method: 'POST',
+          body: 'dataParamId=' + this.paramslist[index].id,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.paramslist.splice(index, 1)
+            this.getParamTableData()
+          })
+        }).catch((e) => {
+          e.toString()
+        })
       },
       addStep () {
         if (this.addStepsButtunFlag) {
-          this.stepslist.push(this.caseStep)
+          this.caseStep.caseId = this.addcase.id
+//          this.stepslist.push(this.caseStep)
+          this.addStepFunction()
         } else {
           this.stepslist[this.index].name = this.caseStep.name
           this.stepslist[this.index].caseId = this.caseStep.caseId
@@ -825,8 +914,70 @@
           this.stepslist[this.index].responseType = this.caseStep.responseType
           this.stepslist[this.index].action = this.caseStep.action
           this.stepslist[this.index].switchType = this.caseStep.switchType
+          this.editStepFunction(this.stepslist[this.index])
         }
-        this.caseStep = {id: '', name: '', caseId: '', expect: '', responseType: 'xml', action: '', switchType: true, requestType: 'grpc', requestMethod: 'NLP', stepId: ''}
+        this.caseStep = {
+          id: '',
+          name: '',
+          caseId: '',
+          expect: '',
+          responseType: 'xml',
+          action: '',
+          switchType: true,
+          requestType: 'grpc',
+          requestMethod: 'NLP',
+          stepId: ''
+        }
+      },
+      deleteStepFunction (index) {
+//        console.log('index: ' + index)
+        fetch(window.serverurl + '/step/delete', {
+          method: 'POST',
+          body: 'id=' + index,
+          headers: {
+//            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+//            console.log(json)
+            this.getStepsList()
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      editStepFunction (editparams) {
+        fetch(window.serverurl + '/step/save', {
+          method: 'POST',
+          body: JSON.stringify(editparams),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.getStepsList()
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      addStepFunction () {
+        fetch(window.serverurl + '/step/create', {
+          method: 'POST',
+          body: JSON.stringify(this.caseStep),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.getStepsList()
+          })
+        }).catch((e) => {
+          e.toString()
+        })
       },
       getDateTime () {
         var date = new Date()
@@ -847,11 +998,23 @@
 //          this.casedata[this.index].author = this.addcase.author
           this.editCaseFunction()
         }
-        this.addcase = {id: '', name: '', description: '', result: '', projectName: '', moduleName: '', switchType: true, author: '', cellClassName: {}, projectId: ''}
+        this.addcase = {
+          id: '',
+          name: '',
+          description: '',
+          result: '',
+          projectName: '',
+          moduleName: '',
+          switchType: true,
+          author: '',
+          cellClassName: {},
+          projectId: ''
+        }
         this.preCaseAddFlag = false
       },
       getStepsList () {
-        fetch(this.serverurl + '/step/stepList?caseId=' + this.addcase.id, {
+        this.stepsTableDataLoading = true
+        fetch(window.serverurl + '/step/stepList?caseId=' + this.addcase.id, {
           method: 'POST',
           body: JSON.stringify(this.addcase),
           headers: {
@@ -861,21 +1024,24 @@
         }).then((res) => {
           res.json().then((json) => {
             this.stepslist = json.result.data
+            this.stepsTableDataLoading = false
           })
         }).catch((e) => {
+          this.stepsTableDataLoading = false
           e.toString()
         })
       },
       addCaseFunction () {
-        fetch(this.serverurl + '/case/create', {
+        fetch(window.serverurl + '/case/create', {
           method: 'POST',
-          body: JSON.stringify(this.addcase),
+          body: 'name=' + this.addcase.name + '&description=' + this.addcase.description + '&author=' + this.addcase.author + '&domainName=' + this.addcase.moduleName + '&projectId=' + this.addcase.projectId,
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
           res.json().then((json) => {
+//            console.log('addcase: ' + JSON.stringify(json))
             this.getCase()
           })
         }).catch((e) => {
@@ -883,15 +1049,16 @@
         })
       },
       editCaseFunction () {
-        fetch(this.serverurl + '/case/save', {
+        fetch(window.serverurl + '/case/save', {
           method: 'POST',
-          body: JSON.stringify(this.addcase),
+          body: 'name=' + this.addcase.name + '&description=' + this.addcase.description + '&author=' + this.addcase.author + '&domainName=' + this.addcase.moduleName + '&projectId=' + this.addcase.projectId + '&switchType=' + this.addcase.switchType + '&id=' + this.addcase.caseId,
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
           res.json().then((json) => {
+//            console.log('editcase: ' + JSON.stringify(json))
             this.getCase()
           })
         }).catch((e) => {
@@ -900,10 +1067,31 @@
       },
       addStepCancel () {
         this.editAndAddFlag = false
-        this.caseStep = {id: '', name: '', caseId: '', expect: '', responseType: 'xml', action: '', switchType: true, requestType: 'grpc', requestMethod: 'NLP', stepId: ''}
+        this.caseStep = {
+          id: '',
+          name: '',
+          caseId: '',
+          expect: '',
+          responseType: 'xml',
+          action: '',
+          switchType: true,
+          requestType: 'grpc',
+          requestMethod: 'NLP',
+          stepId: ''
+        }
       },
       addCaseCancelEvent () {
-        this.addcase = {name: '', description: '', result: '', projectName: '', moduleName: '', switchType: true, author: '', cellClassName: {}, projectId: ''}
+        this.addcase = {
+          name: '',
+          description: '',
+          result: '',
+          projectName: '',
+          moduleName: '',
+          switchType: true,
+          author: '',
+          cellClassName: {},
+          projectId: ''
+        }
         this.preCaseAddFlag = false
       },
       addParamModel () {
@@ -925,11 +1113,13 @@
         this.newParamsValue = {parameter: '', value: '', id: '', stepId: ''}
       },
       editParameter (paramData) {
-        fetch(this.serverurl + '/dataParams/edit', {
+//        console.log(JSON.stringify(paramData))
+//        console.log(paramData)
+        fetch(window.serverurl + '/dataParams/edit', {
           method: 'POST',
-          body: JSON.stringify(paramData),
+          body: 'stepId=' + paramData.stepId + '&parameter=' + paramData.parameter + '&value=' + paramData.value + '&id=' + paramData.id,
           headers: {
-//            'Accept': 'application/json',
+            'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
@@ -941,16 +1131,18 @@
         })
       },
       addParameter (paramData) {
-        fetch(this.serverurl + '/dataParams/create', {
+//        console.log(JSON.stringify(paramData))
+//        console.log(paramData)
+        fetch(window.serverurl + '/dataParams/create', {
           method: 'POST',
-          body: JSON.stringify(paramData),
+          body: 'stepId=' + paramData.stepId + '&parameter=' + paramData.parameter + '&value=' + paramData.value,
           headers: {
-//            'Accept': 'application/json',
+            'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
           res.json().then((json) => {
-            console.log(json)
+//            console.log(json)
             this.getParamTableData()
           })
         }).catch((e) => {
@@ -963,11 +1155,8 @@
 //          this.loading = false
 //        }, 3000)
 
-        fetch(this.serverurl + '/case/list?curPage=1&pageSize=15', {
+        fetch(window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize, {
           method: 'GET',
-//          body: JSON.stringify({
-//            name: this.searchStr
-//          }),
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -975,6 +1164,7 @@
         }).then((res) => {
           res.json().then((json) => {
             this.casedata = json.result.data.result
+            this.pageHelp.totalNum = json.result.data.page.totalNum
             this.loading = false
           })
         }).catch((e) => {

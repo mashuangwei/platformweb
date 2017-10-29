@@ -148,17 +148,19 @@
 </template>
 <script>
   import $ from 'jquery'
-  import ICol from '../../../node_modules/iview/src/components/grid/col.vue'
-  import Row from '../../../node_modules/iview/src/components/grid/row.vue'
+  import { Col, Row } from 'iview'
+//  import ICol from 'iview/src/components/grid/col.vue'
+//  import Row from 'iview/src/components/grid/row.vue'
 
   export default {
     components: {
       Row,
-      ICol,
-      'name': 'asr'
+      'i-col': Col,
+      'name': 'task'
     },
     data () {
       return {
+        intervalTmp: null,
         projectData: this.getMockData(),
         targetKeys3: this.getTargetKeys(),
         listStyle: {
@@ -209,9 +211,14 @@
         condition: '',
         addTask: {
           name: '',
+          projectId: '',
+          type: 'NLP',
+          author: '',
           module: null,
           createTime: null,
           updateTime: null,
+          result: '',
+          caseMount: '',
           cellClassName: {}
         },
         tasktable: [
@@ -239,14 +246,14 @@
             align: 'center'
           },
           {
-            title: '执行结果',
+            title: '执行进度',
             width: 150,
             key: 'result',
             align: 'center',
             render: (h, params) => {
               const row = params.row
-              const text = row.result === '' ? '未执行' : row.result === 'testing' ? '测试中 ' : row.result === 'success' ? '测试通过' : '测试失败'
-              const color = row.result === '' ? 'yellow' : row.result === 'testing' ? 'blue' : row.result === 'success' ? 'green' : 'red'
+              const text = (typeof row.result === 'undefined' || row.result === '') ? '未执行' : row.result === 'testing' ? '测试中 ' : row.result === 'success' ? '测试结束' : '测试结束'
+              const color = (typeof row.result === 'undefined' || row.result === '') ? 'yellow' : row.result === 'testing' ? 'blue' : row.result === 'success' ? 'green' : 'red'
               return h('Tag', {
                 props: {
                   type: 'dot',
@@ -287,7 +294,7 @@
                   },
                   on: {
                     click: () => {
-//                      this.executeTask(params.index)
+                      this.executeTask(params.index)
                     }
                   }
                 }, '历史记录')
@@ -364,8 +371,6 @@
         this.addtaskmodal = true
         this.addTaskButtunFlag = false
         this.addTask = Object.assign({}, this.addTask, this.taskTableData[index])
-        this.addTask.createTime = null
-        this.addTask.updateTime = null
       },
       addTaskData () {
         this.taskmodeltitle = '添加Task'
@@ -374,96 +379,117 @@
         this.okButtonText = '添加'
       },
       removeTask (index) {
-        fetch('http://localhost:8000/tts/delete/' + this.taskTableData[index].id, {
-          method: 'DELETE',
+        fetch(window.serverurl + '/task/delete', {
+          method: 'POST',
+          body: JSON.stringify({id: this.taskTableData[index].id}),
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
         }).then((res) => {
           res.json().then((json) => {
-            console.log(json)
-            this.getAllTask()
+//            console.log(json)
+            this.getTaskList()
           })
         }).catch((e) => {
           e.toString()
         })
       },
       getAllTask () {
-        this.taskTableData.push(this.addTask)
-        this.addTask = {
-          name: '',
-          module: null,
-          createTime: null,
-          updateTime: null,
-          cellClassName: {}
-        }
+//        this.taskTableData.push(this.addTask)
+//        fetch(window.serverurl + '/task/taskList', {
+//          method: 'POST',
+//          body: {type: 'NLP'},
+//          headers: {
+//            'Accept': 'application/json',
+//            'Content-Type': 'application/json'
+//          }
+//        }).then((res) => {
+//          res.json().then((json) => {
+//            console.log('addtask:' + JSON.stringify(json))
+//          })
+//        }).catch((e) => {
+//          e.toString()
+//        })
       },
       addOrSaveTask () {
         if (this.addTaskButtunFlag === false) {
           this.$set(this.taskTableData[this.index], this.addTask)
           this.taskTableData[this.index] = this.addTask
-//          console.log(this.taskTableData[this.index])
-//          fetch('http://localhost:8000/tts/update/' + this.taskTableData[this.index].id, {
-//            method: 'PUT',
-//            body: JSON.stringify(this.addTask),
-//            headers: {
-//              'Accept': 'application/json',
-//              'Content-Type': 'application/json'
-//            }
-//          }).then((res) => {
-//            res.json().then((json) => {
-//              this.getAllTask()
-//            })
-//          }).catch((e) => {
-//            e.toString()
-//          })
+          this.editTaskFunction(this.taskTableData[this.index])
         } else {
-          this.taskTableData.push(this.addTask)
-          this.addTask = {}
-//          fetch('http://localhost:8000/tts/add', {
-//            method: 'POST',
-//            body: JSON.stringify(this.addTask),
-//            headers: {
-//              'Accept': 'application/json',
-//              'Content-Type': 'application/json'
-//            }
-//          }).then((res) => {
-//            res.json().then((json) => {
-//              console.log(json)
-//              this.getAllTask()
-//            })
-//          }).catch((e) => {
-//            e.toString()
-//          })
+          this.addTaskFunction()
         }
         this.addTask = {
           name: '',
           module: null,
+          id: '',
+          projectId: '',
+          author: '',
           createTime: null,
           updateTime: null,
+          type: 'NLP',
+          result: '',
           cellClassName: {}
         }
       },
-      getTaskList () {
-        fetch('http://localhost:8000/tts/getAllTts', {
-          method: 'GET',
+      editTaskFunction (editTaskData) {
+        fetch(window.serverurl + '/task/edit', {
+          method: 'POST',
+          body: JSON.stringify(editTaskData),
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.taskTableData = json
-            for (var i = 0; i < this.taskTableData.length; i++) {
-              this.$set(this.taskTableData[i], 'result', '')
-              this.taskTableData[i].createTime = this.formatTime(this.taskTableData[i].createTime)
-              this.taskTableData[i].updateTime = this.formatTime(this.taskTableData[i].updateTime)
-            }
+//            console.log('addtask:' + JSON.stringify(json))
+            this.getTaskList()
           })
         }).catch((e) => {
           e.toString()
         })
+      },
+      addTaskFunction () {
+        fetch(window.serverurl + '/task/create', {
+          method: 'POST',
+          body: JSON.stringify(this.addTask),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+//            console.log('addtask:' + JSON.stringify(json))
+            this.getTaskList()
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      getTaskList () {
+        fetch(window.serverurl + '/task/taskList', {
+          method: 'POST',
+          body: JSON.stringify({type: 'NLP'}),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.taskTableData = json.result.data
+            for (var i = 0; i < this.taskTableData.length; i++) {
+              this.taskTableData[i].createTime = this.formatTime(this.taskTableData[i].createTime)
+              this.taskTableData[i].updateTime = this.formatTime(this.taskTableData[i].updateTime)
+            }
+//            console.log('addtask:' + JSON.stringify(json))
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      testInterval () {
+        console.log(Math.floor(Math.random() * 1000 + 1))
       },
       formatTime (datetime) {
         var time = new Date(datetime)
@@ -499,7 +525,7 @@
         }
       },
       getDateTime () {
-        var date = new Date()
+        let date = new Date()
         return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
       },
       searchTask () {
@@ -518,15 +544,24 @@
       },
       executeTask (index) {
         this.$set(this.taskTableData[index], 'result', 'testing')
-        fetch('http://localhost:8000/tts/send/' + this.taskTableData[index].id, {
-          method: 'PUT',
+        fetch(window.serverurl + '/task/batch', {
+          method: 'POST',
+          body: JSON.stringify({taskId: this.taskTableData[index].id}),
           headers: {
             'Accept': 'application/json'
           }
         }).then((res) => {
-          res.json().then((json) => {
-            this.$set(this.taskTableData[index], 'result', json.data.result)
-          })
+          try {
+            if (res.status === 400) {
+              return
+            }
+            res.json().then((json) => {
+              console.log(JSON.stringify(json))
+              this.$set(this.taskTableData[index], 'result', json.data.result)
+            })
+          } catch (e) {
+            console.log(e.toString())
+          }
         }).catch((e) => {
           e.toString()
         })
@@ -577,7 +612,10 @@
       }
     },
     mounted () {
-//      this.$on('editor-update', this.onEditIntents)
+//      this.intervalTmp = setInterval(() => {
+//        this.testInterval()
+//      }, 1000)
+//      clearInterval(this.intervalTmp)
     }
   }
 </script>
