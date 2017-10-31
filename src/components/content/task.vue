@@ -96,8 +96,9 @@
     <br>
     <!-- 分页 -->
     <row>
-      <i-col span="14" offset="10">
-        <Page :total="100" size="small" show-elevator show-sizer show-total placement="top"></Page>
+      <i-col span="14" offset="8">
+        <Page :total="taskPageHelp.totalNum"  show-elevator show-sizer show-total placement="top" :current="taskPageHelp.curPage"
+              :page-size="taskPageHelp.pageSize" @on-change="getTaskPageIndex" @on-page-size-change="getTaskPageSize" :page-size-opts="taskPageSizeOptions"></Page>
       </i-col>
     </row>
 
@@ -130,7 +131,7 @@
 
       <Transfer
         :titles="transerTitles"
-        :data="projectData"
+        :data="addTask.projectData"
         :target-keys="targetKeys3"
         :list-style="listStyle"
         :render-format="render3"
@@ -143,6 +144,72 @@
       </Transfer>
 
 
+    </Modal>
+    <!--  task历史记录页面 -->
+    <Modal
+      :mask-closable="false"
+      width="890"
+      height="620"
+      title="task执行历史记录"
+      okText="关闭"
+      v-model="taskHistoryModel"
+      :styles="{top: '20px'}">
+
+      <row>
+        <Table :loading="taskHistroyLoading" :columns="taskHistoryTable" :data="taskHistoryTableData" width="870" height="520" :border="showBorder" :stripe="showStripe"
+               :show-header="showHeader" :showIndex="true"></Table>
+      </row>
+      <br>
+      <!-- 分页 -->
+      <row>
+        <i-col span="18" offset="6">
+          <Page :total="taskHistoryPageHelp.totalNum"  show-elevator show-sizer show-total placement="top" :current="taskHistoryPageHelp.curPage"
+                :page-size="taskHistoryPageHelp.pageSize" @on-change="getTaskHitoryPageIndex" @on-page-size-change="getTaskHistoryPageSize" :page-size-opts="taskHistroyPageSizeOptions"></Page>
+        </i-col>
+      </row>
+    </Modal>
+
+    <!--  job详细记录页面 -->
+    <Modal
+      :mask-closable="false"
+      width="990"
+      height="620"
+      title="job执行错误Case信息"
+      okText="关闭"
+      v-model="taskHistoryDetailModel"
+      :styles="{top: '20px'}">
+
+      <row>
+        <i-col span="4" offset="0">
+          <div style="line-height: 32px;"><label>用例执行总数：{{nlpResultReport.totalNum}}</label></div>
+        </i-col>
+        <i-col span="5" offset="0">
+          <div style="line-height: 32px;"><label>用例执行成功数：{{nlpResultReport.passNum}}</label></div>
+        </i-col>
+        <i-col span="5" offset="0">
+          <div style="line-height: 32px;"><label>用例执行个数：{{nlpResultReport.runNum}}</label></div>
+        </i-col>
+        <i-col span="5" offset="0">
+          <div style="line-height: 32px;"><label>用例执行失败数：{{nlpResultReport.failNum}}</label></div>
+        </i-col>
+        <i-col span="5" offset="0">
+          <div style="line-height: 32px;"><label>用例执行忽略数：{{nlpResultReport.ignoreNum}}</label></div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <Table :loading="taskHistroyDetailLoading" :columns="taskHistoryDetailTable" :data="taskHistoryDetailTableData" width="976" height="520" :border="showBorder" :stripe="showStripe"
+               :show-header="showHeader" :showIndex="true"></Table>
+      </row>
+      <br>
+      <!-- 分页 -->
+      <row>
+        <i-col span="18" offset="6">
+          <Page :total="taskHistoryDetailPageHelp.totalNum"  show-elevator show-sizer show-total placement="top" :current="taskHistoryDetailPageHelp.curPage"
+                :page-size="taskHistoryDetailPageHelp.pageSize" @on-change="getTaskHitoryDetailPageIndex" @on-page-size-change="getTaskHistoryDetailPageSize" :page-size-opts="taskHistroyDetailPageSizeOptions"></Page>
+        </i-col>
+      </row>
     </Modal>
   </div>
 </template>
@@ -160,8 +227,29 @@
     },
     data () {
       return {
+        taskHistoryDetailTableData: [],
+        taskHistoryDetailModel: false,
+        taskHistroyDetailLoading: false,
+        taskPageSizeOptions: [13, 26, 39, 52],
+        taskHistroyDetailPageSizeOptions: [10, 20, 30, 50],
+        taskHistroyPageSizeOptions: [10, 20, 30, 50],
+        taskHistoryDetailPageHelp: {
+          curPage: 1,
+          endIndex: 10,
+          pageSize: 10,
+          startIndex: 0,
+          totalNum: 0,
+          totalPageNum: 0
+        },
+        taskPageHelp: {
+          curPage: 1,
+          endIndex: 10,
+          pageSize: 13,
+          startIndex: 0,
+          totalNum: 0,
+          totalPageNum: 0
+        },
         intervalTmp: null,
-        projectData: this.getMockData(),
         targetKeys3: this.getTargetKeys(),
         listStyle: {
           width: '250px',
@@ -205,13 +293,14 @@
         showHeader: true,
         fixedHeader: true,
         addtaskmodal: false,
+        taskHistoryModel: false,
         okButtonText: '添加',
         taskmodeltitle: '添加Task',
         addTaskButtunFlag: true,
         condition: '',
         addTask: {
           name: '',
-          projectId: '',
+          projectIds: [],
           type: 'NLP',
           author: '',
           module: null,
@@ -219,8 +308,141 @@
           updateTime: null,
           result: '',
           caseMount: '',
+          projectData: [],
           cellClassName: {}
         },
+        taskHistroyLoading: false,
+        taskHistoryTableData: [],
+        jobId: '',
+        nlpResultReport: {
+          failNum: 0,
+          ignoreNum: 0,
+          totalNum: 0,
+          passNum: 0,
+          runNum: 0
+        },
+        taskHistoryDetailTable: [
+          {
+            type: 'index',
+            width: 70,
+            align: 'center'
+          },
+          {
+            title: '结果描述',
+            width: 200,
+            key: 'description',
+            align: 'center'
+          },
+          {
+            title: 'Moduleame',
+            width: 200,
+            key: 'module_name',
+            align: 'center'
+          },
+          {
+            title: '期望结果',
+            width: 200,
+            key: 'expect',
+            align: 'center'
+          },
+          {
+            title: 'name',
+            width: 160,
+            key: 'name',
+            align: 'center'
+          },
+          {
+            title: '更新时间',
+            width: 160,
+            key: 'updateTime',
+            align: 'center'
+          }
+//          {
+//            title: '测试详情',
+//            width: 180,
+//            key: 'testDetail',
+//            align: 'center',
+//            render: (h, params) => {
+//              return h('div', [
+//                h('Button', {
+//                  props: {
+//                    type: 'primary',
+//                    icon: 'ios-cloud-download-outline',
+//                    size: 'small'
+//                  },
+//                  style: {
+//                    marginRight: '7px'
+//                  },
+//                  on: {
+//                    click: () => {
+//                      this.getJobDetail(params.index)
+//                    }
+//                  }
+//                }, '查看')
+//              ])
+//            }
+//          }
+
+        ],
+
+        taskHistoryTable: [
+          {
+            type: 'index',
+            width: 70,
+            align: 'center'
+          },
+          {
+            title: '执行人员',
+            width: 140,
+            key: 'starter',
+            align: 'center'
+          },
+          {
+            title: '开始时间',
+            width: 160,
+            key: 'createTime',
+            align: 'center'
+          },
+          {
+            title: '结束时间',
+            width: 160,
+            key: 'endTime',
+            align: 'center'
+          },
+          {
+            title: '执行结果',
+            width: 160,
+            key: 'jobStatus',
+            align: 'center'
+          },
+          {
+            title: '测试详情',
+            width: 180,
+            key: 'testDetail',
+            align: 'center',
+            render: (h, params) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    icon: 'ios-cloud-download-outline',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '7px'
+                  },
+                  on: {
+                    click: () => {
+                      this.taskHistoryDetailModel = true
+                      this.getJobDetail(params.index)
+                    }
+                  }
+                }, '查看')
+              ])
+            }
+          }
+
+        ],
         tasktable: [
           {
             type: 'selection',
@@ -248,19 +470,19 @@
           {
             title: '执行进度',
             width: 150,
-            key: 'result',
-            align: 'center',
-            render: (h, params) => {
-              const row = params.row
-              const text = (typeof row.result === 'undefined' || row.result === '') ? '未执行' : row.result === 'testing' ? '测试中 ' : row.result === 'success' ? '测试结束' : '测试结束'
-              const color = (typeof row.result === 'undefined' || row.result === '') ? 'yellow' : row.result === 'testing' ? 'blue' : row.result === 'success' ? 'green' : 'red'
-              return h('Tag', {
-                props: {
-                  type: 'dot',
-                  color: color
-                }
-              }, text)
-            }
+            key: 'status',
+            align: 'center'
+//            render: (h, params) => {
+//              const row = params.row
+//              const text = (typeof row.result === 'undefined' || row.result === '') ? '未执行' : row.result === 'testing' ? '测试中 ' : row.result === 'success' ? '测试结束' : '测试结束'
+//              const color = (typeof row.result === 'undefined' || row.result === '') ? 'yellow' : row.result === 'testing' ? 'blue' : row.result === 'success' ? 'green' : 'red'
+//              return h('Tag', {
+//                props: {
+//                  type: 'dot',
+//                  color: color
+//                }
+//              }, text)
+//            }
           },
           {
             title: '测试详情',
@@ -280,7 +502,7 @@
                   },
                   on: {
                     click: () => {
-//                      this.editTask(params.index)
+                      this.getLastBulidTaskDetail(params.index)
                     }
                   }
                 }, '查看'),
@@ -294,7 +516,7 @@
                   },
                   on: {
                     click: () => {
-                      this.executeTask(params.index)
+                      this.queryTaskHistory(params.index)
                     }
                   }
                 }, '历史记录')
@@ -351,7 +573,16 @@
             }
           }
         ],
-        taskTableData: []
+        taskTableData: [],
+        taskId: '',
+        taskHistoryPageHelp: {
+          curPage: 1,
+          endIndex: 10,
+          pageSize: 10,
+          startIndex: 0,
+          totalNum: 0,
+          totalPageNum: 0
+        }
       }
     },
     created () {
@@ -364,6 +595,9 @@
         console.log(file)
         console.log(fileList)
       },
+      getLastBulidTaskDetail () {
+        this.taskHistoryDetailModel = true
+      },
       editTask (index) {
         this.index = index
         this.taskmodeltitle = '编辑Task'
@@ -371,12 +605,179 @@
         this.addtaskmodal = true
         this.addTaskButtunFlag = false
         this.addTask = Object.assign({}, this.addTask, this.taskTableData[index])
+        this.getSelectModuled(index)
+      },
+      getSelectModuled (index) {
+        if (typeof this.addTask.projectData !== 'undefined') {
+          this.addTask.projectData.splice(0, this.addTask.projectData.length)
+        }
+        if (typeof this.targetKeys3 !== 'undefined') {
+          this.targetKeys3.splice(0, this.targetKeys3.length)
+        }
+        this.targetKeys3 = this.taskTableData[index].projectIds
+        fetch(window.serverurl + '/project/allList', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            var mockdata = json.result.data
+            for (let i = 0; i < mockdata.length; i++) {
+              this.addTask.projectData.push({
+                key: mockdata[i].id,
+                label: mockdata[i].moduleName,
+                description: mockdata[i].projectName,
+                disabled: false
+              })
+            }
+            for (let i = 0; i < mockdata.length; i++) {
+              if (this.checkIdExist(index, mockdata[i].id)) {
+                this.addTask.projectData.disabled = false
+              }
+            }
+          })
+        }).catch((e) => {
+          console.log(e)
+          e.toString()
+        })
+      },
+      checkIdExist (index, id) {
+        var flag = false
+        for (let j = 0; j < this.taskTableData[index].projectIds.length; j++) {
+          if (this.taskTableData[index].projectIds[j] === id) {
+            flag = true
+          }
+        }
+        return flag
+      },
+      queryTaskHistory (index) {
+        this.taskHistoryModel = true
+        console.log(JSON.stringify(this.taskTableData[index]))
+        this.taskId = this.taskTableData[index].id
+        this.taskHistroyLoading = true
+        fetch(window.serverurl + '/task/taskHistoryList?curPage=' + this.taskHistoryPageHelp.curPage + '&pageSize=' + this.taskHistoryPageHelp.pageSize + '&taskId=' + this.taskId, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.taskHistoryTableData = json.result.data.result
+            for (var i = 0; i < this.taskHistoryTableData.length; i++) {
+              this.taskHistoryTableData[i].createTime = this.formatTime(this.taskHistoryTableData[i].createTime)
+              this.taskHistoryTableData[i].updateTime = this.formatTime(this.taskHistoryTableData[i].updateTime)
+              this.taskHistoryTableData[i].endTime = this.formatTime(this.taskHistoryTableData[i].endTime)
+            }
+            this.taskHistoryPageHelp.totalNum = json.result.data.page.totalNum
+            this.taskHistoryPageHelp.totalPageNum = json.result.data.page.totalPageNum
+            this.taskHistroyLoading = false
+          })
+        }).catch((e) => {
+          console.log(e)
+          e.toString()
+        })
       },
       addTaskData () {
         this.taskmodeltitle = '添加Task'
         this.addtaskmodal = true
         this.addTaskButtunFlag = true
         this.okButtonText = '添加'
+        if (typeof this.addTask.projectData !== 'undefined') {
+          this.addTask.projectData.splice(0, this.addTask.projectData.length)
+        }
+        if (typeof this.targetKeys3 !== 'undefined') {
+          this.targetKeys3.splice(0, this.targetKeys3.length)
+        }
+        this.getProjectIdList()
+      },
+      getTaskPageIndex (pageIndex) {
+        this.taskPageHelp.curPage = pageIndex
+        this.loading = true
+        fetch(window.serverurl + '/task/taskList?type=NLP&curPage=' + pageIndex + '&pageSize=' + this.taskPageHelp.pageSize, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.taskTableData = json.result.data.result
+            for (var i = 0; i < this.taskTableData.length; i++) {
+              this.taskTableData[i].createTime = this.formatTime(this.taskTableData[i].createTime)
+              this.taskTableData[i].updateTime = this.formatTime(this.taskTableData[i].updateTime)
+            }
+            this.taskPageHelp.totalNum = json.result.data.page.totalNum
+            this.taskPageHelp.totalPageNum = json.result.data.page.totalPageNum
+            this.loading = false
+          })
+        }).catch((e) => {
+          console.log(e)
+          e.toString()
+        })
+      },
+      getTaskPageSize (pageSize) {
+        this.taskPageHelp.pageSize = pageSize
+      },
+      getTaskHitoryPageIndex (pageIndex) {
+        this.taskHistoryModel = true
+        this.taskHistroyLoading = true
+        this.taskHistoryPageHelp.curPage = pageIndex
+        fetch(window.serverurl + '/task/taskHistoryList?curPage=' + pageIndex + '&pageSize=' + this.taskHistoryPageHelp.pageSize + '&taskId=' + this.taskId, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.taskHistoryTableData = json.result.data.result
+            for (var i = 0; i < this.taskHistoryTableData.length; i++) {
+              this.taskHistoryTableData[i].createTime = this.formatTime(this.taskHistoryTableData[i].createTime)
+              this.taskHistoryTableData[i].updateTime = this.formatTime(this.taskHistoryTableData[i].updateTime)
+              this.taskHistoryTableData[i].endTime = this.formatTime(this.taskHistoryTableData[i].endTime)
+            }
+            this.taskHistoryPageHelp.totalNum = json.result.data.page.totalNum
+            this.taskHistoryPageHelp.totalPageNum = json.result.data.page.totalPageNum
+            this.taskHistroyLoading = false
+          })
+        }).catch((e) => {
+          console.log(e)
+          e.toString()
+        })
+      },
+      getTaskHistoryPageSize (pageSize) {
+        this.taskHistoryPageHelp.pageSize = pageSize
+      },
+      getTaskHitoryDetailPageIndex (pageIndex) {
+        this.taskHistroyDetailLoading = false
+        this.taskHistoryDetailPageHelp.curPage = pageIndex
+        fetch(window.serverurl + '/task/taskExecuteDetail', {
+          method: 'POST',
+          body: 'taskId=' + this.taskId + '&jobId=' + this.jobId + '&pageSize=' + this.taskHistoryDetailPageHelp.pageSize + '&curPage=' + pageIndex,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.taskHistroyDetailLoading = true
+            this.taskHistoryDetailTableData = json.result.data.failCaseList.result
+            this.taskHistoryDetailPageHelp.totalNum = json.result.data.failCaseList.page.totalNum
+            this.taskHistoryDetailPageHelp.totalPageNum = json.result.data.failCaseList.page.totalPageNum
+            for (let i = 0; i < this.taskHistoryDetailTableData.length; i++) {
+              this.taskHistoryDetailTableData[i].updateTime = this.formatTime(this.taskHistoryDetailTableData[i].updateTime)
+            }
+//            console.log('addtask:' + JSON.stringify(json))
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      getTaskHistoryDetailPageSize (pageSize) {
+        this.taskHistoryDetailPageHelp.pageSize = pageSize
       },
       removeTask (index) {
         fetch(window.serverurl + '/task/delete', {
@@ -388,7 +789,7 @@
           }
         }).then((res) => {
           res.json().then((json) => {
-//            console.log(json)
+            console.log(json)
             this.getTaskList()
           })
         }).catch((e) => {
@@ -413,9 +814,12 @@
 //        })
       },
       addOrSaveTask () {
+        this.addTask.projectIds = this.targetKeys3
         if (this.addTaskButtunFlag === false) {
           this.$set(this.taskTableData[this.index], this.addTask)
           this.taskTableData[this.index] = this.addTask
+          delete this.taskTableData[this.index].updateTime
+          delete this.taskTableData[this.index].createTime
           this.editTaskFunction(this.taskTableData[this.index])
         } else {
           this.addTaskFunction()
@@ -423,13 +827,15 @@
         this.addTask = {
           name: '',
           module: null,
+          projectData: [],
           id: '',
-          projectId: '',
+          projectIds: [],
           author: '',
           createTime: null,
           updateTime: null,
           type: 'NLP',
           result: '',
+          status: '',
           cellClassName: {}
         }
       },
@@ -443,10 +849,11 @@
           }
         }).then((res) => {
           res.json().then((json) => {
-//            console.log('addtask:' + JSON.stringify(json))
+            console.log('addtask:' + JSON.stringify(json))
             this.getTaskList()
           })
         }).catch((e) => {
+          console.log(e.toString())
           e.toString()
         })
       },
@@ -470,14 +877,16 @@
       getTaskList () {
         fetch(window.serverurl + '/task/taskList', {
           method: 'POST',
-          body: JSON.stringify({type: 'NLP'}),
+          body: 'type=NLP&pageSize=10&curPage=' + this.taskPageHelp.curPage,
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.taskTableData = json.result.data
+            this.taskTableData = json.result.data.result
+            this.taskPageHelp.totalNum = json.result.data.page.totalNum
+            this.taskPageHelp.totalPageNum = json.result.data.page.totalPageNum
             for (var i = 0; i < this.taskTableData.length; i++) {
               this.taskTableData[i].createTime = this.formatTime(this.taskTableData[i].createTime)
               this.taskTableData[i].updateTime = this.formatTime(this.taskTableData[i].updateTime)
@@ -487,9 +896,6 @@
         }).catch((e) => {
           e.toString()
         })
-      },
-      testInterval () {
-        console.log(Math.floor(Math.random() * 1000 + 1))
       },
       formatTime (datetime) {
         var time = new Date(datetime)
@@ -518,9 +924,15 @@
       addTaskCancelEvent () {
         this.addTask = {
           name: '',
+          projectIds: [],
+          type: 'NLP',
+          author: '',
           module: null,
           createTime: null,
           updateTime: null,
+          result: '',
+          caseMount: '',
+          projectData: [],
           cellClassName: {}
         }
       },
@@ -543,10 +955,10 @@
         })
       },
       executeTask (index) {
-        this.$set(this.taskTableData[index], 'result', 'testing')
-        fetch(window.serverurl + '/task/batch', {
+//        this.$set(this.taskTableData[index], 'result', 'testing')
+        fetch(window.serverurl + '/task/batch?taskId=' + this.taskTableData[index].id, {
           method: 'POST',
-          body: JSON.stringify({taskId: this.taskTableData[index].id}),
+//          body: JSON.stringify({taskId: this.taskTableData[index].id}),
           headers: {
             'Accept': 'application/json'
           }
@@ -557,7 +969,7 @@
             }
             res.json().then((json) => {
               console.log(JSON.stringify(json))
-              this.$set(this.taskTableData[index], 'result', json.data.result)
+//              this.$set(this.taskTableData[index], 'result', json.data.result)
             })
           } catch (e) {
             console.log(e.toString())
@@ -566,22 +978,31 @@
           e.toString()
         })
       },
-      getMockData () {
-        let mockData = []
-        for (let i = 1; i <= 20; i++) {
-          mockData.push({
-            key: i.toString(),
-            label: '内容' + i,
-            description: '内容' + i + '的描述信息'
-//            disabled: Math.random() * 3 < 1
+      getProjectIdList () {
+        fetch(window.serverurl + '/project/allList', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            var mockdata = json.result.data
+            for (let i = 0; i < mockdata.length; i++) {
+              this.addTask.projectData.push({
+                key: mockdata[i].id,
+                label: mockdata[i].moduleName,
+                description: mockdata[i].projectName
+              })
+            }
           })
-        }
-        return mockData
+        }).catch((e) => {
+          console.log(e)
+          e.toString()
+        })
       },
       getTargetKeys () {
-//        return this.getMockData()
-//          .filter(() => Math.random() * 2 > 1)
-//          .map(item => item.key)
+        console.log('----->' + this.targetKeys3)
       },
       handleChange3 (newTargetKeys) {
         this.targetKeys3 = newTargetKeys
@@ -594,8 +1015,9 @@
         return item.label + ' - ' + item.description
       },
       reloadMockData () {
-        this.projectData = this.getMockData()
-        this.targetKeys3 = this.getTargetKeys()
+        this.addTask.projectData.splice(0, this.addTask.projectData.length)
+        this.targetKeys3.splice(0, this.targetKeys3.length)
+        this.getProjectIdList()
       },
       drawGraph () {
         $.ajax({
@@ -609,13 +1031,46 @@
             console.log(errorMsg)
           }
         })
+      },
+      getJobDetail (index) {
+        this.jobId = this.taskHistoryTableData[index].jobId
+        this.taskHistroyDetailLoading = true
+        fetch(window.serverurl + '/task/taskExecuteDetail', {
+          method: 'POST',
+          body: 'taskId=' + this.taskId + '&jobId=' + this.taskHistoryTableData[index].jobId + '&pageSize=' + this.taskHistoryDetailPageHelp.pageSize + '&curPage=' + this.taskHistoryDetailPageHelp.curPage,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.nlpResultReport.totalNum = json.result.data.totalNum
+            this.nlpResultReport.ignoreNum = json.result.data.ignoreNum
+            this.nlpResultReport.passNum = json.result.data.passNum
+            this.nlpResultReport.runNum = json.result.data.runNum
+            this.nlpResultReport.failNum = json.result.data.failNum
+            this.taskHistroyDetailLoading = false
+            this.taskHistoryDetailTableData = json.result.data.failCaseList.result
+            this.taskHistoryDetailPageHelp.totalNum = json.result.data.failCaseList.page.totalNum
+            this.taskHistoryDetailPageHelp.totalPageNum = json.result.data.failCaseList.page.totalPageNum
+            for (var i = 0; i < this.taskHistoryDetailTableData.length; i++) {
+              this.taskHistoryDetailTableData[i].updateTime = this.formatTime(this.taskHistoryDetailTableData[i].updateTime)
+            }
+//            console.log('addtask:' + JSON.stringify(json))
+          })
+        }).catch((e) => {
+          e.toString()
+        })
       }
     },
     mounted () {
-//      this.intervalTmp = setInterval(() => {
-//        this.testInterval()
-//      }, 1000)
-//      clearInterval(this.intervalTmp)
+      this.intervalTmp = setInterval(() => {
+        this.getTaskList()
+      }, 15000)
+    },
+    destroyed () {
+      console.log('task destoryed.....')
+      clearInterval(this.intervalTmp)
     }
   }
 </script>

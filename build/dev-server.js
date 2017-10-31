@@ -85,6 +85,7 @@ var credentials = {key: privateKey, cert: certificate};
 
 var httpsServer = https.createServer(credentials, app);
 
-httpsServer.listen('443', function() {
+// 提交代码的时候8080端口改为443
+httpsServer.listen('8080', function() {
   console.log('HTTPS Server is running on: https://localhost:443');
 });

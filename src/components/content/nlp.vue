@@ -274,8 +274,8 @@
 </template>
 
 <script>
-  /* eslint-disable no-unused-vars */
-  import $ from 'jquery'
+//  /* eslint-disable no-unused-vars */
+//  import $ from 'jquery'
   import { Col, Row } from 'iview'
 //  import ICol from 'iview/src/components/grid/col.vue'
 //  import Row from 'iview/src/components/grid/row.vue'
@@ -298,9 +298,10 @@
           endIndex: 10,
           pageSize: 13,
           startIndex: 0,
-          totalNum: 1950,
-          totalPageNum: 195
+          totalNum: 0,
+          totalPageNum: 0
         },
+        scheduleidList: [],
         pageSizeOptions: [13, 26, 39, 52],
         paramShow: false,
         stepsTableDataLoading: false,
@@ -650,16 +651,15 @@
       }
     },
     mounted () {
-//      this.$on('editor-update', this.onEditIntents)
+//      this.intervalNlpTmp = setInterval(() => {
+//        this.getCaseStatus()
+//      }, 5000)
+    },
+    destroyed () {
+      console.log('nlp destoryed.....')
+      clearInterval(this.intervalNlpTmp)
     },
     created () {
-//      if (window.localStorage.getItem('nlp') === null) {
-//        console.log('null')
-//        window.localStorage.setItem('nlp', 'case')
-//      } else {
-//        console.log(window.localStorage.getItem('nlp'))
-//        window.localStorage.removeItem('nlp')
-//      }
       this.getCase()
     },
     methods: {
@@ -687,11 +687,32 @@
         }).then((res) => {
           res.json().then((json) => {
             this.$set(this.casedata[index], 'result', json.result.msg)
+//            this.intervalTmp = setInterval(() => {
+//              this.getOneCaseExcuteResult(json.result.data, this.casedata[index])
+//            }, 3000)
+//            this.scheduleidList.push(this.intervalTmp)
           })
         }).catch((e) => {
           e.toString()
         })
       },
+//      getOneCaseExcuteResult (jobId, casedata) {
+//        fetch(window.serverurl + '/task/checkCaseStatus', {
+//          method: 'POST',
+//          body: 'jobId=' + jobId + '&caseId=' + casedata.id,
+//          headers: {
+//            'Accept': 'application/json',
+//            'Content-Type': 'application/x-www-form-urlencoded'
+//          }
+//        }).then((res) => {
+//          res.json().then((json) => {
+//            this.$set(this.casedata, 'result', json.result.msg)
+//            this.intervalTmp = ''
+//          })
+//        }).catch((e) => {
+//          e.toString()
+//        })
+//      },
       getPageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
         this.loading = true
@@ -1149,6 +1170,24 @@
           e.toString()
         })
       },
+      getCaseStatus () {
+        fetch(window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.casedata = json.result.data.result
+            this.pageHelp.totalNum = json.result.data.page.totalNum
+            this.pageHelp.totalPageNum = json.result.data.page.totalPageNum
+            this.loading = false
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
       getCase () {
         this.loading = true
 //        setTimeout(() => {
@@ -1165,6 +1204,7 @@
           res.json().then((json) => {
             this.casedata = json.result.data.result
             this.pageHelp.totalNum = json.result.data.page.totalNum
+            this.pageHelp.totalPageNum = json.result.data.page.totalPageNum
             this.loading = false
           })
         }).catch((e) => {
