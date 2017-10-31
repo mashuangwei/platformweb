@@ -22,8 +22,9 @@
     <!-- 分页 -->
     <row>
       <i-col span="14" offset="8">
-        <Page :total="pageHelp.totalNum"  show-elevator show-sizer show-total placement="top" :current="pageHelp.curPage"
-              :page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize" :page-size-opts="pageSizeOptions"></Page>
+        <Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top" :current="pageHelp.curPage"
+              :page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"
+              :page-size-opts="pageSizeOptions"></Page>
       </i-col>
     </row>
 
@@ -274,11 +275,11 @@
 </template>
 
 <script>
-//  /* eslint-disable no-unused-vars */
-//  import $ from 'jquery'
+  //  /* eslint-disable no-unused-vars */
+  //  import $ from 'jquery'
   import { Col, Row } from 'iview'
-//  import ICol from 'iview/src/components/grid/col.vue'
-//  import Row from 'iview/src/components/grid/row.vue'
+  //  import ICol from 'iview/src/components/grid/col.vue'
+  //  import Row from 'iview/src/components/grid/row.vue'
   import Monaco from 'monaco-editor-forvue'
   import expandRow from './table-expand.vue'
 
@@ -528,8 +529,6 @@
         casetable: [
           {
             type: 'expand',
-//            height: 50,
-//            loading: false,
             width: 50,
             render: (h, params) => {
               return h(expandRow, {
@@ -540,9 +539,7 @@
             }
           },
           {
-//            type: 'selection',
             type: 'index',
-//            fixed: 'left',
             width: 60,
             align: 'center'
           },
@@ -657,7 +654,7 @@
     },
     destroyed () {
       console.log('nlp destoryed.....')
-      clearInterval(this.intervalNlpTmp)
+//      clearInterval(this.intervalNlpTmp)
     },
     created () {
       this.getCase()
@@ -725,6 +722,9 @@
         }).then((res) => {
           res.json().then((json) => {
             this.casedata = json.result.data.result
+            for (let i = 0; i < this.casedata.length; i++) {
+              this.casedata[i].createTime = this.formatTime(this.casedata[i].createTime)
+            }
             this.pageHelp.totalNum = json.result.data.page.totalNum
             this.loading = false
           })
@@ -1188,12 +1188,36 @@
           e.toString()
         })
       },
+      formatTime (datetime) {
+        var time = new Date(datetime)
+        var month = time.getMonth() + 1
+        var day = time.getDay()
+        var hour = time.getHours()
+        var minute = time.getMinutes()
+        var sconds = time.getSeconds()
+        if (month < 10) {
+          month = '0' + month
+        }
+        if (day < 10) {
+          day = '0' + day
+        }
+        if (hour < 10) {
+          hour = '0' + hour
+        }
+        if (minute < 10) {
+          minute = '0' + minute
+        }
+        if (sconds < 10) {
+          sconds = '0' + sconds
+        }
+        return time.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + sconds
+      },
       getCase () {
         this.loading = true
 //        setTimeout(() => {
 //          this.loading = false
 //        }, 3000)
-
+        console.log(9999999)
         fetch(window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize, {
           method: 'GET',
           headers: {
@@ -1203,6 +1227,9 @@
         }).then((res) => {
           res.json().then((json) => {
             this.casedata = json.result.data.result
+            for (let i = 0; i < this.casedata.length; i++) {
+              this.casedata[i].createTime = this.formatTime(this.casedata[i].createTime)
+            }
             this.pageHelp.totalNum = json.result.data.page.totalNum
             this.pageHelp.totalPageNum = json.result.data.page.totalPageNum
             this.loading = false
