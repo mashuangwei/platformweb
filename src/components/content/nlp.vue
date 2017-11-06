@@ -269,6 +269,27 @@
         </i-col>
       </row>
     </Modal>
+
+    <!-- 用例执行获取结果展示model页面 -->
+    <Modal
+      @on-ok="closeInterval"
+      :mask-closable="false"
+      width="400"
+      :title="Case执行结果"
+      v-model="caseExcuteResultModule"
+      :styles="{top: '20px'}">
+      <row>
+        <i-col span="4" offset="1">
+          <div style="line-height: 32px;"><label>参数名称：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="newParamsValue.parameter" placeholder="请输入..." style="width: 200px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+    </Modal>
   </div>
 
 
@@ -278,8 +299,6 @@
   //  /* eslint-disable no-unused-vars */
   //  import $ from 'jquery'
   import { Col, Row } from 'iview'
-  //  import ICol from 'iview/src/components/grid/col.vue'
-  //  import Row from 'iview/src/components/grid/row.vue'
   import Monaco from 'monaco-editor-forvue'
   import expandRow from './table-expand.vue'
 
@@ -294,6 +313,8 @@
     name: 'home',
     data () {
       return {
+        intervalTmp: null,
+        caseExcuteResultModule: false,
         pageHelp: {
           curPage: 1,
           endIndex: 10,
@@ -447,7 +468,6 @@
         stepstable: [
           {
             type: 'index',
-//            fixed: 'left',
             width: 60,
             align: 'center'
           },
@@ -549,12 +569,6 @@
             key: 'name',
             align: 'center'
           },
-//          {
-//            title: '用例描述',
-//            width: 200,
-//            key: 'description',
-//            align: 'center'
-//          },
           {
             title: '是否执行',
             width: 120,
@@ -579,12 +593,6 @@
             key: 'author',
             align: 'center'
           },
-//          {
-//            title: '创建时间',
-//            width: 155,
-//            key: 'createtime',
-//            align: 'center'
-//          },
           {
             title: '执行结果',
             width: 130,
@@ -673,6 +681,7 @@
         this.addcase.projectId = status.value
       },
       executeCase (index) {
+        this.caseExcuteResultModule = true
         this.$set(this.casedata[index], 'result', 'testing')
         fetch(window.serverurl + '/task/one', {
           method: 'POST',
@@ -684,32 +693,33 @@
         }).then((res) => {
           res.json().then((json) => {
             this.$set(this.casedata[index], 'result', json.result.msg)
-//            this.intervalTmp = setInterval(() => {
-//              this.getOneCaseExcuteResult(json.result.data, this.casedata[index])
-//            }, 3000)
-//            this.scheduleidList.push(this.intervalTmp)
+            this.intervalTmp = setInterval(() => {
+              this.getOneCaseExcuteResult(json.result.data, this.casedata[index].id)
+            }, 2000)
           })
         }).catch((e) => {
           e.toString()
         })
       },
-//      getOneCaseExcuteResult (jobId, casedata) {
-//        fetch(window.serverurl + '/task/checkCaseStatus', {
-//          method: 'POST',
-//          body: 'jobId=' + jobId + '&caseId=' + casedata.id,
-//          headers: {
-//            'Accept': 'application/json',
-//            'Content-Type': 'application/x-www-form-urlencoded'
-//          }
-//        }).then((res) => {
-//          res.json().then((json) => {
-//            this.$set(this.casedata, 'result', json.result.msg)
-//            this.intervalTmp = ''
-//          })
-//        }).catch((e) => {
-//          e.toString()
-//        })
-//      },
+      closeInterval () {
+        clearInterval(this.intervalTmp)
+      },
+      getOneCaseExcuteResult (jobId, caseid) {
+        fetch(window.serverurl + '/task/checkCaseStatus', {
+          method: 'POST',
+          body: 'jobId=' + jobId + '&caseId=' + caseid,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.$set(this.casedata, 'result', json.result.msg)
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
       getPageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
         this.loading = true

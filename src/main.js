@@ -11,7 +11,6 @@ import VueResource from 'vue-resource'
 Vue.use(VueResource)
 Vue.use(iview)
 Vue.config.productionTip = false
-// Vue.use(editor)
 
 /* eslint-disable no-new */
 new Vue({

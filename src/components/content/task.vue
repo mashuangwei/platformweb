@@ -243,7 +243,7 @@
         },
         taskPageHelp: {
           curPage: 1,
-          endIndex: 10,
+          endIndex: 13,
           pageSize: 13,
           startIndex: 0,
           totalNum: 0,
@@ -491,21 +491,21 @@
             align: 'center',
             render: (h, params) => {
               return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    icon: 'ios-cloud-download-outline',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '7px'
-                  },
-                  on: {
-                    click: () => {
-                      this.getLastBulidTaskDetail(params.index)
-                    }
-                  }
-                }, '查看'),
+//                h('Button', {
+//                  props: {
+//                    type: 'primary',
+//                    icon: 'ios-cloud-download-outline',
+//                    size: 'small'
+//                  },
+//                  style: {
+//                    marginRight: '7px'
+//                  },
+//                  on: {
+//                    click: () => {
+//                      this.getLastBulidTaskDetail(params.index)
+//                    }
+//                  }
+//                }, '查看'),
                 h('Button', {
                   props: {
                     type: 'primary',
@@ -595,9 +595,9 @@
         console.log(file)
         console.log(fileList)
       },
-      getLastBulidTaskDetail () {
-        this.taskHistoryDetailModel = true
-      },
+//      getLastBulidTaskDetail (index) {
+//        this.taskHistoryDetailModel = true
+//      },
       editTask (index) {
         this.index = index
         this.taskmodeltitle = '编辑Task'
@@ -752,7 +752,7 @@
         this.taskHistoryPageHelp.pageSize = pageSize
       },
       getTaskHitoryDetailPageIndex (pageIndex) {
-        this.taskHistroyDetailLoading = false
+        this.taskHistroyDetailLoading = true
         this.taskHistoryDetailPageHelp.curPage = pageIndex
         fetch(window.serverurl + '/task/taskExecuteDetail', {
           method: 'POST',
@@ -763,7 +763,7 @@
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.taskHistroyDetailLoading = true
+            this.taskHistroyDetailLoading = false
             this.taskHistoryDetailTableData = json.result.data.failCaseList.result
             this.taskHistoryDetailPageHelp.totalNum = json.result.data.failCaseList.page.totalNum
             this.taskHistoryDetailPageHelp.totalPageNum = json.result.data.failCaseList.page.totalPageNum
@@ -815,6 +815,9 @@
       },
       addOrSaveTask () {
         this.addTask.projectIds = this.targetKeys3
+        if (typeof this.addTask.projectIds === 'undefined') {
+          this.addTask.projectIds = []
+        }
         if (this.addTaskButtunFlag === false) {
           this.$set(this.taskTableData[this.index], this.addTask)
           this.taskTableData[this.index] = this.addTask
@@ -875,15 +878,19 @@
         })
       },
       getTaskList () {
+        console.log('size: ' + this.taskPageHelp.pageSize)
         fetch(window.serverurl + '/task/taskList', {
           method: 'POST',
-          body: 'type=NLP&pageSize=10&curPage=' + this.taskPageHelp.curPage,
+          body: 'type=NLP&pageSize=' + this.taskPageHelp.pageSize + '&curPage=' + this.taskPageHelp.curPage,
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
           res.json().then((json) => {
+            if (typeof json.result.data.result === 'undefined') {
+              return
+            }
             this.taskTableData = json.result.data.result
             this.taskPageHelp.totalNum = json.result.data.page.totalNum
             this.taskPageHelp.totalPageNum = json.result.data.page.totalPageNum
@@ -1066,7 +1073,7 @@
     mounted () {
       this.intervalTmp = setInterval(() => {
         this.getTaskList()
-      }, 15000)
+      }, 5000)
     },
     destroyed () {
       console.log('task destoryed.....')
