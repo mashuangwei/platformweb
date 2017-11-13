@@ -149,7 +149,7 @@
             <Menu-item name="1">
               <router-link to="/api">
                 <Icon type="chatbubbles"></Icon>
-                接口测试
+                Rest Api
               </router-link>
             </Menu-item>
             <Menu-item name="2">
@@ -199,9 +199,9 @@
             </Menu-item>
 
             <Menu-item name="9">
-              <router-link to="/report">
+              <router-link to="/monitor">
                 <Icon type="star"></Icon>
-                report
+                监控
               </router-link>
             </Menu-item>
 
@@ -267,7 +267,7 @@
           '/tts': '6',
           '/skill': '7',
           '/task': '8',
-          '/report': '9',
+          '/monitor': '9',
           '/highcharts': '10',
           '/environment': '11',
           '/chartdemo': '12'

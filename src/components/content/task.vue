@@ -90,8 +90,8 @@
     </Row>
 
     <row>
-      <Table :loading="loading" :columns="tasktable" :data="taskTableData" width="1370" height="690" :border="showBorder" :stripe="showStripe"
-             :show-header="showHeader" :showIndex="true"></Table>
+      <Table :loading="loading" :columns="tasktable" :data="taskTableData" :border="showBorder" :stripe="showStripe"
+             :show-header="showHeader" height="670" :showIndex="true"></Table>
     </row>
     <br>
     <!-- 分页 -->
@@ -445,31 +445,31 @@
         ],
         tasktable: [
           {
-            type: 'selection',
+            type: 'index',
             width: 60,
             align: 'center'
           },
           {
             title: 'task名称',
-            width: 410,
+//            width: 410,
             key: 'name',
             align: 'center'
           },
           {
             title: '创建时间',
-            width: 160,
+//            width: 160,
             key: 'createTime',
             align: 'center'
           },
           {
             title: '更新时间',
-            width: 160,
+//            width: 160,
             key: 'updateTime',
             align: 'center'
           },
           {
             title: '执行进度',
-            width: 150,
+//            width: 150,
             key: 'status',
             align: 'center'
 //            render: (h, params) => {
@@ -667,9 +667,9 @@
           res.json().then((json) => {
             this.taskHistoryTableData = json.result.data.result
             for (var i = 0; i < this.taskHistoryTableData.length; i++) {
-              this.taskHistoryTableData[i].createTime = this.formatTime(this.taskHistoryTableData[i].createTime)
-              this.taskHistoryTableData[i].updateTime = this.formatTime(this.taskHistoryTableData[i].updateTime)
-              this.taskHistoryTableData[i].endTime = this.formatTime(this.taskHistoryTableData[i].endTime)
+              this.taskHistoryTableData[i].createTime = this.formatDate(new Date(this.taskHistoryTableData[i].createTime), 'yyyy-MM-dd hh:mm:ss')
+              this.taskHistoryTableData[i].updateTime = this.formatDate(new Date(this.taskHistoryTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
+              this.taskHistoryTableData[i].endTime = this.formatDate(new Date(this.taskHistoryTableData[i].endTime), 'yyyy-MM-dd hh:mm:ss')
             }
             this.taskHistoryPageHelp.totalNum = json.result.data.page.totalNum
             this.taskHistoryPageHelp.totalPageNum = json.result.data.page.totalPageNum
@@ -706,8 +706,8 @@
           res.json().then((json) => {
             this.taskTableData = json.result.data.result
             for (var i = 0; i < this.taskTableData.length; i++) {
-              this.taskTableData[i].createTime = this.formatTime(this.taskTableData[i].createTime)
-              this.taskTableData[i].updateTime = this.formatTime(this.taskTableData[i].updateTime)
+              this.taskTableData[i].createTime = this.formatDate(new Date(this.taskTableData[i].createTime), 'yyyy-MM-dd hh:mm:ss')
+              this.taskTableData[i].updateTime = this.formatDate(new Date(this.taskTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
             }
             this.taskPageHelp.totalNum = json.result.data.page.totalNum
             this.taskPageHelp.totalPageNum = json.result.data.page.totalPageNum
@@ -735,9 +735,9 @@
           res.json().then((json) => {
             this.taskHistoryTableData = json.result.data.result
             for (var i = 0; i < this.taskHistoryTableData.length; i++) {
-              this.taskHistoryTableData[i].createTime = this.formatTime(this.taskHistoryTableData[i].createTime)
-              this.taskHistoryTableData[i].updateTime = this.formatTime(this.taskHistoryTableData[i].updateTime)
-              this.taskHistoryTableData[i].endTime = this.formatTime(this.taskHistoryTableData[i].endTime)
+              this.taskHistoryTableData[i].createTime = this.formatDate(new Date(this.taskHistoryTableData[i].createTime), 'yyyy-MM-dd hh:mm:ss')
+              this.taskHistoryTableData[i].updateTime = this.formatDate(new Date(this.taskHistoryTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
+              this.taskHistoryTableData[i].endTime = this.formatDate(new Date(this.taskHistoryTableData[i].endTime), 'yyyy-MM-dd hh:mm:ss')
             }
             this.taskHistoryPageHelp.totalNum = json.result.data.page.totalNum
             this.taskHistoryPageHelp.totalPageNum = json.result.data.page.totalPageNum
@@ -768,7 +768,7 @@
             this.taskHistoryDetailPageHelp.totalNum = json.result.data.failCaseList.page.totalNum
             this.taskHistoryDetailPageHelp.totalPageNum = json.result.data.failCaseList.page.totalPageNum
             for (let i = 0; i < this.taskHistoryDetailTableData.length; i++) {
-              this.taskHistoryDetailTableData[i].updateTime = this.formatTime(this.taskHistoryDetailTableData[i].updateTime)
+              this.taskHistoryDetailTableData[i].updateTime = this.formatDate(new Date(this.taskHistoryDetailTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
             }
 //            console.log('addtask:' + JSON.stringify(json))
           })
@@ -894,9 +894,9 @@
             this.taskTableData = json.result.data.result
             this.taskPageHelp.totalNum = json.result.data.page.totalNum
             this.taskPageHelp.totalPageNum = json.result.data.page.totalPageNum
-            for (var i = 0; i < this.taskTableData.length; i++) {
-              this.taskTableData[i].createTime = this.formatTime(this.taskTableData[i].createTime)
-              this.taskTableData[i].updateTime = this.formatTime(this.taskTableData[i].updateTime)
+            for (let i = 0; i < this.taskTableData.length; i++) {
+              this.taskTableData[i].createTime = this.formatDate(new Date(this.taskTableData[i].createTime), 'yyyy-MM-dd hh:mm:ss')
+              this.taskTableData[i].updateTime = this.formatDate(new Date(this.taskTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
             }
 //            console.log('addtask:' + JSON.stringify(json))
           })
@@ -904,29 +904,27 @@
           e.toString()
         })
       },
-      formatTime (datetime) {
-        var time = new Date(datetime)
-        var month = time.getMonth() + 1
-        var day = time.getDay()
-        var hour = time.getHours()
-        var minute = time.getMinutes()
-        var sconds = time.getSeconds()
-        if (month < 10) {
-          month = '0' + month
+      formatDate (date, fmt) {
+        if (/(y+)/.test(fmt)) {
+          fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
         }
-        if (day < 10) {
-          day = '0' + day
+        let o = {
+          'M+': date.getMonth() + 1,
+          'd+': date.getDate(),
+          'h+': date.getHours(),
+          'm+': date.getMinutes(),
+          's+': date.getSeconds()
         }
-        if (hour < 10) {
-          hour = '0' + hour
+        for (let k in o) {
+          if (new RegExp(`(${k})`).test(fmt)) {
+            let str = o[k] + ''
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str))
+          }
         }
-        if (minute < 10) {
-          minute = '0' + minute
-        }
-        if (sconds < 10) {
-          sconds = '0' + sconds
-        }
-        return time.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + sconds
+        return fmt
+      },
+      padLeftZero (str) {
+        return ('00' + str).substr(str.length)
       },
       addTaskCancelEvent () {
         this.addTask = {
@@ -1061,7 +1059,7 @@
             this.taskHistoryDetailPageHelp.totalNum = json.result.data.failCaseList.page.totalNum
             this.taskHistoryDetailPageHelp.totalPageNum = json.result.data.failCaseList.page.totalPageNum
             for (var i = 0; i < this.taskHistoryDetailTableData.length; i++) {
-              this.taskHistoryDetailTableData[i].updateTime = this.formatTime(this.taskHistoryDetailTableData[i].updateTime)
+              this.taskHistoryDetailTableData[i].updateTime = this.formatDate(new Date(this.taskHistoryDetailTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
             }
 //            console.log('addtask:' + JSON.stringify(json))
           })

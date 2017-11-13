@@ -205,17 +205,6 @@
             <Input v-model="slotValue" placeholder="词条内容，以逗号分隔，比如1,2" style="width: 220px"></Input>
           </div>
         </i-col>
-        <!--<i-col span="3" offset="1">-->
-          <!--<Select v-model="skilltemplate.slotName" style="width:220px" @on-change="selectAppSlot">-->
-            <!--<Option v-for="item in appSlotList" :value="item.name" :key="item"></Option>-->
-          <!--</Select>-->
-        <!--</i-col>-->
-        <!--<i-col span="2" offset="4">-->
-          <!--<Button type="primary" icon="plus-circled">添加</Button>-->
-        <!--</i-col>-->
-        <!--<i-col span="2" offset="1">-->
-          <!--<Button type="primary" icon="edit">编辑</Button>-->
-        <!--</i-col>-->
       </row>
       <br>
 
@@ -265,8 +254,6 @@
 <script>
   import $ from 'jquery'
   import { Col, Row } from 'iview'
-//  import ICol from 'iview/src/components/grid/col.vue'
-//  import Row from 'iview/src/components/grid/row.vue'
   import editor from 'vue2-ace-editor-new'
   import 'brace/mode/javascript'
   import 'brace/theme/chrome'

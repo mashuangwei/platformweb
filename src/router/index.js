@@ -12,6 +12,7 @@ import skill from '@/components/content/skill.vue'
 import speech from '@/components/content/speech.vue'
 import task from '@/components/content/task.vue'
 import chartdemo from '@/components/content/chartdemo.vue'
+import monitor from '@/components/content/monitor.vue'
 
 Vue.use(Router)
 
@@ -78,6 +79,11 @@ export default new Router({
       path: '/chartdemo',
       name: 'chartdemo',
       component: chartdemo
+    },
+    {
+      path: '/monitor',
+      name: 'monitor',
+      component: monitor
     }
   ]
 })

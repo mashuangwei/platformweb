@@ -14,7 +14,7 @@
     </Row>
 
     <row>
-      <Table :loading="loading" :columns="casetable" :data="casedata" width="1370" height="664" :border="showBorder"
+      <Table :loading="loading" :columns="casetable" :data="casedata" height="666" :border="showBorder"
              :stripe="showStripe"
              :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
     </row>
@@ -273,20 +273,23 @@
     <!-- 用例执行获取结果展示model页面 -->
     <Modal
       @on-ok="closeInterval"
-      :mask-closable="false"
+      :mask-closable="true"
       width="400"
-      :title="Case执行结果"
+      :title="resultTitle"
       v-model="caseExcuteResultModule"
       :styles="{top: '20px'}">
       <row>
-        <i-col span="4" offset="1">
-          <div style="line-height: 32px;"><label>参数名称：</label></div>
+        <i-col class="demo-spin-col" span="8">
+          <Spin fix v-if="spinShow">
+            <Icon type="load-c" size=36   class="demo-spin-icon-load"></Icon>
+            <div>Loading</div>
+          </Spin>
+          <br><br>
+          <i-col span="3" offset="11" v-if="resultShow" :message="caseMessage">
+            <div style="line-height: 32px;"><label>{{caseMessage}}</label></div>
+          </i-col>
         </i-col>
-        <i-col span="3" offset="1">
-          <div>
-            <Input v-model="newParamsValue.parameter" placeholder="请输入..." style="width: 200px"></Input>
-          </div>
-        </i-col>
+
       </row>
       <br>
     </Modal>
@@ -313,6 +316,10 @@
     name: 'home',
     data () {
       return {
+        resultTitle: 'Case执行结果',
+        caseMessage: '',
+        resultShow: false,
+        spinShow: true,
         intervalTmp: null,
         caseExcuteResultModule: false,
         pageHelp: {
@@ -565,37 +572,37 @@
           },
           {
             title: '用例名称',
-            width: 270,
+//            width: 270,
             key: 'name',
             align: 'center'
           },
           {
             title: '是否执行',
-            width: 120,
+//            width: 120,
             key: 'switchType',
             align: 'center'
           },
           {
             title: 'Intent',
-            width: 190,
+//            width: 190,
             key: 'projectName',
             align: 'center'
           },
           {
             title: 'Domain',
-            width: 190,
+//            width: 190,
             key: 'moduleName',
             align: 'center'
           },
           {
             title: 'Author',
-            width: 130,
+//            width: 130,
             key: 'author',
             align: 'center'
           },
           {
             title: '执行结果',
-            width: 130,
+//            width: 130,
             key: 'result',
             align: 'center'
           },
@@ -682,7 +689,10 @@
       },
       executeCase (index) {
         this.caseExcuteResultModule = true
-        this.$set(this.casedata[index], 'result', 'testing')
+        this.spinShow = true
+        this.caseMessage = ''
+        this.resultShow = false
+//        this.$set(this.casedata[index], 'result', 'testing')
         fetch(window.serverurl + '/task/one', {
           method: 'POST',
           body: 'taskId=' + this.casedata[index].id + '&projectId=' + this.casedata[index].projectId,
@@ -692,9 +702,9 @@
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.$set(this.casedata[index], 'result', json.result.msg)
+//            this.$set(this.casedata[index], 'result', json.result.msg)
             this.intervalTmp = setInterval(() => {
-              this.getOneCaseExcuteResult(json.result.data, this.casedata[index].id)
+              this.getOneCaseExcuteResult(json.result.data, this.casedata[index].id, index)
             }, 2000)
           })
         }).catch((e) => {
@@ -703,8 +713,11 @@
       },
       closeInterval () {
         clearInterval(this.intervalTmp)
+        this.spinShow = true
+        this.resultShow = false
+//        this.message = false
       },
-      getOneCaseExcuteResult (jobId, caseid) {
+      getOneCaseExcuteResult (jobId, caseid, index) {
         fetch(window.serverurl + '/task/checkCaseStatus', {
           method: 'POST',
           body: 'jobId=' + jobId + '&caseId=' + caseid,
@@ -714,7 +727,14 @@
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.$set(this.casedata, 'result', json.result.msg)
+            if (json.result.data !== 'RUNNING') {
+              this.caseMessage = 'RUNNING'
+              clearInterval(this.intervalTmp)
+              this.spinShow = false
+              this.resultShow = true
+              this.caseMessage = json.result.data
+              this.$set(this.casedata[index], 'result', json.result.data)
+            }
           })
         }).catch((e) => {
           e.toString()
@@ -733,7 +753,7 @@
           res.json().then((json) => {
             this.casedata = json.result.data.result
             for (let i = 0; i < this.casedata.length; i++) {
-              this.casedata[i].createTime = this.formatTime(this.casedata[i].createTime)
+              this.casedata[i].createTime = this.formatDate(new Date(this.casedata[i].createTime), 'yyyy-MM-dd hh:mm:ss')
             }
             this.pageHelp.totalNum = json.result.data.page.totalNum
             this.loading = false
@@ -1198,36 +1218,33 @@
           e.toString()
         })
       },
-      formatTime (datetime) {
-        var time = new Date(datetime)
-        var month = time.getMonth() + 1
-        var day = time.getDay()
-        var hour = time.getHours()
-        var minute = time.getMinutes()
-        var sconds = time.getSeconds()
-        if (month < 10) {
-          month = '0' + month
+      formatDate (date, fmt) {
+        if (/(y+)/.test(fmt)) {
+          fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
         }
-        if (day < 10) {
-          day = '0' + day
+        let o = {
+          'M+': date.getMonth() + 1,
+          'd+': date.getDate(),
+          'h+': date.getHours(),
+          'm+': date.getMinutes(),
+          's+': date.getSeconds()
         }
-        if (hour < 10) {
-          hour = '0' + hour
+        for (let k in o) {
+          if (new RegExp(`(${k})`).test(fmt)) {
+            let str = o[k] + ''
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str))
+          }
         }
-        if (minute < 10) {
-          minute = '0' + minute
-        }
-        if (sconds < 10) {
-          sconds = '0' + sconds
-        }
-        return time.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + sconds
+        return fmt
+      },
+      padLeftZero (str) {
+        return ('00' + str).substr(str.length)
       },
       getCase () {
         this.loading = true
 //        setTimeout(() => {
 //          this.loading = false
 //        }, 3000)
-        console.log(9999999)
         fetch(window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize, {
           method: 'GET',
           headers: {
@@ -1238,7 +1255,7 @@
           res.json().then((json) => {
             this.casedata = json.result.data.result
             for (let i = 0; i < this.casedata.length; i++) {
-              this.casedata[i].createTime = this.formatTime(this.casedata[i].createTime)
+              this.casedata[i].createTime = this.formatDate(new Date(this.casedata[i].createTime), 'yyyy-MM-dd hh:mm:ss')
             }
             this.pageHelp.totalNum = json.result.data.page.totalNum
             this.pageHelp.totalPageNum = json.result.data.page.totalPageNum
@@ -1280,4 +1297,26 @@
     padding-top: 15px;
   }
 
+  .demo-spin-icon-load {
+    animation: ani-demo-spin 1s linear infinite;
+  }
+
+  @keyframes ani-demo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .demo-spin-col {
+    height: 100px;
+    width: 380px;
+    position: relative;
+    border: 1px solid #eee;
+  }
 </style>

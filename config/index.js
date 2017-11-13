@@ -38,8 +38,12 @@ module.exports = {
         pathRewrite: { '^/api': '' },
         target: "http://10.88.128.140:8080",
         changeOrigin: false
+      },
+      '/msw': {
+        pathRewrite: { '^/msw': '' },
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true
       }
-
     },
 
     // CSS Sourcemaps off by default because relative paths are "buggy"
