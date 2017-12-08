@@ -13,12 +13,20 @@ import speech from '@/components/content/speech.vue'
 import task from '@/components/content/task.vue'
 import chartdemo from '@/components/content/chartdemo.vue'
 import monitor from '@/components/content/monitor.vue'
+import job from '@/components/content/job.vue'
+import login from '@/components/content/login.vue'
 
 Vue.use(Router)
 
 export default new Router({
   linkActiveClass: 'active',
   routes: [
+    {
+      path: '/login',
+      name: 'login',
+      alias: '/',
+      component: login
+    },
     {
       path: '/api',
       name: 'api',
@@ -84,6 +92,11 @@ export default new Router({
       path: '/monitor',
       name: 'monitor',
       component: monitor
+    },
+    {
+      path: '/job',
+      name: 'job',
+      component: job
     }
   ]
 })

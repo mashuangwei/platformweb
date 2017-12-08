@@ -232,6 +232,7 @@
   import 'brace/mode/javascript'
   import 'brace/theme/chrome'
   import Monaco from 'monaco-editor-forvue'
+  import $ from 'jquery'
 
   export default {
     components: {
@@ -617,6 +618,22 @@
         this.addcasemodal = true
         this.addCaseButtunFlag = true
         this.okButtonText = '添加'
+        this.login()
+      },
+      login () {
+        $.ajax({
+          type: 'POST',
+          async: true,
+          data: 'username=admin&password=admin',
+          url: window.account + '/login',
+//          dataType: 'json',
+          success: (result) => {
+            console.log('login success')
+          },
+          error: (errorMsg) => {
+            console.log(errorMsg)
+          }
+        })
       },
       removeCase (index) {
         this.casedata.splice(index, 1)

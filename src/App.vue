@@ -5,6 +5,9 @@
   .active {
     color: #2d8cf0;
   }
+  .pr {
+    position: relative !important;
+  }
   .ivu-menu-vertical .ivu-menu-item {
     padding: 0;
   }
@@ -24,6 +27,10 @@
     .ivu-modal {
       top: 0;
     }
+  }
+
+  .ivu-form-inline .ivu-form-item {
+    display: block;
   }
 
   .ivu-table .table-info-cell-result-success {
@@ -99,6 +106,13 @@
     text-align: left;
   }
 
+  .username {
+    position: absolute;
+    right: 20px;
+    line-height: 60px;
+    color: #fff;
+  }
+
   .layout {
 
     .layout-nav {
@@ -118,11 +132,16 @@
     }
 
   }
+  .ivu-col-span-20 {
+    height: 100%;
+  }
 </style>
 <template>
   <div class="layout">
+
     <Menu mode="horizontal" theme="primary" active-name="1">
       <div class="layout-nav">
+
         <Menu-item name="11">
           <Icon type="home"></Icon>
           首页
@@ -139,8 +158,15 @@
           <Icon type="ios-paper"></Icon>
           <a href="https://sonar.rokid-inc.com" class="db" target="_Blank">Sonar</a>
         </Menu-item>
+
+        <div v-if="isLogined" class="username">ab.xyz</div>
+        <div v-else class="username">
+          <Button type="primary" @click.stop.prevent="login">登录</Button>
+        </div>
+
       </div>
     </Menu>
+
 
     <div class="layout-content" height="760px">
       <Row>
@@ -206,9 +232,9 @@
             </Menu-item>
 
             <Menu-item name="10">
-              <router-link to="/highcharts">
+              <router-link to="/job">
                 <Icon type="gear-b"></Icon>
-                Highcharts
+                Job Manage
               </router-link>
             </Menu-item>
 
@@ -224,6 +250,13 @@
               <router-link to="/chartdemo">
                 <Icon type="scissors"></Icon>
                 动态图表
+              </router-link>
+            </Menu-item>
+
+            <Menu-item name="13">
+              <router-link to="/highcharts">
+                <Icon type="gear-b"></Icon>
+                Highcharts
               </router-link>
             </Menu-item>
 
@@ -249,6 +282,7 @@
 <script>
   import { Col, Row } from 'iview'
   import editor from 'vue2-ace-editor-new'
+
   export default {
     components: {
       Row,
@@ -258,6 +292,7 @@
     name: 'index',
     data () {
       return {
+        isLogined: false,
         activeMenu: {
           '/api': '1',
           '/test': '2',
@@ -268,13 +303,19 @@
           '/skill': '7',
           '/task': '8',
           '/monitor': '9',
-          '/highcharts': '10',
+          '/job': '10',
           '/environment': '11',
-          '/chartdemo': '12'
+          '/chartdemo': '12',
+          '/highcharts': '13'
         }
       }
     },
-    methods: {}
+    methods: {
+      login () {
+        this.$router.push('/login')
+      }
+
+    }
   }
 </script>
 

@@ -73,7 +73,7 @@
   <div>
     <Row>
       <i-col span="2">
-        <Select v-model="SelectProjectModel" style="width:150px">
+        <Select v-model="SelectProjectModel" style="width:150px" @on-change="selectTaskModule">
           <Option v-for="item in projectList" :value="item.value" :key="item.value"></Option>
         </Select>
       </i-col>
@@ -91,7 +91,7 @@
 
     <row>
       <Table :loading="loading" :columns="tasktable" :data="taskTableData" :border="showBorder" :stripe="showStripe"
-             :show-header="showHeader" height="670" :showIndex="true"></Table>
+             :show-header="showHeader" height="670" :showIndex="true" ></Table>
     </row>
     <br>
     <!-- 分页 -->
@@ -137,7 +137,7 @@
         :render-format="render3"
         :operations="['向左移动','向右移动']"
         filterable
-        @on-change="handleChange3">
+        @on-change="keyChange">
         <div :style="{float: 'right', margin: '5px'}">
           <Button type="ghost" size="small" @click="reloadMockData">刷新</Button>
         </div>
@@ -227,6 +227,8 @@
     },
     data () {
       return {
+        asrTaskShowFlag: false,
+        nlpTaskShowFlag: true,
         taskHistoryDetailTableData: [],
         taskHistoryDetailModel: false,
         taskHistroyDetailLoading: false,
@@ -301,7 +303,7 @@
         addTask: {
           name: '',
           projectIds: [],
-          type: 'NLP',
+          type: '',
           author: '',
           module: null,
           createTime: null,
@@ -582,18 +584,124 @@
           startIndex: 0,
           totalNum: 0,
           totalPageNum: 0
-        }
+        },
+        asrModuleData: [
+          {
+            key: '1',
+            label: 'online-child.sh',
+            description: '',
+            disabled: false
+          },
+          {
+            key: '2',
+            label: 'online-man.sh',
+            description: '',
+            disabled: false
+          },
+          {
+            key: '3',
+            label: 'online-woman.sh',
+            description: '',
+            disabled: false
+          },
+          {
+            key: '4',
+            label: 'online-train.sh',
+            description: '',
+            disabled: false
+          },
+          {
+            key: '5',
+            label: 'online-homebase.sh',
+            description: '',
+            disabled: false
+          },
+          {
+            key: '6',
+            label: 'online-music.sh',
+            description: '',
+            disabled: false
+          },
+          {
+            key: '7',
+            label: 'online-haier.sh',
+            description: '',
+            disabled: false
+          },
+          {
+            key: '8',
+            label: 'online-zte.sh',
+            description: '',
+            disabled: false
+          }
+        ]
       }
     },
     created () {
-      this.getTaskList()
+      this.getNlpTaskList()
     },
     methods: {
+      selectTaskModule () {
+        console.log('selectModule: ' + this.SelectProjectModel)
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.getNlpTaskList()
+            clearInterval(this.intervalTmp)
+            this.intervalTmp = setInterval(() => {
+              this.getNlpTaskList()
+            }, 6000)
+            this.asrTaskShowFlag = false
+            this.nlpTaskShowFlag = true
+            break
+          }
+          case 'asr': {
+            this.getAsrTaskList()
+            clearInterval(this.intervalTmp)
+            this.intervalTmp = setInterval(() => {
+              this.getAsrTaskList()
+            }, 6000)
+            this.nlpTaskShowFlag = false
+            this.asrTaskShowFlag = true
+            break
+          }
+          default: {
+            this.asrTaskShowFlag = false
+            this.nlpTaskShowFlag = true
+          }
+        }
+      },
+      getAsrTaskList () {
+        console.log('size: ' + this.taskPageHelp.pageSize)
+        fetch(window.serverurl + '/task/taskList', {
+          method: 'POST',
+          body: 'type=ASR&pageSize=' + this.taskPageHelp.pageSize + '&curPage=' + this.taskPageHelp.curPage,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            if (typeof json.result.data.result === 'undefined') {
+              return
+            }
+            this.taskTableData = json.result.data.result
+            this.taskPageHelp.totalNum = json.result.data.page.totalNum
+            this.taskPageHelp.totalPageNum = json.result.data.page.totalPageNum
+            for (let i = 0; i < this.taskTableData.length; i++) {
+              this.taskTableData[i].createTime = this.formatDate(new Date(this.taskTableData[i].createTime), 'yyyy-MM-dd hh:mm:ss')
+              this.taskTableData[i].updateTime = this.formatDate(new Date(this.taskTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
+            }
+//            console.log('addtask:' + JSON.stringify(json))
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
       handleSuccess (res, file, fileList) {
         this.uploadShowFlag = false
-        console.log(res)
-        console.log(file)
-        console.log(fileList)
+        console.log('res: ' + res)
+        console.log('file: ' + file)
+        console.log('filelist: ' + fileList)
       },
 //      getLastBulidTaskDetail (index) {
 //        this.taskHistoryDetailModel = true
@@ -607,13 +715,7 @@
         this.addTask = Object.assign({}, this.addTask, this.taskTableData[index])
         this.getSelectModuled(index)
       },
-      getSelectModuled (index) {
-        if (typeof this.addTask.projectData !== 'undefined') {
-          this.addTask.projectData.splice(0, this.addTask.projectData.length)
-        }
-        if (typeof this.targetKeys3 !== 'undefined') {
-          this.targetKeys3.splice(0, this.targetKeys3.length)
-        }
+      getSelectModuledByNlp (index) {
         this.targetKeys3 = this.taskTableData[index].projectIds
         fetch(window.serverurl + '/project/allList', {
           method: 'GET',
@@ -643,6 +745,53 @@
           e.toString()
         })
       },
+      getSelectModuledByAsr (index) {
+        this.targetKeys3 = this.taskTableData[index].projectIds
+        console.log('newtarget: ' + this.targetKeys3)
+        var mockdata = this.asrModuleData
+        for (let i = 0; i < this.targetKeys3.length; i++) {
+          for (let j = 0; j < mockdata.length; j++) {
+            if (mockdata[j].key === this.targetKeys3[i].toString()) {
+              mockdata.splice(j, 1)
+              break
+            }
+          }
+        }
+        console.log('getSelectModuledByAsr：' + this.targetKeys3)
+        for (let i = 0; i < mockdata.length; i++) {
+          this.addTask.projectData.push({
+            key: mockdata[i].key,
+            label: mockdata[i].label,
+            description: mockdata[i].description,
+            disabled: false
+          })
+        }
+        // for (let i = 0; i < mockdata.length; i++) {
+        //   if (this.checkIdExist(index, mockdata[i].key)) {
+        //     this.addTask.projectData.disabled = false
+        //   }
+        // }
+        console.log('this.addTask.projectData: ' + this.addTask.projectData.toString())
+        console.log('newtarget: ' + this.targetKeys3)
+      },
+      getSelectModuled (index) {
+        if (typeof this.addTask.projectData !== 'undefined') {
+          this.addTask.projectData.splice(0, this.addTask.projectData.length)
+        }
+        if (typeof this.targetKeys3 !== 'undefined') {
+          this.targetKeys3.splice(0, this.targetKeys3.length)
+        }
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.getSelectModuledByNlp(index)
+            break
+          }
+          case 'asr': {
+            this.getSelectModuledByAsr(index)
+            break
+          }
+        }
+      },
       checkIdExist (index, id) {
         var flag = false
         for (let j = 0; j < this.taskTableData[index].projectIds.length; j++) {
@@ -652,7 +801,7 @@
         }
         return flag
       },
-      queryTaskHistory (index) {
+      queryHitoryByNlp (index) {
         this.taskHistoryModel = true
         console.log(JSON.stringify(this.taskTableData[index]))
         this.taskId = this.taskTableData[index].id
@@ -680,6 +829,22 @@
           e.toString()
         })
       },
+      queryHitoryByAsr (index) {
+        // window.location.href = 'http://10.88.128.140:8080/views/performamce/index.html#/view'
+        window.open('http://lightssaber.rokid-inc.com/views/performamce/index.html#/view')
+      },
+      queryTaskHistory (index) {
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.queryHitoryByNlp(index)
+            break
+          }
+          case 'asr': {
+            this.queryHitoryByAsr(index)
+            break
+          }
+        }
+      },
       addTaskData () {
         this.taskmodeltitle = '添加Task'
         this.addtaskmodal = true
@@ -691,7 +856,51 @@
         if (typeof this.targetKeys3 !== 'undefined') {
           this.targetKeys3.splice(0, this.targetKeys3.length)
         }
-        this.getProjectIdList()
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.getProjectIdListByNlp()
+            break
+          }
+          case 'asr': {
+            this.getProjectIdListByAsr()
+            break
+          }
+        }
+      },
+      getProjectIdListByNlp () {
+        fetch(window.serverurl + '/project/allList', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            var mockdata = json.result.data
+            for (let i = 0; i < mockdata.length; i++) {
+              this.addTask.projectData.push({
+                key: mockdata[i].id,
+                label: mockdata[i].moduleName,
+                description: mockdata[i].projectName
+              })
+            }
+          })
+        }).catch((e) => {
+          console.log(e)
+          e.toString()
+        })
+      },
+      getProjectIdListByAsr () {
+        this.addTask.projectData = this.asrModuleData
+        // var mockdata = this.asrModuleData
+        // for (let i = 0; i < mockdata.length; i++) {
+        //   this.addTask.projectData.push({
+        //     key: mockdata.key,
+        //     label: mockdata[i].label,
+        //     description: mockdata[i].description,
+        //     disabled: true
+        //   })
+        // }
       },
       getTaskPageIndex (pageIndex) {
         this.taskPageHelp.curPage = pageIndex
@@ -779,7 +988,7 @@
       getTaskHistoryDetailPageSize (pageSize) {
         this.taskHistoryDetailPageHelp.pageSize = pageSize
       },
-      removeTask (index) {
+      removeTaskByNlp (index) {
         fetch(window.serverurl + '/task/delete', {
           method: 'POST',
           body: JSON.stringify({id: this.taskTableData[index].id}),
@@ -790,11 +999,40 @@
         }).then((res) => {
           res.json().then((json) => {
             console.log(json)
-            this.getTaskList()
+            this.getNlpTaskList()
           })
         }).catch((e) => {
           e.toString()
         })
+      },
+      removeTaskByAsr (index) {
+        fetch(window.serverurl + '/task/delete', {
+          method: 'POST',
+          body: JSON.stringify({id: this.taskTableData[index].id}),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            console.log(json)
+            this.getAsrTaskList()
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      removeTask (index) {
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.removeTaskByNlp(index)
+            break
+          }
+          case 'asr': {
+            this.removeTaskByAsr(index)
+            break
+          }
+        }
       },
       getAllTask () {
 //        this.taskTableData.push(this.addTask)
@@ -825,6 +1063,16 @@
           delete this.taskTableData[this.index].createTime
           this.editTaskFunction(this.taskTableData[this.index])
         } else {
+          switch (this.SelectProjectModel) {
+            case 'nlp': {
+              this.addTask.type = 'NLP'
+              break
+            }
+            case 'asr': {
+              this.addTask.type = 'ASR'
+              break
+            }
+          }
           this.addTaskFunction()
         }
         this.addTask = {
@@ -836,7 +1084,7 @@
           author: '',
           createTime: null,
           updateTime: null,
-          type: 'NLP',
+          type: '',
           result: '',
           status: '',
           cellClassName: {}
@@ -853,7 +1101,16 @@
         }).then((res) => {
           res.json().then((json) => {
             console.log('addtask:' + JSON.stringify(json))
-            this.getTaskList()
+            switch (this.SelectProjectModel) {
+              case 'nlp': {
+                this.getNlpTaskList()
+                break
+              }
+              case 'asr': {
+                this.getAsrTaskList()
+                break
+              }
+            }
           })
         }).catch((e) => {
           console.log(e.toString())
@@ -871,13 +1128,22 @@
         }).then((res) => {
           res.json().then((json) => {
 //            console.log('addtask:' + JSON.stringify(json))
-            this.getTaskList()
+            switch (this.SelectProjectModel) {
+              case 'nlp': {
+                this.getNlpTaskList()
+                break
+              }
+              case 'asr': {
+                this.getAsrTaskList()
+                break
+              }
+            }
           })
         }).catch((e) => {
           e.toString()
         })
       },
-      getTaskList () {
+      getNlpTaskList () {
         console.log('size: ' + this.taskPageHelp.pageSize)
         fetch(window.serverurl + '/task/taskList', {
           method: 'POST',
@@ -959,8 +1225,8 @@
           e.toString()
         })
       },
-      executeTask (index) {
-//        this.$set(this.taskTableData[index], 'result', 'testing')
+      executeTaskByNlp (index) {
+        //        this.$set(this.taskTableData[index], 'result', 'testing')
         fetch(window.serverurl + '/task/batch?taskId=' + this.taskTableData[index].id, {
           method: 'POST',
 //          body: JSON.stringify({taskId: this.taskTableData[index].id}),
@@ -982,6 +1248,42 @@
         }).catch((e) => {
           e.toString()
         })
+      },
+      executeTaskByAsr (index) {
+        fetch(window.serverurl + '/performance/asyncExecuteSSH?taskId=' + this.taskTableData[index].id + '&port=10000&server=ksyun-1&cmd=' + this.taskTableData[index].projectId, {
+          method: 'GET',
+//          body: JSON.stringify({taskId: this.taskTableData[index].id}),
+          headers: {
+            'Accept': 'application/json'
+          }
+        }).then((res) => {
+          try {
+            if (res.status === 400) {
+              return
+            }
+            res.json().then((json) => {
+              console.log(JSON.stringify(json))
+              this.getAsrTaskList()
+//              this.$set(this.taskTableData[index], 'result', json.data.result)
+            })
+          } catch (e) {
+            console.log(e.toString())
+          }
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      executeTask (index) {
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.executeTaskByNlp(index)
+            break
+          }
+          case 'asr': {
+            this.executeTaskByAsr(index)
+            break
+          }
+        }
       },
       getProjectIdList () {
         fetch(window.serverurl + '/project/allList', {
@@ -1009,20 +1311,38 @@
       getTargetKeys () {
         console.log('----->' + this.targetKeys3)
       },
-      handleChange3 (newTargetKeys) {
+      keyChange (newTargetKeys, direction, moveKeys) {
+        console.log('this.targetKeys3: ' + this.targetKeys3 + ' direction: ' + direction + ' moveKeys: ' + moveKeys)
         this.targetKeys3 = newTargetKeys
-        var len = this.targetKeys3.length
-        for (let i = 0; i < len; i++) {
-          console.log('key: ' + newTargetKeys[i])
-        }
+        // var len = this.targetKeys3.length
+        // for (let i = 0; i < len; i++) {
+        //   console.log('key: ' + newTargetKeys[i])
+        // }
       },
       render3 (item) {
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            return item.label + ' - ' + item.description
+          }
+          case 'asr': {
+            return item.label
+          }
+        }
         return item.label + ' - ' + item.description
       },
       reloadMockData () {
         this.addTask.projectData.splice(0, this.addTask.projectData.length)
         this.targetKeys3.splice(0, this.targetKeys3.length)
-        this.getProjectIdList()
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.getProjectIdListByNlp()
+            break
+          }
+          case 'asr': {
+            this.getProjectIdListByAsr()
+            break
+          }
+        }
       },
       drawGraph () {
         $.ajax({
@@ -1037,7 +1357,7 @@
           }
         })
       },
-      getJobDetail (index) {
+      getJobDetailByNlp (index) {
         this.jobId = this.taskHistoryTableData[index].jobId
         this.taskHistroyDetailLoading = true
         fetch(window.serverurl + '/task/taskExecuteDetail', {
@@ -1066,12 +1386,25 @@
         }).catch((e) => {
           e.toString()
         })
+      },
+      getJobDetailByAsr (index) {},
+      getJobDetail (index) {
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.getJobDetailByNlp(index)
+            break
+          }
+          case 'asr': {
+            this.getJobDetailByAsr(index)
+            break
+          }
+        }
       }
     },
     mounted () {
       this.intervalTmp = setInterval(() => {
-        this.getTaskList()
-      }, 5000)
+        this.getNlpTaskList()
+      }, 10000)
     },
     destroyed () {
       console.log('task destoryed.....')

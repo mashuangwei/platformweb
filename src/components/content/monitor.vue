@@ -75,21 +75,46 @@
 </style>
 <template>
   <div>
-    <Row>
-      <i-col span="2">
-        <Button type="primary" @click="addTemplate" style="margin-bottom:15px;">新增Job</Button>
+    <Row style="margin-bottom:15px;margin-top: 10px">
+      <i-col span="2" offset="0">
+        <div style="margin-top: 5px"><label style="color: black">监控项：</label></div>
       </i-col>
-      <i-col span="3" offset="12">
-        <Input v-model="condition" icon="ios-search-strong" placeholder="请输入..."
-               style="width: 200px"></Input>
+      <i-col span="1" offset="0">
+        <div>
+          <Select v-model="checkoduleName" style="width:160px" @on-change="selectCheckModule">
+            <Option v-for="(item, idx) in checkModuleList" :value="item" :key="idx"></Option>
+          </Select>
+        </div>
       </i-col>
-      <i-col span="1" offset="2">
+
+      <i-col l span="4" offset="3" style="font-size: 12px; color: #495060;">
+        <DatePicker type="daterange" :options="options2" placement="bottom-end" placeholder="请选择日期" style="width: 200px" @on-change="dateChange"></DatePicker>
+      </i-col >
+
+      <!--<i-col span="3" offset="0">-->
+        <!--<Input v-model="searchStr" icon="ios-search-strong" placeholder="请输入..."-->
+               <!--style="width: 200px"></Input>-->
+      <!--</i-col>-->
+      <i-col span="1" offset="0">
         <Button type="primary" icon="ios-search" @click="searchBy">搜索</Button>
       </i-col>
     </Row>
-
     <row>
-      <Table :columns="jobtable" :data="jobdatalist"  height="690" :border="showBorder" :loading="loading"
+      <i-col span="3" offset="0">
+        <div style="font-size: 12px; color: #495060;"><label>总数：{{monitorData.successCounts + monitorData.failCounts}}</label></div>
+      </i-col>
+      <i-col span="3" offset="0">
+        <div style="font-size: 12px; color: #495060;"><label>success：{{monitorData.successCounts}}</label></div>
+      </i-col>
+      <i-col span="3" offset="0">
+        <div style="font-size: 12px; color: #495060;"><label>fail：{{monitorData.failCounts}}</label></div>
+      </i-col>
+    </row>
+    <!--<div class="border-bt editor-wrap" v-show="true">-->
+    <!--</div>-->
+    <br>
+    <row>
+      <Table :columns="jobtable" :data="jobdatalist" height="640" :border="showBorder" :loading="loading"
              :stripe="showStripe"
              :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
     </row>
@@ -117,6 +142,54 @@
     },
     data () {
       return {
+        monitorData: {
+          successCounts: 0,
+          failCounts: 0,
+          data: null
+        },
+        searchDate: [],
+        options2: {
+          shortcuts: [
+            {
+              text: 'A week',
+              value: () => {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+                return [start, end]
+              }
+            },
+            {
+              text: 'A month',
+              value: () => {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+                return [start, end]
+              }
+            },
+            {
+              text: '3 month',
+              value: () => {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+                return [start, end]
+              }
+            },
+            {
+              onClick: () => {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+                return [start, end]
+              }
+            }
+          ]
+        },
+        searchStr: '',
+        checkoduleName: '',
+        checkModuleList: ['All', 'dev环境离线编译', '线上环境离线编译'],
         pageHelp: {
           totalNum: 0,
           curPage: 1,
@@ -148,50 +221,15 @@
           },
           {
             title: '结果描述',
-            width: 470,
+            width: 700,
             key: 'description',
             align: 'center'
           },
           {
             title: '测试时间',
-            width: 180,
+            width: 194,
             key: 'createTime',
             align: 'center'
-          },
-          {
-            title: '操作',
-            key: 'action',
-            width: 250,
-            align: 'center',
-            render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '7px'
-                  },
-                  on: {
-                    click: () => {
-//                      this.editTemplate(params.index)
-                    }
-                  }
-                }, '编辑'),
-                h('Button', {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-//                      this.removeTemplate(params.index)
-                    }
-                  }
-                }, '删除')
-              ])
-            }
           }
         ]
       }
@@ -203,9 +241,36 @@
       handleSuccess (res, file, fileList) {
         this.uploadShowFlag = false
       },
+      dateChange (newDate) {
+        console.log('newDate: ', newDate)
+        this.searchDate = newDate
+      },
+      selectCheckModule () {
+        console.log('module: ' + this.checkoduleName)
+      },
       selectCheckType () {
       },
       searchBy () {
+        this.loading = true
+        console.log('url: ' + window.myurl + '/check/queryByCondition?page_num=' + this.pageHelp.curPage + '&page_size=' + this.pageHelp.pageSize + '&startTime=' + this.searchDate[0] + '&endTime=' + this.searchDate[1] + '&jobName=' + this.checkoduleName)
+        $.ajax({
+          type: 'GET',
+          async: true,
+          url: window.myurl + '/check/queryByCondition?page_num=' + this.pageHelp.curPage + '&page_size=' + this.pageHelp.pageSize + '&startTime=' + this.searchDate[0] + '&endTime=' + this.searchDate[1] + '&jobName=' + this.checkoduleName,
+          dataType: 'json',
+          success: (result) => {
+            this.jobdatalist = result.pageInfo.list
+            this.pageHelp.totalNum = result.pageInfo.total
+            this.pageHelp.totalPageNum = result.pageInfo.pages
+            this.monitorData.failCounts = result.failCounts
+            this.monitorData.successCounts = result.successCounts
+            this.loading = false
+          },
+          error: function (errorMsg) {
+            // window.utils.ajaxFail(errorMsg);
+            console.log(errorMsg)
+          }
+        })
       },
       getAllCheckResult () {
         this.loading = true
@@ -245,20 +310,6 @@
       },
       getPageSize (pageSize) {
         this.pageHelp.pageSize = pageSize
-      },
-      drawGraph () {
-        $.ajax({
-          type: 'GET',
-          async: true,
-          url: window.myurl + '/check/query?page_num=1&page_size=60',
-          dataType: 'json',
-          success: (result) => {
-            this.jobdatalist = result.list
-          },
-          error: function (errorMsg) {
-            console.log(errorMsg)
-          }
-        })
       }
     },
     mounted () {

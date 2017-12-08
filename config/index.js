@@ -43,6 +43,11 @@ module.exports = {
         pathRewrite: { '^/msw': '' },
         target: "http://127.0.0.1:8000",
         changeOrigin: true
+      },
+      '/account': {
+        pathRewrite: { '^/account': '' },
+        target: "http://127.0.0.1:8081",
+        changeOrigin: true
       }
     },
 
