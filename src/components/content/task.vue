@@ -615,7 +615,8 @@
       getAsrChildParam (childData) {
         console.log('parent-get-data: ' + childData)
         this.addTask.type = 'ASR'
-        this.addTask.projectId = childData
+        this.addTask.name = childData.taskname
+        this.addTask.projectId = JSON.stringify(childData)
         this.addTaskFunction()
       },
       selectTaskModule () {

@@ -101,7 +101,7 @@
       },
       addAsr () {
         console.log('addAsr: ' + JSON.stringify(this.data.addData))
-        this.$emit('update', JSON.stringify(this.data.addData))
+        this.$emit('update', this.data.addData)
       },
       addAsrCancel () {
         console.log('addAsrCancel')
