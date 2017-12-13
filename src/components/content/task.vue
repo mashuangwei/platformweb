@@ -102,6 +102,8 @@
       </i-col>
     </row>
 
+    <addAsr :data="asrdata" @update="getAsrChildParam"></addAsr>
+
     <!-- task新增页面 -->
     <Modal
       @on-ok="addOrSaveTask"
@@ -197,7 +199,6 @@
         </i-col>
       </row>
       <br>
-
       <row>
         <Table :loading="taskHistroyDetailLoading" :columns="taskHistoryDetailTable" :data="taskHistoryDetailTableData" width="976" height="520" :border="showBorder" :stripe="showStripe"
                :show-header="showHeader" :showIndex="true"></Table>
@@ -216,17 +217,29 @@
 <script>
   import $ from 'jquery'
   import { Col, Row } from 'iview'
+  import addAsr from './asr/asrAdd'
 //  import ICol from 'iview/src/components/grid/col.vue'
 //  import Row from 'iview/src/components/grid/row.vue'
 
   export default {
     components: {
+      addAsr,
       Row,
       'i-col': Col,
       'name': 'task'
     },
     data () {
       return {
+        asrdata: {
+          addData: {
+            taskname: '',
+            domain: '',
+            people: 5,
+            starttime: null,
+            endtime: null
+          },
+          addmodal: false
+        },
         asrTaskShowFlag: false,
         nlpTaskShowFlag: true,
         taskHistoryDetailTableData: [],
@@ -303,6 +316,7 @@
         addTask: {
           name: '',
           projectIds: [],
+          projectId: '',
           type: '',
           author: '',
           module: null,
@@ -532,13 +546,20 @@
             align: 'center',
             render: (h, params) => {
               return h('div', [
+                // this.SelectProjectModel === 'asr'?
                 h('Button', {
                   props: {
                     type: 'primary',
                     size: 'small'
                   },
+                  // 原生属性，控制按钮是否灰显可用,true表示不可用，false表示可用
+                  attrs: {
+                    disabled: false
+                  },
                   style: {
-                    marginRight: '7px'
+                    marginRight: '7px',
+                    // 控制按钮是否显示
+                    display: (this.SelectProjectModel === 'asr' ? 'none' : 'auto')
                   },
                   on: {
                     click: () => {
@@ -584,63 +605,19 @@
           startIndex: 0,
           totalNum: 0,
           totalPageNum: 0
-        },
-        asrModuleData: [
-          {
-            key: '1',
-            label: 'online-child.sh',
-            description: '',
-            disabled: false
-          },
-          {
-            key: '2',
-            label: 'online-man.sh',
-            description: '',
-            disabled: false
-          },
-          {
-            key: '3',
-            label: 'online-woman.sh',
-            description: '',
-            disabled: false
-          },
-          {
-            key: '4',
-            label: 'online-train.sh',
-            description: '',
-            disabled: false
-          },
-          {
-            key: '5',
-            label: 'online-homebase.sh',
-            description: '',
-            disabled: false
-          },
-          {
-            key: '6',
-            label: 'online-music.sh',
-            description: '',
-            disabled: false
-          },
-          {
-            key: '7',
-            label: 'online-haier.sh',
-            description: '',
-            disabled: false
-          },
-          {
-            key: '8',
-            label: 'online-zte.sh',
-            description: '',
-            disabled: false
-          }
-        ]
+        }
       }
     },
     created () {
       this.getNlpTaskList()
     },
     methods: {
+      getAsrChildParam (childData) {
+        console.log('parent-get-data: ' + childData)
+        this.addTask.type = 'ASR'
+        this.addTask.projectId = childData
+        this.addTaskFunction()
+      },
       selectTaskModule () {
         console.log('selectModule: ' + this.SelectProjectModel)
         switch (this.SelectProjectModel) {
@@ -671,7 +648,7 @@
         }
       },
       getAsrTaskList () {
-        console.log('size: ' + this.taskPageHelp.pageSize)
+        // console.log('size: ' + this.taskPageHelp.pageSize)
         fetch(window.serverurl + '/task/taskList', {
           method: 'POST',
           body: 'type=ASR&pageSize=' + this.taskPageHelp.pageSize + '&curPage=' + this.taskPageHelp.curPage,
@@ -846,23 +823,24 @@
         }
       },
       addTaskData () {
-        this.taskmodeltitle = '添加Task'
-        this.addtaskmodal = true
-        this.addTaskButtunFlag = true
-        this.okButtonText = '添加'
-        if (typeof this.addTask.projectData !== 'undefined') {
-          this.addTask.projectData.splice(0, this.addTask.projectData.length)
-        }
-        if (typeof this.targetKeys3 !== 'undefined') {
-          this.targetKeys3.splice(0, this.targetKeys3.length)
-        }
         switch (this.SelectProjectModel) {
           case 'nlp': {
+            this.taskmodeltitle = '添加Task'
+            this.addtaskmodal = true
+            this.addTaskButtunFlag = true
+            this.okButtonText = '添加'
+            if (typeof this.addTask.projectData !== 'undefined') {
+              this.addTask.projectData.splice(0, this.addTask.projectData.length)
+            }
+            if (typeof this.targetKeys3 !== 'undefined') {
+              this.targetKeys3.splice(0, this.targetKeys3.length)
+            }
             this.getProjectIdListByNlp()
             break
           }
           case 'asr': {
-            this.getProjectIdListByAsr()
+            // this.getProjectIdListByAsr()
+            this.asrdata.addmodal = true
             break
           }
         }
@@ -1070,6 +1048,7 @@
             }
             case 'asr': {
               this.addTask.type = 'ASR'
+              this.addTask.projectId = this.asrdata
               break
             }
           }
@@ -1079,6 +1058,7 @@
           name: '',
           module: null,
           projectData: [],
+          projectId: '',
           id: '',
           projectIds: [],
           author: '',
@@ -1144,7 +1124,7 @@
         })
       },
       getNlpTaskList () {
-        console.log('size: ' + this.taskPageHelp.pageSize)
+        // console.log('size: ' + this.taskPageHelp.pageSize)
         fetch(window.serverurl + '/task/taskList', {
           method: 'POST',
           body: 'type=NLP&pageSize=' + this.taskPageHelp.pageSize + '&curPage=' + this.taskPageHelp.curPage,
@@ -1196,6 +1176,7 @@
         this.addTask = {
           name: '',
           projectIds: [],
+          projectId: '',
           type: 'NLP',
           author: '',
           module: null,
@@ -1412,4 +1393,3 @@
     }
   }
 </script>
-
