@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import api from '@/components/content/api.vue'
 import test from '@/components/content/test.vue'
 import report from '@/components/content/report.vue'
-import environment from '@/components/content/environment.vue'
+// import environment from '@/components/content/charts/environment.vue'
 import nlp from '@/components/content/nlp.vue'
 import highcharts from '@/components/content/highcharts.vue'
 import asr from '@/components/content/asr.vue'
@@ -15,7 +15,8 @@ import chartdemo from '@/components/content/chartdemo.vue'
 import monitor from '@/components/content/monitor.vue'
 import job from '@/components/content/job.vue'
 import login from '@/components/content/login.vue'
-
+import pressure from '@/components/content/pressureTest/pressure.vue'
+import opboss from '@/components/content/opboss/opbossdata.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -44,9 +45,9 @@ export default new Router({
       component: report
     },
     {
-      path: '/environment',
-      name: 'environment',
-      component: environment
+      path: '/pressureTest/pressure',
+      name: 'pressure',
+      component: pressure
     },
     {
       path: '/nlp',
@@ -97,6 +98,11 @@ export default new Router({
       path: '/job',
       name: 'job',
       component: job
+    },
+    {
+      path: '/opboss',
+      name: 'opboss',
+      component: opboss
     }
   ]
 })

@@ -8,10 +8,6 @@
     }
   }
 
-  .ivu-radio-wrapper {
-    padding-top: 6px;
-  }
-
   .ivu-table .table-info-cell-result-success {
     /*background-color: #19be6b;*/
     color: #19be6b;
@@ -75,26 +71,19 @@
 </style>
 <template>
   <div>
-    <Row>
-      <i-col span="2">
-        <Button type="primary" @click="addScheduleJob" style="margin-bottom:15px;">新增</Button>
-      </i-col>
-      <i-col span="3" offset="15">
-        <Input v-model="searchStr" icon="ios-search-strong" placeholder="请输入..."
-               style="width: 200px"></Input>
-      </i-col>
-      <i-col span="1" offset="2">
-        <Button type="primary" icon="ios-search" @click="searchJob">搜索</Button>
-      </i-col>
-    </Row>
-
+    <!--<Row style="margin-bottom:15px;margin-top: 10px">-->
+      <!--<i-col span="1" offset="0">-->
+        <!--<Button type="primary" icon="ios-search" @click="searchBy">搜索</Button>-->
+      <!--</i-col>-->
+    <!--</Row>-->
     <row>
-      <Table :columns="jobtable" :data="jobdatalist" height="690" :border="showBorder" :loading="loading"
+      <br>
+      <Table :columns="jobtable" :data="jobdatalist" height="665" :border="showBorder" :loading="loading"
              :stripe="showStripe"
              :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
     </row>
     <br>
-    <!-- 分页 -->
+
     <row>
       <i-col span="14" offset="8" style="font-size: 12px; color: #495060;">
         <Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top" :current="pageHelp.curPage"
@@ -102,6 +91,17 @@
               :page-size-opts="pageSizeOptions"></Page>
       </i-col>
     </row>
+
+    <br>
+    <!-- 分页 -->
+    <!--<row>-->
+      <!--<i-col span="14" offset="8">-->
+        <!--<Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top" :current="pageHelp.curPage"-->
+              <!--:page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"-->
+              <!--:page-size-opts="pageSizeOptions"></Page>-->
+      <!--</i-col>-->
+    <!--</row>-->
+
 
   </div>
 </template>
@@ -117,16 +117,19 @@
     },
     data () {
       return {
+        pressureData: {
+          id: '',
+          showFlag: false
+        },
+        nodataContent: '没有数据',
         searchStr: '',
-        checkoduleName: '',
-        classlist: [],
+        loading: false,
+        pageSizeOptions: [10, 20, 30, 50, 100],
         pageHelp: {
           totalNum: 0,
           curPage: 1,
-          pageSize: 15
+          pageSize: 13
         },
-        nodataContent: '暂无数据',
-        pageSizeOptions: [15, 30, 50, 100],
         showBorder: true,
         showStripe: true,
         showHeader: true,
@@ -138,33 +141,39 @@
             align: 'center'
           },
           {
-            title: 'JobName',
-            width: 300,
-            key: 'job_NAME',
+            title: 'TaskName',
+            key: 'caseName',
             align: 'center'
           },
           {
-            title: 'JobGroup',
-            width: 200,
-            key: 'job_GROUP',
+            title: '任务描述',
+            key: 'description',
             align: 'center'
           },
           {
-            title: 'JobClassName',
-            width: 300,
-            key: 'job_CLASS_NAME',
+            title: '线程数',
+            key: 'threadNum',
             align: 'center'
           },
           {
-            title: 'cron_EXPRESSION',
-            width: 200,
-            key: 'cron_EXPRESSION',
+            title: '执行时间',
+            key: 'time',
+            align: 'center'
+          },
+          // {
+          //   title: 'voipath',
+          //   key: 'voipath',
+          //   align: 'center'
+          // },
+          {
+            title: '任务进度',
+            key: 'status',
             align: 'center'
           },
           {
             title: '操作',
             key: 'action',
-            width: 300,
+            width: 200,
             align: 'center',
             render: (h, params) => {
               return h('div', [
@@ -178,21 +187,19 @@
                   },
                   on: {
                     click: () => {
-//                      this.editTemplate(params.index)
+                      this.pressureData.showFlag = true
+                      // this.editTask(params.index)
                     }
                   }
-                }, '编辑'),
+                }, '查看记录'),
                 h('Button', {
                   props: {
                     type: 'error',
                     size: 'small'
                   },
-                  style: {
-                    marginRight: '7px'
-                  },
                   on: {
                     click: () => {
-                      this.deleteJob(params.index)
+                      // this.removeTask(params.index)
                     }
                   }
                 }, '删除'),
@@ -202,109 +209,67 @@
                     size: 'small'
                   },
                   style: {
-                    marginRight: '7px'
+                    marginLeft: '7px'
                   },
                   on: {
                     click: () => {
-                      this.pauseJob(params.index)
+                      // this.executeTask(params.index)
                     }
                   }
-                }, '暂停'),
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-                      this.resumeJob(params.index)
-                    }
-                  }
-                }, '恢复')
+                }, '执行')
               ])
             }
+          },
+          {
+            title: '创建时间',
+            key: 'createTime',
+            align: 'center'
           }
         ]
       }
     },
     created () {
-      this.getAllCheckResult()
+      this.getAll()
     },
     methods: {
-      deleteJob (index) {
-        $.ajax({
-          type: 'POST',
-          async: true,
-          data: 'jobClassName=' + this.jobdatalist[index].job_NAME + '&jobGroupName=' + this.jobdatalist[index].job_GROUP,
-          url: window.myurl + '/job/delete',
-//          dataType: 'json',
-          success: (result) => {
-            console.log(11111)
-            this.getAllCheckResult()
-            console.log(result.toString())
-          },
-          error: (errorMsg) => {
-            console.log(errorMsg)
-          }
-        })
-      },
-      pauseJob (index) {
-        $.ajax({
-          type: 'POST',
-          async: true,
-          data: 'jobClassName=' + this.jobdatalist[index].job_NAME + '&jobGroupName=' + this.jobdatalist[index].job_GROUP,
-          url: window.myurl + '/job/pause',
-//          dataType: 'json',
-          success: (result) => {
-            console.log(result)
-          },
-          error: function (errorMsg) {
-            console.log(errorMsg)
-          }
-        })
-      },
-      resumeJob (index) {
-        $.ajax({
-          type: 'POST',
-          async: true,
-          data: 'jobClassName=' + this.jobdatalist[index].job_NAME + '&jobGroupName=' + this.jobdatalist[index].job_GROUP,
-          url: window.myurl + '/job/resume',
-//          dataType: 'json',
-          success: (result) => {
-            console.log(result)
-          },
-          error: function (errorMsg) {
-            console.log(errorMsg)
-          }
-        })
-      },
-      handleSuccess (res, file, fileList) {
-        this.uploadShowFlag = false
-      },
-      addScheduleJob () {},
-      searchJob () {},
-      selectCheckModule () {
-        console.log('module: ' + this.checkoduleName)
-      },
-      selectCheckType () {
-      },
-      searchBy () {
-      },
-      getAllCheckResult () {
+      getAll () {
         this.loading = true
+        console.log('url: ' + window.myurl + '/pressure/getAll?pageNo=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize)
         $.ajax({
           type: 'GET',
           async: true,
-          url: window.myurl + '/job/query?pageNum=1&pageSize=15',
+          url: window.myurl + '/pressure/getAll?pageNo=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize,
           dataType: 'json',
           success: (result) => {
-            this.$set(this.jobdatalist, result.JobAndTrigger.list)
-            this.jobdatalist = result.JobAndTrigger.list
-            this.pageHelp.totalNum = result.JobAndTrigger.total
-            this.pageHelp.totalPageNum = result.JobAndTrigger.pages
+            this.jobdatalist = result.data.list
+            this.pageHelp.totalNum = result.data.total
+            this.pageHelp.totalPageNum = result.data.pages
             this.loading = false
           },
           error: function (errorMsg) {
+            // window.utils.ajaxFail(errorMsg);
+            console.log(errorMsg)
+          }
+        })
+      },
+      searchBy () {
+        this.loading = true
+        console.log('url: ' + window.myurl + '/check/queryByCondition?page_num=' + this.pageHelp.curPage + '&page_size=' + this.pageHelp.pageSize + '&startTime=' + this.searchDate[0] + '&endTime=' + this.searchDate[1] + '&jobName=' + this.checkoduleName)
+        $.ajax({
+          type: 'GET',
+          async: true,
+          url: window.myurl + '/check/queryByCondition?page_num=' + this.pageHelp.curPage + '&page_size=' + this.pageHelp.pageSize + '&startTime=' + this.searchDate[0] + '&endTime=' + this.searchDate[1] + '&jobName=' + this.checkoduleName,
+          dataType: 'json',
+          success: (result) => {
+            this.jobdatalist = result.pageInfo.list
+            this.pageHelp.totalNum = result.pageInfo.total
+            this.pageHelp.totalPageNum = result.pageInfo.pages
+            this.monitorData.failCounts = result.failCounts
+            this.monitorData.successCounts = result.successCounts
+            this.loading = false
+          },
+          error: function (errorMsg) {
+            // window.utils.ajaxFail(errorMsg);
             console.log(errorMsg)
           }
         })
@@ -312,20 +277,7 @@
       getPageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
         this.loading = true
-        $.ajax({
-          type: 'GET',
-          async: true,
-          url: window.myurl + '/job/query?pageNum=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize,
-          dataType: 'json',
-          success: (result) => {
-            this.jobdatalist = result.JobAndTrigger.list
-            this.pageHelp.totalNum = result.JobAndTrigger.total
-            this.loading = false
-          },
-          error: function (errorMsg) {
-            console.log(errorMsg)
-          }
-        })
+        this.getAll()
       },
       getPageSize (pageSize) {
         this.pageHelp.pageSize = pageSize

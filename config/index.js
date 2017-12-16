@@ -48,6 +48,11 @@ module.exports = {
         pathRewrite: { '^/account': '' },
         target: "http://127.0.0.1:8081",
         changeOrigin: true
+      },
+      '/opboss': {
+        pathRewrite: { '^/opboss': '' },
+        target: "http://syslog-2:8000",
+        changeOrigin: true
       }
     },
 

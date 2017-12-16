@@ -238,11 +238,10 @@
               </router-link>
             </Menu-item>
 
-
             <Menu-item name="11">
-              <router-link to="/environment">
+              <router-link to="/pressureTest/pressure">
                 <Icon type="flag"></Icon>
-                图表
+                性能测试
               </router-link>
             </Menu-item>
 
@@ -257,6 +256,13 @@
               <router-link to="/highcharts">
                 <Icon type="gear-b"></Icon>
                 Highcharts
+              </router-link>
+            </Menu-item>
+
+            <Menu-item name="14">
+              <router-link to="/opboss">
+                <Icon type="planet"></Icon>
+                Opboss
               </router-link>
             </Menu-item>
 
@@ -304,9 +310,10 @@
           '/task': '8',
           '/monitor': '9',
           '/job': '10',
-          '/environment': '11',
+          '/pressureTest/pressure': '11',
           '/chartdemo': '12',
-          '/highcharts': '13'
+          '/highcharts': '13',
+          '/opboss': '14'
         }
       }
     },

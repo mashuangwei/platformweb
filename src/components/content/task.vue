@@ -96,7 +96,7 @@
     <br>
     <!-- 分页 -->
     <row>
-      <i-col span="14" offset="8">
+      <i-col span="14" offset="8" style="font-size: 12px; color: #495060;">
         <Page :total="taskPageHelp.totalNum"  show-elevator show-sizer show-total placement="top" :current="taskPageHelp.curPage"
               :page-size="taskPageHelp.pageSize" @on-change="getTaskPageIndex" @on-page-size-change="getTaskPageSize" :page-size-opts="taskPageSizeOptions"></Page>
       </i-col>
@@ -276,26 +276,26 @@
             value: 'nlp',
             label: 'nlp'
           },
-          {
-            value: 'speech',
-            label: 'speech'
-          },
+          // {
+          //   value: 'speech',
+          //   label: 'speech'
+          // },
           {
             value: 'asr',
             label: 'asr'
-          },
-          {
-            value: 'tts',
-            label: 'tts'
-          },
-          {
-            value: 'api',
-            label: 'api'
-          },
-          {
-            value: 'ui',
-            label: 'ui'
           }
+          // {
+          //   value: 'tts',
+          //   label: 'tts'
+          // },
+          // {
+          //   value: 'api',
+          //   label: 'api'
+          // },
+          // {
+          //   value: 'ui',
+          //   label: 'ui'
+          // }
         ],
         SelectProjectModel: 'nlp',
         fileName: '',
@@ -649,7 +649,8 @@
         }
       },
       getAsrTaskList () {
-        // console.log('size: ' + this.taskPageHelp.pageSize)
+        this.loading = true
+        // console.log('pageSize: ' + this.taskPageHelp.pageSize + 'this.taskPageHelp.curPage: ' + this.taskPageHelp.curPage)
         fetch(window.serverurl + '/task/taskList', {
           method: 'POST',
           body: 'type=ASR&pageSize=' + this.taskPageHelp.pageSize + '&curPage=' + this.taskPageHelp.curPage,
@@ -659,6 +660,7 @@
           }
         }).then((res) => {
           res.json().then((json) => {
+            this.loading = false
             if (typeof json.result.data.result === 'undefined') {
               return
             }
@@ -672,6 +674,7 @@
 //            console.log('addtask:' + JSON.stringify(json))
           })
         }).catch((e) => {
+          this.loading = false
           e.toString()
         })
       },
@@ -681,9 +684,6 @@
         console.log('file: ' + file)
         console.log('filelist: ' + fileList)
       },
-//      getLastBulidTaskDetail (index) {
-//        this.taskHistoryDetailModel = true
-//      },
       editTask (index) {
         this.index = index
         this.taskmodeltitle = '编辑Task'
@@ -883,28 +883,39 @@
       },
       getTaskPageIndex (pageIndex) {
         this.taskPageHelp.curPage = pageIndex
-        this.loading = true
-        fetch(window.serverurl + '/task/taskList?type=NLP&curPage=' + pageIndex + '&pageSize=' + this.taskPageHelp.pageSize, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
+        switch (this.SelectProjectModel) {
+          case 'nlp': {
+            this.getNlpTaskList()
+            break
           }
-        }).then((res) => {
-          res.json().then((json) => {
-            this.taskTableData = json.result.data.result
-            for (var i = 0; i < this.taskTableData.length; i++) {
-              this.taskTableData[i].createTime = this.formatDate(new Date(this.taskTableData[i].createTime), 'yyyy-MM-dd hh:mm:ss')
-              this.taskTableData[i].updateTime = this.formatDate(new Date(this.taskTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
-            }
-            this.taskPageHelp.totalNum = json.result.data.page.totalNum
-            this.taskPageHelp.totalPageNum = json.result.data.page.totalPageNum
-            this.loading = false
-          })
-        }).catch((e) => {
-          console.log(e)
-          e.toString()
-        })
+          case 'asr': {
+            this.getAsrTaskList()
+            break
+          }
+          default: {
+          }
+        }
+        // fetch(window.serverurl + '/task/taskList?type=NLP&curPage=' + pageIndex + '&pageSize=' + this.taskPageHelp.pageSize, {
+        //   method: 'GET',
+        //   headers: {
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/x-www-form-urlencoded'
+        //   }
+        // }).then((res) => {
+        //   res.json().then((json) => {
+        //     this.taskTableData = json.result.data.result
+        //     for (var i = 0; i < this.taskTableData.length; i++) {
+        //       this.taskTableData[i].createTime = this.formatDate(new Date(this.taskTableData[i].createTime), 'yyyy-MM-dd hh:mm:ss')
+        //       this.taskTableData[i].updateTime = this.formatDate(new Date(this.taskTableData[i].updateTime), 'yyyy-MM-dd hh:mm:ss')
+        //     }
+        //     this.taskPageHelp.totalNum = json.result.data.page.totalNum
+        //     this.taskPageHelp.totalPageNum = json.result.data.page.totalPageNum
+        //     this.loading = false
+        //   })
+        // }).catch((e) => {
+        //   console.log(e)
+        //   e.toString()
+        // })
       },
       getTaskPageSize (pageSize) {
         this.taskPageHelp.pageSize = pageSize
@@ -1126,6 +1137,7 @@
       },
       getNlpTaskList () {
         // console.log('size: ' + this.taskPageHelp.pageSize)
+        this.loading = true
         fetch(window.serverurl + '/task/taskList', {
           method: 'POST',
           body: 'type=NLP&pageSize=' + this.taskPageHelp.pageSize + '&curPage=' + this.taskPageHelp.curPage,
@@ -1135,6 +1147,7 @@
           }
         }).then((res) => {
           res.json().then((json) => {
+            this.loading = false
             if (typeof json.result.data.result === 'undefined') {
               return
             }
@@ -1148,6 +1161,7 @@
 //            console.log('addtask:' + JSON.stringify(json))
           })
         }).catch((e) => {
+          this.loading = false
           e.toString()
         })
       },

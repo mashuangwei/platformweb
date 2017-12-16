@@ -21,7 +21,7 @@
     <br>
     <!-- 分页 -->
     <row>
-      <i-col span="14" offset="8">
+      <i-col span="14" offset="8" style="font-size: 12px; color: #495060;">
         <Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top" :current="pageHelp.curPage"
               :page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"
               :page-size-opts="pageSizeOptions"></Page>

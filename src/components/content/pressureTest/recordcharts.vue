@@ -1,9 +1,23 @@
 <template>
-  <div>
-    <div id="main" style="min-width:800px;height:400px"></div>
-    <br/>
-    <div id="asr" style="min-width:800px;height:400px"></div>
-  </div>
+
+  <Modal
+    :mask-closable="false"
+    @on-ok="okButtonClick"
+    @on-cancel="cancelButtonClick"
+    :width="850"
+    :title=title
+    :okText=okText
+    v-model="data.showRecordCharts"
+    :styles="{top: '20px'}">
+
+    <div>
+      <div id="main" style="min-width:800px;height:400px"></div>
+      <br/>
+      <div id="asr" style="min-width:800px;height:400px"></div>
+    </div>
+
+  </Modal>
+
 
 </template>
 <script>
@@ -12,11 +26,16 @@
 
   export default {
     name: 'app',
+    props: {
+      data: Object
+    },
     data () {
       return {
         highCharts: null,
         asrHighCharts: null,
         id: 'test',
+        title: '性能测试结果',
+        okText: '确定',
         option: {
           title: {
             text: 'Speech性能测试',
@@ -108,6 +127,8 @@
       this.asrHighCharts = HighCharts.chart(document.getElementById('asr'), this.options)
     },
     methods: {
+      okButtonClick () {},
+      cancelButtonClick () {}
       // drawGraph (id) {
       // }
     }
