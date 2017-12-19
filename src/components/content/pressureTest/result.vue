@@ -3,7 +3,9 @@
 </style>
 <template>
   <Modal
-    :mask-closable="false"
+    @on-ok="okButton"
+    @on-cancel="cancelButton"
+    :mask-closable="true"
     :scrollable="true"
     :width="1500"
     :title=title
@@ -16,7 +18,7 @@
         <i-col span="12">
           <row>
               <Table :columns="chartRecordTable" :data="chartdatalist" height="650" :border="showBorder" :loading="loading"
-                     :stripe="showStripe"
+                     :stripe="showStripe" @on-row-click="showChartData"
                      :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
             <br>
               <Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top"
@@ -26,9 +28,11 @@
           </row>
         </i-col>
         <i-col span="12">
-          <div id="main" style="min-width:700px;height:300px"></div>
+          <div id="tps" style="min-width:700px;height:300px"></div>
           <br/>
-          <div id="asr" style="min-width:700px;height:300px"></div>
+          <div id="maxRT" style="min-width:700px;height:300px"></div>
+          <br/>
+          <div id="AvgRT" style="min-width:700px;height:300px"></div>
         </i-col>
       </row>
       <br>
@@ -56,9 +60,9 @@
     },
     data () {
       return {
-        option: {
+        tpsoption: {
           title: {
-            text: 'Speech性能测试',
+            text: 'TPS数据',
             x: -20
           },
           subtitle: {
@@ -66,7 +70,7 @@
             x: -20
           },
           xAxis: {
-            categories: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+            categories: ['1513607888', '1513607889', '1513607884', '1513607885', '1513607886', '1513607880', '1513607881', '1513607882']
           },
           yAxis: {
             title: {
@@ -79,7 +83,7 @@
             }]
           },
           tooltip: {
-            valueSuffix: '°C'
+            valueSuffix: ''
           },
           legend: {
             layout: 'vertical',
@@ -94,13 +98,13 @@
             href: 'https://developer.rokid.com/#/'
           },
           series: [{
-            name: 'Speech',
-            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+            name: 'TPS',
+            data: [1, 1, 1, 1, 1, 1, 1, 1]
           }]
         },
-        options: {
+        maxRToption: {
           title: {
-            text: 'Asr性能测试',
+            text: 'maxRT数据',
             x: -20
           },
           subtitle: {
@@ -108,11 +112,11 @@
             x: -20
           },
           xAxis: {
-            categories: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+            categories: []
           },
           yAxis: {
             title: {
-              text: 'TPS'
+              text: 'maxRT'
             },
             plotLines: [{
               value: 0,
@@ -121,7 +125,7 @@
             }]
           },
           tooltip: {
-            valueSuffix: '°C'
+            valueSuffix: ''
           },
           legend: {
             layout: 'vertical',
@@ -136,12 +140,55 @@
             href: 'https://developer.rokid.com/#/'
           },
           series: [{
-            name: 'Asr',
-            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+            name: 'maxRT',
+            data: []
           }]
         },
-        highCharts: null,
-        asrHighCharts: null,
+        AvgRToption: {
+          title: {
+            text: 'maxRT数据',
+            x: -20
+          },
+          subtitle: {
+            text: '数据来源: rokid',
+            x: -20
+          },
+          xAxis: {
+            categories: []
+          },
+          yAxis: {
+            title: {
+              text: 'AvgRT'
+            },
+            plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#808080'
+            }]
+          },
+          tooltip: {
+            valueSuffix: ''
+          },
+          legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+          },
+          // 版权信息是否展示,false：不展示
+          credits: {
+            text: 'Rokid',
+            enabled: false,
+            href: 'https://developer.rokid.com/#/'
+          },
+          series: [{
+            name: 'AvgRT',
+            data: []
+          }]
+        },
+        tpsHighCharts: null,
+        maxRTHighCharts: null,
+        avgRTHighCharts: null,
         chartPara: {
           showRecordCharts: false,
           id: 0
@@ -171,11 +218,13 @@
           {
             title: 'TaskName',
             key: 'caseName',
+            width: 275,
             align: 'center'
           },
           {
             title: '创建时间',
             key: 'createTime',
+            width: 200,
             align: 'center'
           },
           {
@@ -195,7 +244,7 @@
                   },
                   on: {
                     click: () => {
-                      // this.chartPara.showRecordCharts = true
+                      this.showDataResult(params.index)
                     }
                   }
                 }, '查看')
@@ -206,20 +255,73 @@
       }
     },
     mounted () {
-      this.highCharts = HighCharts.chart(document.getElementById('main'), this.option)
-      this.asrHighCharts = HighCharts.chart(document.getElementById('asr'), this.options)
+      // this.tpsHighCharts = HighCharts.chart(document.getElementById('tps'), this.tpsoption)
+      // this.maxRTHighCharts = HighCharts.chart(document.getElementById('maxRT'), this.maxRToption)
+      // this.avgRTHighCharts = HighCharts.chart(document.getElementById('AvgRT'), this.AvgRToption)
     },
     created () {
       this.getAll()
     },
+    destroyed () {
+      this.$emit('update')
+    },
     methods: {
-      getAll () {
-        this.loading = true
-        console.log('url: ' + window.myurl + '/pressure/getResultById/' + '1' + '?pageNo=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize)
+      addOptionData (result) {
+        this.tpsoption.xAxis.categories.splice(0, this.tpsoption.xAxis.categories.length)
+        this.tpsoption.series[0].data.splice(0, this.tpsoption.series[0].data.length)
+        for (let i = 0; i < result.data.tps.key.length; i++) {
+          this.tpsoption.xAxis.categories.push(result.data.tps.key[i])
+          this.tpsoption.series[0].data.push(result.data.tps.value[i])
+        }
+
+        this.maxRToption.xAxis.categories.splice(0, this.maxRToption.xAxis.categories.length)
+        this.maxRToption.series[0].data.splice(0, this.maxRToption.series[0].data.length)
+        for (let i = 0; i < result.data.maxRT.key.length; i++) {
+          this.maxRToption.xAxis.categories.push(result.data.maxRT.key[i])
+          this.maxRToption.series[0].data.push(result.data.maxRT.value[i])
+        }
+
+        this.AvgRToption.xAxis.categories.splice(0, this.AvgRToption.xAxis.categories.length)
+        this.AvgRToption.series[0].data.splice(0, this.AvgRToption.series[0].data.length)
+        for (let i = 0; i < result.data.avgRT.key.length; i++) {
+          this.AvgRToption.xAxis.categories.push(result.data.avgRT.key[i])
+          this.AvgRToption.series[0].data.push(result.data.avgRT.value[i])
+        }
+      },
+      showDataResult (index) {
         $.ajax({
           type: 'GET',
           async: true,
-          url: window.myurl + '/pressure/getResultById/' + '1' + '?pageNo=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize,
+          url: window.myurl + '/pressure/getResultByResultId/' + this.chartdatalist[index].id,
+          dataType: 'json',
+          success: (result) => {
+            this.addOptionData(result)
+            this.tpsHighCharts = HighCharts.chart(document.getElementById('tps'), this.tpsoption)
+            this.maxRTHighCharts = HighCharts.chart(document.getElementById('maxRT'), this.maxRToption)
+            this.avgRTHighCharts = HighCharts.chart(document.getElementById('AvgRT'), this.AvgRToption)
+          },
+          error: (errorMsg) => {
+            console.log(errorMsg)
+          }
+        })
+      },
+      okButton () {
+        this.$destroy()
+      },
+      cancelButton () {
+        this.$destroy()
+      },
+      showChartData (data) {
+        // console.log('data: ' + JSON.stringify(this.chartdatalist[index]))
+        // console.log('index: ' + JSON.stringify(index))
+        // console.log('index1: ' + JSON.stringify(index[1]))
+      },
+      getAll () {
+        this.loading = true
+        $.ajax({
+          type: 'GET',
+          async: true,
+          url: window.myurl + '/pressure/getResultById/' + this.data.id + '?pageNo=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize,
           dataType: 'json',
           success: (result) => {
             this.chartdatalist = result.data.list

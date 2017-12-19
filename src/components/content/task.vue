@@ -1246,11 +1246,12 @@
         })
       },
       executeTaskByAsr (index) {
-        fetch(window.serverurl + '/performance/asyncExecuteSSH?taskId=' + this.taskTableData[index].id + '&port=10000&server=ksyun-1&cmd=' + this.taskTableData[index].projectId, {
-          method: 'GET',
-//          body: JSON.stringify({taskId: this.taskTableData[index].id}),
+        fetch(window.serverurl + '/task/batch', {
+          method: 'POST',
+          body: 'taskId=' + this.taskTableData[index].id,
           headers: {
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
           try {

@@ -72,9 +72,9 @@
 <template>
   <div>
     <!--<Row style="margin-bottom:15px;margin-top: 10px">-->
-      <!--<i-col span="1" offset="0">-->
-        <!--<Button type="primary" icon="ios-search" @click="searchBy">搜索</Button>-->
-      <!--</i-col>-->
+    <!--<i-col span="1" offset="0">-->
+    <!--<Button type="primary" icon="ios-search" @click="searchBy">搜索</Button>-->
+    <!--</i-col>-->
     <!--</Row>-->
     <row>
       <br>
@@ -95,31 +95,34 @@
     <br>
     <!-- 分页 -->
     <!--<row>-->
-      <!--<i-col span="14" offset="8">-->
-        <!--<Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top" :current="pageHelp.curPage"-->
-              <!--:page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"-->
-              <!--:page-size-opts="pageSizeOptions"></Page>-->
-      <!--</i-col>-->
+    <!--<i-col span="14" offset="8">-->
+    <!--<Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top" :current="pageHelp.curPage"-->
+    <!--:page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"-->
+    <!--:page-size-opts="pageSizeOptions"></Page>-->
+    <!--</i-col>-->
     <!--</row>-->
-
+    <result-record :data="pressureData" v-if="pressureData.vshowFlag" @update="updateChildDate"></result-record>
 
   </div>
 </template>
 <script>
   import $ from 'jquery'
   import { Col, Row } from 'iview'
+  import resultRecord from './result'
 
   export default {
     components: {
       Row,
       'i-col': Col,
+      resultRecord: resultRecord,
       'name': 'skillcheck'
     },
     data () {
       return {
         pressureData: {
-          id: '',
-          showFlag: false
+          id: 0,
+          showFlag: false,
+          vshowFlag: false
         },
         nodataContent: '没有数据',
         searchStr: '',
@@ -134,6 +137,7 @@
         showStripe: true,
         showHeader: true,
         jobdatalist: [],
+        executeButton: false,
         jobtable: [
           {
             type: 'index',
@@ -150,16 +154,16 @@
             key: 'description',
             align: 'center'
           },
-          {
-            title: '线程数',
-            key: 'threadNum',
-            align: 'center'
-          },
-          {
-            title: '执行时间',
-            key: 'time',
-            align: 'center'
-          },
+          // {
+          //   title: '线程数',
+          //   key: 'threadNum',
+          //   align: 'center'
+          // },
+          // {
+          //   title: '执行时间',
+          //   key: 'time',
+          //   align: 'center'
+          // },
           // {
           //   title: 'voipath',
           //   key: 'voipath',
@@ -173,9 +177,13 @@
           {
             title: '操作',
             key: 'action',
-            width: 200,
+            width: 230,
             align: 'center',
             render: (h, params) => {
+              // let buttonLoading = false
+              if (params.row.status === 'running') {
+                this.buttonLoading = true
+              }
               return h('div', [
                 h('Button', {
                   props: {
@@ -187,6 +195,9 @@
                   },
                   on: {
                     click: () => {
+                      this.pressureData.vshowFlag = true
+                      console.log('>>>>>' + JSON.stringify(this.jobdatalist[params.index]))
+                      this.pressureData.id = this.jobdatalist[params.index].id
                       this.pressureData.showFlag = true
                       // this.editTask(params.index)
                     }
@@ -199,7 +210,7 @@
                   },
                   on: {
                     click: () => {
-                      // this.removeTask(params.index)
+                      this.removeTask(params.index)
                     }
                   }
                 }, '删除'),
@@ -207,13 +218,17 @@
                   props: {
                     type: 'primary',
                     size: 'small'
+                    // loading: buttonLoading
                   },
                   style: {
                     marginLeft: '7px'
                   },
                   on: {
                     click: () => {
-                      // this.executeTask(params.index)
+                      // this.executeButton = true
+                      this.jobdatalist[params.index].status = 'running'
+                      this.pressureData.id = this.jobdatalist[params.index].id
+                      this.executeTask(params.index)
                     }
                   }
                 }, '执行')
@@ -232,6 +247,53 @@
       this.getAll()
     },
     methods: {
+      updateChildDate () {
+        this.pressureData.showFlag = false
+        this.pressureData.vshowFlag = false
+      },
+      removeTask (index) {
+        $.ajax({
+          type: 'DELETE',
+          async: true,
+          url: window.myurl + '/pressure/delete/' + this.jobdatalist[index].id,
+          dataType: 'json',
+          success: (result) => {
+            if (result.code === 200) {
+              this.$Message.success('删除成功')
+              this.getAll()
+            } else {
+              this.$Message.error('删除失败')
+            }
+          },
+          error: (errorMsg) => {
+            this.$Message.error('删除失败')
+            console.log(errorMsg)
+          }
+        })
+      },
+      executeTask (index) {
+        console.log('url: ' + window.myurl + '/pressure/execute/' + this.jobdatalist[index].id)
+        $.ajax({
+          type: 'POST',
+          async: true,
+          url: window.myurl + '/pressure/execute/' + this.jobdatalist[index].id,
+          dataType: 'json',
+          success: (result) => {
+            if (result.code === 200) {
+              this.$Message.success('执行结束')
+              this.jobdatalist[index].status = 'finished'
+            } else {
+              this.$Message.error('执行失败')
+              this.jobdatalist[index].status = 'finished'
+            }
+            this.executeButton = false
+          },
+          error: (errorMsg) => {
+            this.executeButton = false
+            console.log(errorMsg)
+          }
+        })
+      },
       getAll () {
         this.loading = true
         console.log('url: ' + window.myurl + '/pressure/getAll?pageNo=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize)
