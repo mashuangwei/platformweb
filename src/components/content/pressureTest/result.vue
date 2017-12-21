@@ -17,18 +17,19 @@
         <br>
         <i-col span="12">
           <row>
-              <Table :columns="chartRecordTable" :data="chartdatalist" height="650" :border="showBorder" :loading="loading"
-                     :stripe="showStripe" @on-row-click="showChartData"
-                     :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
+            <Table :columns="chartRecordTable" :data="chartdatalist" height="650" :border="showBorder"
+                   :loading="loading"
+                   :stripe="showStripe" @on-row-click="showChartData"
+                   :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
             <br>
-              <Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top"
-                    :current="pageHelp.curPage"
-                    :page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"
-                    :page-size-opts="pageSizeOptions"></Page>
+            <Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top"
+                  :current="pageHelp.curPage"
+                  :page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"
+                  :page-size-opts="pageSizeOptions"></Page>
           </row>
         </i-col>
         <i-col span="12">
-          <div id="tps" style="min-width:700px;height:300px"></div>
+          <div id="tps" style="min-width:700px;height:400px"></div>
           <br/>
           <div id="maxRT" style="min-width:700px;height:300px"></div>
           <br/>
@@ -37,7 +38,6 @@
       </row>
       <br>
 
-
     </div>
 
   </Modal>
@@ -45,11 +45,25 @@
 </template>
 <script>
   import Breadcrumb from 'iview/src/components/breadcrumb/breadcrumb'
-  // import recordCharts from './recordcharts'
   import ICol from 'iview/src/components/grid/col'
-  import HighCharts from 'highcharts'
   import $ from 'jquery'
+  import HighCharts from 'highcharts/highstock'
+  import * as Exporting from 'highcharts/modules/exporting'
+  import * as HighchartsMore from 'highcharts/highcharts-more'
 
+  HighchartsMore(HighCharts)
+
+  import * as HighchartsDrilldown from 'highcharts/modules/drilldown'
+
+  HighchartsDrilldown(HighCharts)
+
+  import * as Highcharts3D from 'highcharts/highcharts-3d'
+
+  Highcharts3D(HighCharts)
+
+  Highcharts3D(HighCharts)
+  // 初始化导出模块
+  Exporting(HighCharts)
   export default {
     components: {
       ICol,
@@ -60,139 +74,6 @@
     },
     data () {
       return {
-        tpsoption: {
-          title: {
-            text: 'TPS数据',
-            x: -20
-          },
-          subtitle: {
-            text: '数据来源: rokid',
-            x: -20
-          },
-          xAxis: {
-            categories: ['1513607888', '1513607889', '1513607884', '1513607885', '1513607886', '1513607880', '1513607881', '1513607882']
-          },
-          yAxis: {
-            title: {
-              text: 'TPS'
-            },
-            plotLines: [{
-              value: 0,
-              width: 1,
-              color: '#808080'
-            }]
-          },
-          tooltip: {
-            valueSuffix: ''
-          },
-          legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-          },
-          // 版权信息是否展示,false：不展示
-          credits: {
-            text: 'Rokid',
-            enabled: false,
-            href: 'https://developer.rokid.com/#/'
-          },
-          series: [{
-            name: 'TPS',
-            data: [1, 1, 1, 1, 1, 1, 1, 1]
-          }]
-        },
-        maxRToption: {
-          title: {
-            text: 'maxRT数据',
-            x: -20
-          },
-          subtitle: {
-            text: '数据来源: rokid',
-            x: -20
-          },
-          xAxis: {
-            categories: []
-          },
-          yAxis: {
-            title: {
-              text: 'maxRT'
-            },
-            plotLines: [{
-              value: 0,
-              width: 1,
-              color: '#808080'
-            }]
-          },
-          tooltip: {
-            valueSuffix: ''
-          },
-          legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-          },
-          // 版权信息是否展示,false：不展示
-          credits: {
-            text: 'Rokid',
-            enabled: false,
-            href: 'https://developer.rokid.com/#/'
-          },
-          series: [{
-            name: 'maxRT',
-            data: []
-          }]
-        },
-        AvgRToption: {
-          title: {
-            text: 'maxRT数据',
-            x: -20
-          },
-          subtitle: {
-            text: '数据来源: rokid',
-            x: -20
-          },
-          xAxis: {
-            categories: []
-          },
-          yAxis: {
-            title: {
-              text: 'AvgRT'
-            },
-            plotLines: [{
-              value: 0,
-              width: 1,
-              color: '#808080'
-            }]
-          },
-          tooltip: {
-            valueSuffix: ''
-          },
-          legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-          },
-          // 版权信息是否展示,false：不展示
-          credits: {
-            text: 'Rokid',
-            enabled: false,
-            href: 'https://developer.rokid.com/#/'
-          },
-          series: [{
-            name: 'AvgRT',
-            data: []
-          }]
-        },
-        tpsHighCharts: null,
-        maxRTHighCharts: null,
-        avgRTHighCharts: null,
-        chartPara: {
-          showRecordCharts: false,
-          id: 0
-        },
         showRecord: false,
         okText: '确定',
         title: '性能测试任务记录列表',
@@ -255,9 +136,6 @@
       }
     },
     mounted () {
-      // this.tpsHighCharts = HighCharts.chart(document.getElementById('tps'), this.tpsoption)
-      // this.maxRTHighCharts = HighCharts.chart(document.getElementById('maxRT'), this.maxRToption)
-      // this.avgRTHighCharts = HighCharts.chart(document.getElementById('AvgRT'), this.AvgRToption)
     },
     created () {
       this.getAll()
@@ -266,28 +144,6 @@
       this.$emit('update')
     },
     methods: {
-      addOptionData (result) {
-        this.tpsoption.xAxis.categories.splice(0, this.tpsoption.xAxis.categories.length)
-        this.tpsoption.series[0].data.splice(0, this.tpsoption.series[0].data.length)
-        for (let i = 0; i < result.data.tps.key.length; i++) {
-          this.tpsoption.xAxis.categories.push(result.data.tps.key[i])
-          this.tpsoption.series[0].data.push(result.data.tps.value[i])
-        }
-
-        this.maxRToption.xAxis.categories.splice(0, this.maxRToption.xAxis.categories.length)
-        this.maxRToption.series[0].data.splice(0, this.maxRToption.series[0].data.length)
-        for (let i = 0; i < result.data.maxRT.key.length; i++) {
-          this.maxRToption.xAxis.categories.push(result.data.maxRT.key[i])
-          this.maxRToption.series[0].data.push(result.data.maxRT.value[i])
-        }
-
-        this.AvgRToption.xAxis.categories.splice(0, this.AvgRToption.xAxis.categories.length)
-        this.AvgRToption.series[0].data.splice(0, this.AvgRToption.series[0].data.length)
-        for (let i = 0; i < result.data.avgRT.key.length; i++) {
-          this.AvgRToption.xAxis.categories.push(result.data.avgRT.key[i])
-          this.AvgRToption.series[0].data.push(result.data.avgRT.value[i])
-        }
-      },
       showDataResult (index) {
         $.ajax({
           type: 'GET',
@@ -295,15 +151,186 @@
           url: window.myurl + '/pressure/getResultByResultId/' + this.chartdatalist[index].id,
           dataType: 'json',
           success: (result) => {
-            this.addOptionData(result)
-            this.tpsHighCharts = HighCharts.chart(document.getElementById('tps'), this.tpsoption)
-            this.maxRTHighCharts = HighCharts.chart(document.getElementById('maxRT'), this.maxRToption)
-            this.avgRTHighCharts = HighCharts.chart(document.getElementById('AvgRT'), this.AvgRToption)
+            let tpsoption = {
+              chart: {
+                zoomType: 'x'
+              },
+              tooltip: {
+                split: false,
+                shared: true
+              },
+              rangeSelector: {
+                allButtonsEnabled: true,
+                buttons: [{
+                  type: 'second',
+                  count: 30,
+                  text: '30s'
+                }, {
+                  type: 'minute',
+                  count: 1,
+                  text: '1m'
+                }, {
+                  type: 'hour',
+                  count: 1,
+                  text: '1h'
+                }, {
+                  type: 'day',
+                  count: 1,
+                  text: '1d'
+                }, {
+                  type: 'all',
+                  text: 'All'
+                }],
+                selected: 3
+              },
+              yAxis: {
+                title: {
+                  text: 'TPS'
+                }
+              },
+              title: {
+                text: 'TPS'
+              },
+              subtitle: {
+                text: ''
+              },
+              credits: {
+                enabled: false
+              },
+              series: [{
+                name: 'TPS',
+                data: result.data.tps,
+                pointStart: Date.UTC(result.data.startTime.year, result.data.startTime.month - 1, result.data.startTime.day, result.data.startTime.hour, result.data.startTime.minutes, result.data.startTime.seconds),
+                pointInterval: 1000,
+                tooltip: {
+                  valueDecimals: 1,
+                  valueSuffix: ''
+                }
+              }]
+            }
+            let maxRToption = {
+              chart: {
+                zoomType: 'x'
+              },
+              tooltip: {
+                split: false,
+                shared: true
+              },
+              rangeSelector: {
+                allButtonsEnabled: true,
+                buttons: [{
+                  type: 'second',
+                  count: 30,
+                  text: '30s'
+                }, {
+                  type: 'minute',
+                  count: 1,
+                  text: '1m'
+                }, {
+                  type: 'hour',
+                  count: 1,
+                  text: '1h'
+                }, {
+                  type: 'day',
+                  count: 1,
+                  text: '1d'
+                }, {
+                  type: 'all',
+                  text: 'All'
+                }],
+                selected: 3
+              },
+              yAxis: {
+                title: {
+                  text: 'maxRT'
+                }
+              },
+              title: {
+                text: 'maxRT'
+              },
+              subtitle: {
+                text: ''
+              },
+              credits: {
+                enabled: false
+              },
+              series: [{
+                name: 'maxRT',
+                data: result.data.maxRT,
+                pointStart: Date.UTC(result.data.startTime.year, result.data.startTime.month - 1, result.data.startTime.day, result.data.startTime.hour, result.data.startTime.minutes, result.data.startTime.seconds),
+                pointInterval: 1000,
+                tooltip: {
+                  valueDecimals: 1,
+                  valueSuffix: ''
+                }
+              }]
+            }
+            let AvgRToption = {
+              chart: {
+                zoomType: 'x'
+              },
+              tooltip: {
+                split: false,
+                shared: true
+              },
+              rangeSelector: {
+                allButtonsEnabled: true,
+                buttons: [{
+                  type: 'second',
+                  count: 30,
+                  text: '30s'
+                }, {
+                  type: 'minute',
+                  count: 1,
+                  text: '1m'
+                }, {
+                  type: 'hour',
+                  count: 1,
+                  text: '1h'
+                }, {
+                  type: 'day',
+                  count: 1,
+                  text: '1d'
+                }, {
+                  type: 'all',
+                  text: 'All'
+                }],
+                selected: 3
+              },
+              yAxis: {
+                title: {
+                  text: 'AvgRT'
+                }
+              },
+              title: {
+                text: 'AvgRT'
+              },
+              subtitle: {
+                text: ''
+              },
+              credits: {
+                enabled: false
+              },
+              series: [{
+                name: 'AvgRT',
+                data: result.data.avgRT,
+                pointStart: Date.UTC(result.data.startTime.year, result.data.startTime.month - 1, result.data.startTime.day, result.data.startTime.hour, result.data.startTime.minutes, result.data.startTime.seconds),
+                pointInterval: 1000,
+                tooltip: {
+                  valueDecimals: 1,
+                  valueSuffix: ''
+                }
+              }]
+            }
+            HighCharts.stockChart(document.getElementById('tps'), tpsoption)
+            HighCharts.stockChart(document.getElementById('maxRT'), maxRToption)
+            HighCharts.stockChart(document.getElementById('AvgRT'), AvgRToption)
           },
           error: (errorMsg) => {
             console.log(errorMsg)
           }
-        })
+        }
+        )
       },
       okButton () {
         this.$destroy()
@@ -330,7 +357,6 @@
             this.loading = false
           },
           error: function (errorMsg) {
-            // window.utils.ajaxFail(errorMsg);
             console.log(errorMsg)
           }
         })
@@ -343,11 +369,7 @@
       getPageSize (pageSize) {
         this.pageHelp.pageSize = pageSize
       },
-      add () {
-        // this.$emit('update', this.data.addData)
-      },
       cancel () {
-        console.log('hights')
       }
     }
   }

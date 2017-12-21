@@ -1,15 +1,41 @@
 <template>
-  <div>
-    <Row>
+  <div style="">
+    <Row style="font-size: 12px; color: #495060;">
       <i-col span="2">
         <Button type="primary" @click="addPlatformCase" style="margin-bottom:15px;">新增</Button>
       </i-col>
-      <i-col span="3" offset="15">
-        <Input v-model="searchStr" icon="ios-search-strong" placeholder="请输入..."
-               style="width: 200px"></Input>
+
+      <i-col span="2" offset="4">
+        <div style="margin-top: 7px">
+          <label style="color: black; text-align: right;">DomainName：</label>
+        </div>
+
       </i-col>
-      <i-col span="1" offset="2">
-        <Button type="primary" icon="ios-search" @click="getCase">搜索</Button>
+
+      <i-col span="4">
+        <div>
+          <Select v-model="domainName"  @on-change="selectDomainName">
+            <Option v-for="(item, idx) in domainNameList" :value="item" :key="idx">{{item}}</Option>
+          </Select>
+        </div>
+      </i-col>
+
+      <i-col span="2" offset="1">
+        <div style="margin-top: 7px; text-align: right;"><label style="color: black">ProjectId：</label></div>
+      </i-col>
+      <i-col span="4">
+        <div>
+          <Select v-model="projectIdSelected" @on-change="selectProjectId">
+            <Option v-for="(item, idx) in projectIdList" :value="item.id" :key="idx">{{item.projectName}}</Option>
+          </Select>
+        </div>
+      </i-col>
+      <!--<i-col span="3" offset="10">-->
+        <!--<Input v-model="searchStr" icon="ios-search-strong" placeholder="请输入..."-->
+               <!--style="width: 200px"></Input>-->
+      <!--</i-col>-->
+      <i-col span="2" offset="1">
+        <Button type="primary" icon="ios-search" @click="searchCase">搜索</Button>
       </i-col>
     </Row>
 
@@ -84,7 +110,7 @@
         <i-col span="3" offset="1">
           <div>
             <Select v-model="addcase.moduleName" style="width:350px" @on-change="selectDomain">
-              <Option v-for="(item, idx) in moduleList" :value="item" :key="idx"></Option>
+              <Option v-for="(item, idx) in moduleList" :value="item" :key="idx">{{item}}</Option>
             </Select>
           </div>
         </i-col>
@@ -316,6 +342,10 @@
     name: 'home',
     data () {
       return {
+        projectIdList: [],
+        projectIdSelected: 0,
+        domainName: '',
+        domainNameList: [],
         resultTitle: 'Case执行结果',
         caseMessage: '',
         resultShow: false,
@@ -663,6 +693,7 @@
       }
     },
     mounted () {
+      this.getDomainNameList()
 //      this.intervalNlpTmp = setInterval(() => {
 //        this.getCaseStatus()
 //      }, 5000)
@@ -675,6 +706,66 @@
       this.getCase()
     },
     methods: {
+      selectDomainName (domain) {
+        this.domainName = domain
+        fetch(window.serverurl + '/project/projectList?moduleName=' + domain, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.projectIdList = json.result.data
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      searchCase () {
+        this.loading = true
+        let url = window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize + '&domainName=' + this.domainName + '&projectId=' + this.projectIdSelected
+        fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.casedata = json.result.data.result
+            for (let i = 0; i < this.casedata.length; i++) {
+              this.casedata[i].createTime = this.formatDate(new Date(this.casedata[i].createTime), 'yyyy-MM-dd hh:mm:ss')
+            }
+            this.pageHelp.totalNum = json.result.data.page.totalNum
+            this.pageHelp.totalPageNum = json.result.data.page.totalPageNum
+            this.loading = false
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
+      selectProjectId (projectId) {
+        this.projectIdSelected = projectId
+      },
+      getDomainNameList () {
+        fetch(window.serverurl + '/project/moduleList', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then((res) => {
+          res.json().then((json) => {
+            this.domainNameList = json.result.data
+            if (json.result.data.length > 0) {
+              this.domainName = this.domainNameList[0]
+            }
+          })
+        }).catch((e) => {
+          e.toString()
+        })
+      },
       onMounted (editor) {
         this.editor = editor
       },
@@ -692,7 +783,6 @@
         this.spinShow = true
         this.caseMessage = ''
         this.resultShow = false
-//        this.$set(this.casedata[index], 'result', 'testing')
         fetch(window.serverurl + '/task/one', {
           method: 'POST',
           body: 'taskId=' + this.casedata[index].id + '&projectId=' + this.casedata[index].projectId,
@@ -794,7 +884,6 @@
 //        }
       },
       selectDomain () {
-//        console.log(this.addcase.moduleName)
         this.getProjectList(this.addcase.moduleName)
       },
       getProjectList (domainName) {
@@ -1242,9 +1331,6 @@
       },
       getCase () {
         this.loading = true
-//        setTimeout(() => {
-//          this.loading = false
-//        }, 3000)
         fetch(window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize, {
           method: 'GET',
           headers: {

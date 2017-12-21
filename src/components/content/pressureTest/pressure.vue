@@ -154,21 +154,6 @@
             key: 'description',
             align: 'center'
           },
-          // {
-          //   title: '线程数',
-          //   key: 'threadNum',
-          //   align: 'center'
-          // },
-          // {
-          //   title: '执行时间',
-          //   key: 'time',
-          //   align: 'center'
-          // },
-          // {
-          //   title: 'voipath',
-          //   key: 'voipath',
-          //   align: 'center'
-          // },
           {
             title: '任务进度',
             key: 'status',
@@ -196,7 +181,6 @@
                   on: {
                     click: () => {
                       this.pressureData.vshowFlag = true
-                      console.log('>>>>>' + JSON.stringify(this.jobdatalist[params.index]))
                       this.pressureData.id = this.jobdatalist[params.index].id
                       this.pressureData.showFlag = true
                       // this.editTask(params.index)
@@ -272,7 +256,6 @@
         })
       },
       executeTask (index) {
-        console.log('url: ' + window.myurl + '/pressure/execute/' + this.jobdatalist[index].id)
         $.ajax({
           type: 'POST',
           async: true,
@@ -296,7 +279,6 @@
       },
       getAll () {
         this.loading = true
-        console.log('url: ' + window.myurl + '/pressure/getAll?pageNo=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize)
         $.ajax({
           type: 'GET',
           async: true,
@@ -309,14 +291,12 @@
             this.loading = false
           },
           error: function (errorMsg) {
-            // window.utils.ajaxFail(errorMsg);
             console.log(errorMsg)
           }
         })
       },
       searchBy () {
         this.loading = true
-        console.log('url: ' + window.myurl + '/check/queryByCondition?page_num=' + this.pageHelp.curPage + '&page_size=' + this.pageHelp.pageSize + '&startTime=' + this.searchDate[0] + '&endTime=' + this.searchDate[1] + '&jobName=' + this.checkoduleName)
         $.ajax({
           type: 'GET',
           async: true,
@@ -331,7 +311,6 @@
             this.loading = false
           },
           error: function (errorMsg) {
-            // window.utils.ajaxFail(errorMsg);
             console.log(errorMsg)
           }
         })
