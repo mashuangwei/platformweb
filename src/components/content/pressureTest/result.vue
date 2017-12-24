@@ -7,35 +7,29 @@
     @on-cancel="cancelButton"
     :mask-closable="true"
     :scrollable="true"
-    :width="1500"
+    :width="1150"
     :title=title
     v-model="data.showFlag"
     :styles="{top: '20px'}">
     <div>
-      <br>
       <row>
-        <br>
-        <i-col span="12">
-          <row>
-            <Table :columns="chartRecordTable" :data="chartdatalist" height="650" :border="showBorder"
-                   :loading="loading"
-                   :stripe="showStripe" @on-row-click="showChartData"
-                   :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
-            <br>
-            <Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top"
-                  :current="pageHelp.curPage"
-                  :page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"
-                  :page-size-opts="pageSizeOptions"></Page>
-          </row>
-        </i-col>
-        <i-col span="12">
-          <div id="tps" style="min-width:700px;height:400px"></div>
-          <br/>
-          <div id="maxRT" style="min-width:700px;height:300px"></div>
-          <br/>
-          <div id="AvgRT" style="min-width:700px;height:300px"></div>
-        </i-col>
+        <row>
+          <Table :columns="chartRecordTable" :data="chartdatalist" height="200" :border="showBorder"
+                 :loading="loading"
+                 :stripe="showStripe" @on-row-click="showChartData"
+                 :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
+          <br>
+          <Page :total="pageHelp.totalNum" show-elevator show-sizer show-total placement="top"
+                :current="pageHelp.curPage"
+                :page-size="pageHelp.pageSize" @on-change="getPageIndex" @on-page-size-change="getPageSize"
+                :page-size-opts="pageSizeOptions"></Page>
+        </row>
       </row>
+      <div id="tps" style="min-width:700px;height:300px; width:1100px"></div>
+      <br/>
+      <div id="maxRT" style="min-width:700px;height:300px; width:1100px"></div>
+      <br/>
+      <div id="AvgRT" style="min-width:700px;height:300px; width:1100px"></div>
       <br>
 
     </div>
@@ -84,7 +78,7 @@
         pageHelp: {
           totalNum: 0,
           curPage: 1,
-          pageSize: 13
+          pageSize: 10
         },
         showBorder: true,
         showStripe: true,
@@ -99,7 +93,6 @@
           {
             title: 'TaskName',
             key: 'caseName',
-            width: 275,
             align: 'center'
           },
           {
@@ -111,7 +104,6 @@
           {
             title: '操作',
             key: 'action',
-            width: 200,
             align: 'center',
             render: (h, params) => {
               return h('div', [
@@ -356,18 +348,19 @@
             this.pageHelp.totalPageNum = result.data.pages
             this.loading = false
           },
-          error: function (errorMsg) {
+          error: (errorMsg) => {
+            this.loading = false
             console.log(errorMsg)
           }
         })
       },
       getPageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
-        this.loading = true
         this.getAll()
       },
       getPageSize (pageSize) {
         this.pageHelp.pageSize = pageSize
+        this.getAll()
       },
       cancel () {
       }

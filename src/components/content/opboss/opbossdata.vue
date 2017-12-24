@@ -63,14 +63,14 @@
         loading: false,
         searchDate: [],
         nodataContent: '暂无数据',
-        pageSizeOptions: [15, 30, 50, 100],
+        pageSizeOptions: [30, 50, 80, 100],
         showBorder: true,
         showStripe: true,
         showHeader: true,
         pageHelp: {
           totalNum: 0,
           curPage: 1,
-          pageSize: 15
+          pageSize: 30
         },
         column: [
           {

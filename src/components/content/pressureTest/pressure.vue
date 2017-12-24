@@ -147,6 +147,7 @@
           {
             title: 'TaskName',
             key: 'caseName',
+            width: 250,
             align: 'center'
           },
           {
@@ -155,7 +156,13 @@
             align: 'center'
           },
           {
+            title: '参数',
+            key: 'params',
+            align: 'center'
+          },
+          {
             title: '任务进度',
+            width: 100,
             key: 'status',
             align: 'center'
           },
@@ -221,6 +228,7 @@
           },
           {
             title: '创建时间',
+            width: 150,
             key: 'createTime',
             align: 'center'
           }
@@ -256,6 +264,7 @@
         })
       },
       executeTask (index) {
+        this.$Message.success('任务开始执行')
         $.ajax({
           type: 'POST',
           async: true,

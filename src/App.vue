@@ -184,12 +184,30 @@
                 用例管理
               </router-link>
             </Menu-item>
-            <Menu-item name="3">
-              <router-link to="/asr">
-                <Icon type="android-globe"></Icon>
+            <Submenu name="3">
+              <template slot="title">
+                <Icon type="ios-analytics"></Icon>
                 Asr
-              </router-link>
-            </Menu-item>
+              </template>
+              <Menu-item name="3-1">
+                <router-link to="/asrCheck">
+                  <Icon type="funnel"></Icon>
+                  Asr验证
+                </router-link>
+              </Menu-item>
+              <Menu-item name="3-2">
+                <router-link to="/asr">
+                  <Icon type="crop"></Icon>
+                  Asr报告
+                </router-link>
+              </Menu-item>
+            </Submenu>
+            <!--<Menu-item name="3">-->
+              <!--<router-link to="/asr">-->
+                <!--<Icon type="android-globe"></Icon>-->
+                <!--Asr-->
+              <!--</router-link>-->
+            <!--</Menu-item>-->
             <Menu-item name="4">
               <router-link to="/speech">
               <Icon type="chatbubbles"></Icon>
@@ -279,7 +297,7 @@
     <div class="layout-copy">
       <row>
         <i-col span="4" offset="10">
-          2011-2017 &copy; Rokid
+          2017-2018 &copy; Rokid
         </i-col>
       </row>
     </div>
@@ -313,7 +331,8 @@
           '/pressureTest/pressure': '11',
           '/chartdemo': '12',
           '/highcharts': '13',
-          '/opboss': '14'
+          '/opboss': '14',
+          '/asrCheck': '15'
         }
       }
     },

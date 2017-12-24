@@ -17,6 +17,7 @@ import job from '@/components/content/job.vue'
 import login from '@/components/content/login.vue'
 import pressure from '@/components/content/pressureTest/pressure.vue'
 import opboss from '@/components/content/opboss/opbossdata.vue'
+import asrCheck from '@/components/content/asr/asrCheck.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -103,6 +104,11 @@ export default new Router({
       path: '/opboss',
       name: 'opboss',
       component: opboss
+    },
+    {
+      path: '/asrCheck',
+      name: 'asrCheck',
+      component: asrCheck
     }
   ]
 })
