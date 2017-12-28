@@ -7,7 +7,7 @@ import report from '@/components/content/report.vue'
 import nlp from '@/components/content/nlp.vue'
 import highcharts from '@/components/content/highcharts.vue'
 import asr from '@/components/content/asr.vue'
-import tts from '@/components/content/tts.vue'
+// import tts from '@/components/content/tts.vue'
 import skill from '@/components/content/skill.vue'
 import speech from '@/components/content/speech.vue'
 import task from '@/components/content/task.vue'
@@ -18,6 +18,7 @@ import login from '@/components/content/login.vue'
 import pressure from '@/components/content/pressureTest/pressure.vue'
 import opboss from '@/components/content/opboss/opbossdata.vue'
 import asrCheck from '@/components/content/asr/asrCheck.vue'
+import ttsSystemManage from '@/components/content/tts/SystemManage.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -65,11 +66,11 @@ export default new Router({
       name: 'asr',
       component: asr
     },
-    {
-      path: '/tts',
-      name: 'tts',
-      component: tts
-    },
+    // {
+    //   path: '/tts',
+    //   name: 'tts',
+    //   component: tts
+    // },
     {
       path: '/skill',
       name: 'skill',
@@ -109,6 +110,11 @@ export default new Router({
       path: '/asrCheck',
       name: 'asrCheck',
       component: asrCheck
+    },
+    {
+      path: '/ttsSystemManage',
+      name: 'ttsSystemManage',
+      component: ttsSystemManage
     }
   ]
 })

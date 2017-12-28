@@ -148,7 +148,7 @@
         </Menu-item>
         <Menu-item name="12">
           <Icon type="ios-keypad"></Icon>
-          <a href="https://ngrinder.rokid-inc.com/login" class="db" target="_Blank">Ngrinder</a>
+          <a href="https://ngrinder.rokid-inc.com/ngrinder/login" class="db" target="_Blank">Ngrinder</a>
         </Menu-item>
         <Menu-item name="13">
           <Icon type="ios-analytics"></Icon>
@@ -178,12 +178,12 @@
                 Rest Api
               </router-link>
             </Menu-item>
-            <Menu-item name="2">
-              <router-link to="/test">
-                <Icon type="heart"></Icon>
-                用例管理
-              </router-link>
-            </Menu-item>
+            <!--<Menu-item name="2">-->
+              <!--<router-link to="/test">-->
+                <!--<Icon type="heart"></Icon>-->
+                <!--用例管理-->
+              <!--</router-link>-->
+            <!--</Menu-item>-->
             <Submenu name="3">
               <template slot="title">
                 <Icon type="ios-analytics"></Icon>
@@ -195,12 +195,12 @@
                   Asr验证
                 </router-link>
               </Menu-item>
-              <Menu-item name="3-2">
-                <router-link to="/asr">
-                  <Icon type="crop"></Icon>
-                  Asr报告
-                </router-link>
-              </Menu-item>
+              <!--<Menu-item name="3-2">-->
+                <!--<router-link to="/asr">-->
+                  <!--<Icon type="crop"></Icon>-->
+                  <!--Asr报告-->
+                <!--</router-link>-->
+              <!--</Menu-item>-->
             </Submenu>
             <!--<Menu-item name="3">-->
               <!--<router-link to="/asr">-->
@@ -208,12 +208,12 @@
                 <!--Asr-->
               <!--</router-link>-->
             <!--</Menu-item>-->
-            <Menu-item name="4">
-              <router-link to="/speech">
-              <Icon type="chatbubbles"></Icon>
-              Speech
-              </router-link>
-            </Menu-item>
+            <!--<Menu-item name="4">-->
+              <!--<router-link to="/speech">-->
+              <!--<Icon type="chatbubbles"></Icon>-->
+              <!--Speech-->
+              <!--</router-link>-->
+            <!--</Menu-item>-->
             <Menu-item name="5">
               <router-link to="/nlp">
               <Icon type="stats-bars"></Icon>
@@ -221,19 +221,31 @@
             </router-link>
             </Menu-item>
 
-            <Menu-item name="6">
-              <router-link to="/tts">
+            <Submenu name="6">
+              <template slot="title">
                 <Icon type="fireball"></Icon>
-                TTS
-              </router-link>
-            </Menu-item>
+                Tts
+              </template>
+              <Menu-item name="6-1">
+                <router-link to="/ttsSystemManage">
+                  <Icon type="funnel"></Icon>
+                  Tts系统管理
+                </router-link>
+              </Menu-item>
+              <!--<Menu-item name="3-2">-->
+              <!--<router-link to="/asr">-->
+              <!--<Icon type="crop"></Icon>-->
+              <!--Asr报告-->
+              <!--</router-link>-->
+              <!--</Menu-item>-->
+            </Submenu>
 
-            <Menu-item name="7">
-              <router-link to="/skill">
-                <Icon type="paper-airplane"></Icon>
-                Skill模板
-              </router-link>
-            </Menu-item>
+            <!--<Menu-item name="7">-->
+              <!--<router-link to="/skill">-->
+                <!--<Icon type="paper-airplane"></Icon>-->
+                <!--Skill模板-->
+              <!--</router-link>-->
+            <!--</Menu-item>-->
 
             <Menu-item name="8">
               <router-link to="/task">
@@ -242,19 +254,19 @@
               </router-link>
             </Menu-item>
 
-            <Menu-item name="9">
-              <router-link to="/monitor">
-                <Icon type="star"></Icon>
-                监控
-              </router-link>
-            </Menu-item>
+            <!--<Menu-item name="9">-->
+              <!--<router-link to="/monitor">-->
+                <!--<Icon type="star"></Icon>-->
+                <!--监控-->
+              <!--</router-link>-->
+            <!--</Menu-item>-->
 
-            <Menu-item name="10">
-              <router-link to="/job">
-                <Icon type="gear-b"></Icon>
-                Job Manage
-              </router-link>
-            </Menu-item>
+            <!--<Menu-item name="10">-->
+              <!--<router-link to="/job">-->
+                <!--<Icon type="gear-b"></Icon>-->
+                <!--Job Manage-->
+              <!--</router-link>-->
+            <!--</Menu-item>-->
 
             <Menu-item name="11">
               <router-link to="/pressureTest/pressure">
@@ -263,19 +275,19 @@
               </router-link>
             </Menu-item>
 
-            <Menu-item name="12">
-              <router-link to="/chartdemo">
-                <Icon type="scissors"></Icon>
-                动态图表
-              </router-link>
-            </Menu-item>
+            <!--<Menu-item name="12">-->
+              <!--<router-link to="/chartdemo">-->
+                <!--<Icon type="scissors"></Icon>-->
+                <!--动态图表-->
+              <!--</router-link>-->
+            <!--</Menu-item>-->
 
-            <Menu-item name="13">
-              <router-link to="/highcharts">
-                <Icon type="gear-b"></Icon>
-                Highcharts
-              </router-link>
-            </Menu-item>
+            <!--<Menu-item name="13">-->
+              <!--<router-link to="/highcharts">-->
+                <!--<Icon type="gear-b"></Icon>-->
+                <!--Highcharts-->
+              <!--</router-link>-->
+            <!--</Menu-item>-->
 
             <Menu-item name="14">
               <router-link to="/opboss">
@@ -323,7 +335,7 @@
           '/asr': '3',
           '/speech': '4',
           '/nlp': '5',
-          '/tts': '6',
+          '/ttsSystemManage': '6',
           '/skill': '7',
           '/task': '8',
           '/monitor': '9',

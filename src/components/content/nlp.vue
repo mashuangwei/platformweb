@@ -343,7 +343,7 @@
     data () {
       return {
         projectIdList: [],
-        projectIdSelected: 0,
+        projectIdSelected: '',
         domainName: '',
         domainNameList: [],
         resultTitle: 'Case执行结果',
@@ -699,8 +699,6 @@
 //      }, 5000)
     },
     destroyed () {
-      console.log('nlp destoryed.....')
-//      clearInterval(this.intervalNlpTmp)
     },
     created () {
       this.getCase()
@@ -716,7 +714,12 @@
           }
         }).then((res) => {
           res.json().then((json) => {
-            this.projectIdList = json.result.data
+            this.projectIdList = []
+            console.log('list: ' + this.projectIdList)
+            this.projectIdSelected = ''
+            this.$nextTick(() => {
+              this.projectIdList = json.result.data
+            })
           })
         }).catch((e) => {
           e.toString()
@@ -724,7 +727,13 @@
       },
       searchCase () {
         this.loading = true
-        let url = window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize + '&domainName=' + this.domainName + '&projectId=' + this.projectIdSelected
+        this.pageHelp.curPage = 1
+        let url = ''
+        if (this.domainName === '') {
+          url = window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize + '&projectId=' + this.projectIdSelected
+        } else {
+          url = window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize + '&domainName=' + this.domainName + '&projectId=' + this.projectIdSelected
+        }
         fetch(url, {
           method: 'GET',
           headers: {
@@ -742,6 +751,7 @@
             this.loading = false
           })
         }).catch((e) => {
+          this.loading = false
           e.toString()
         })
       },
@@ -758,9 +768,9 @@
         }).then((res) => {
           res.json().then((json) => {
             this.domainNameList = json.result.data
-            if (json.result.data.length > 0) {
-              this.domainName = this.domainNameList[0]
-            }
+            // if (json.result.data.length > 0) {
+            //   this.domainName = this.domainNameList[0]
+            // }
           })
         }).catch((e) => {
           e.toString()
@@ -771,6 +781,7 @@
       },
       onCodeChange (editor) {
         this.caseStep.expect = this.editor.getValue()
+        // this.editor.s
       },
       executeStepsTest () {
         // 执行步骤测试
@@ -833,7 +844,13 @@
       getPageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
         this.loading = true
-        fetch(window.serverurl + '/case/list?curPage=' + pageIndex + '&pageSize=' + this.pageHelp.pageSize, {
+        let url = ''
+        if (this.domainName === '') {
+          url = window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize + '&projectId=' + this.projectIdSelected
+        } else {
+          url = window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize + '&domainName=' + this.domainName + '&projectId=' + this.projectIdSelected
+        }
+        fetch(url, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -849,12 +866,11 @@
             this.loading = false
           })
         }).catch((e) => {
-          console.log(e)
+          this.loading = false
           e.toString()
         })
       },
       getPageSize (pageSize) {
-        console.log('pageSize: ' + pageSize)
         this.pageHelp.pageSize = pageSize
       },
       addSteps () {
@@ -870,11 +886,6 @@
         })
       },
       selectEvent () {
-//        if (this.caseStep.httpType === 'get' || this.caseStep.httpType === 'delete') {
-//          this.editJsonComponentShow = false
-//        } else {
-//          this.editJsonComponentShow = true
-//        }
       },
       switchSelect (status) {
 //        if (status) {
@@ -1331,7 +1342,8 @@
       },
       getCase () {
         this.loading = true
-        fetch(window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize, {
+        let url = window.serverurl + '/case/list?curPage=' + this.pageHelp.curPage + '&pageSize=' + this.pageHelp.pageSize + '&projectId=' + this.projectIdSelected
+        fetch(url, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -1348,6 +1360,7 @@
             this.loading = false
           })
         }).catch((e) => {
+          this.loading = false
           e.toString()
         })
       }

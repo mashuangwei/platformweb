@@ -4,14 +4,22 @@
       <i-col span="2" offset="0" style="font-size: 12px; color: #495060;">
         <div style="line-height: 32px;"><label>日期时间：</label></div>
       </i-col>
-      <i-col span="2" offset="0" style="font-size: 12px; color: #495060;">
+      <i-col span="2" offset="0" style="font-size: 12px; color: #495060; margin-left: -20px">
         <div>
           <DatePicker type="datetimerange" placeholder="请选择日期时间" style="width: 300px"
                       @on-change="dateChange"></DatePicker>
         </div>
       </i-col>
-      <i-col span="3" offset="5">
+      <i-col span="3" offset="4">
         <Input v-model="deviceid" placeholder="请输入deviceid"
+               style="width: 200px"></Input>
+      </i-col>
+      <i-col span="3" offset="1">
+        <Input v-model="appId" placeholder="请输入appId"
+               style="width: 250px"></Input>
+      </i-col>
+      <i-col span="3" offset="2">
+        <Input v-model="intent" placeholder="请输入intent"
                style="width: 200px"></Input>
       </i-col>
       <i-col span="1" offset="2">
@@ -79,6 +87,16 @@
             align: 'center'
           },
           {
+            title: 'appId',
+            key: 'app_id',
+            align: 'center'
+          },
+          {
+            title: 'intent',
+            key: 'intent',
+            align: 'center'
+          },
+          {
             title: 'deviceId',
             key: 'asrdeviceid',
             align: 'center'
@@ -128,12 +146,14 @@
         ],
         data: [],
         deviceid: '',
+        appId: '',
+        intent: '',
         startDate: subDate(today),
         endDate: addDate(today)
       }
     },
     created () {
-      this.getListData('', 1, this.pageHelp.pageSize, this.startDate, this.endDate)
+      this.getListData('', 1, this.pageHelp.pageSize, this.startDate, this.endDate, this.appId, this.intent)
     },
     methods: {
       dateChange (date) {
@@ -141,11 +161,11 @@
         this.endDate = date[1].toString().replace(' ', '-')
       },
       searchByDateAndDeviceid () {
-        this.getListData(this.deviceid, this.pageHelp.curPage, this.pageHelp.pageSize, this.startDate, this.endDate)
+        this.getListData(this.deviceid, this.pageHelp.curPage, this.pageHelp.pageSize, this.startDate, this.endDate, this.appId, this.intent)
       },
-      getListData (deviceid, pageNo, pageSize, startDate, endDate) {
+      getListData (deviceid, pageNo, pageSize, startDate, endDate, appId, intent) {
         this.loading = true
-        var url = window.opboss + '/opboss/getmongodata/?deviceid=' + this.deviceid + '&page=' + pageNo + '&size=' + pageSize + '&startdate=' + startDate + '&enddate=' + endDate
+        var url = window.opboss + '/opboss/getmongodataregular/?deviceid=' + this.deviceid + '&page=' + pageNo + '&size=' + pageSize + '&startdate=' + startDate + '&enddate=' + endDate + '&app_id=' + appId + '&intent=' + intent
         $.ajax({
           type: 'GET',
           async: true,
@@ -163,15 +183,15 @@
         })
       },
       search () {
-        this.getListData(this.deviceid, this.pageHelp.curPage, this.pageHelp.pageSize, this.startDate, this.endDate)
+        this.getListData(this.deviceid, this.pageHelp.curPage, this.pageHelp.pageSize, this.startDate, this.endDate, this.appId, this.intent)
       },
       pageChange (curPage) {
         this.pageHelp.curPage = curPage
-        this.getListData(this.deviceid, curPage, this.pageHelp.pageSize, this.startDate, this.endDate)
+        this.getListData(this.deviceid, curPage, this.pageHelp.pageSize, this.startDate, this.endDate, this.appId, this.intent)
       },
       sizeChange (pageSize) {
         this.pageHelp.pageSize = pageSize
-        this.getListData(this.deviceid, this.pageHelp.curPage, pageSize, this.startDate, this.endDate)
+        this.getListData(this.deviceid, this.pageHelp.curPage, pageSize, this.startDate, this.endDate, this.appId, this.intent)
       }
     }
   }

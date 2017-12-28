@@ -2,127 +2,155 @@
   <div style="font-size: 12px; color: #495060;">
     <Form ref="asrParam" :model="asrParam" :rules="ruleValidate" :label-width="80">
       <row>
-        <i-col span="3" offset="1">
-          <FormItem label="server" prop="test_server">
-            <Select v-model="asrParam.test_server" placeholder="Select your server" style="width: 200px"
-                    @on-change="selectServer">
-              <Option v-for="(item, idx) in server" :value="item" :key="idx"></Option>
-            </Select>
+        <i-col span="11" offset="0">
+          <row>
+            <i-col span="2">
+              <FormItem label="server" prop="test_server">
+                <Select v-model="asrParam.test_server" placeholder="Select your server" style="width: 200px"
+                        @on-change="selectServer">
+                  <Option v-for="(item, idx) in server" :value="item" :key="idx"></Option>
+                </Select>
+              </FormItem>
+            </i-col>
+            <i-col span="3" style="margin-left: 230px">
+              <FormItem label="lang" prop="lang">
+                <Select v-model="asrParam.lang" placeholder="Select your lang" style="width: 200px"
+                        @on-change="selectLang">
+                  <Option v-for="(item, idx) in lang" :value="item" :key="idx"></Option>
+                </Select>
+              </FormItem>
+            </i-col>
+          </row>
+
+          <row>
+            <i-col span="2">
+              <FormItem label="codec" prop="codec">
+                <Select v-model="asrParam.codec" placeholder="Select your codec" style="width: 200px"
+                        @on-change="selectCodec">
+                  <Option v-for="(item, idx) in codec" :value="item" :key="idx"></Option>
+                </Select>
+              </FormItem>
+            </i-col>
+            <i-col span="3" style="margin-left: 230px">
+              <FormItem label="id" prop="id">
+                <Input v-model="asrParam.id" placeholder="输入整数值" style="width: 200px"></Input>
+              </FormItem>
+            </i-col>
+          </row>
+
+          <row>
+            <i-col span="2">
+              <FormItem label="vt" prop="vt">
+                <Input v-model="asrParam.vt" placeholder="输入激活词" style="width: 200px"></Input>
+              </FormItem>
+            </i-col>
+
+            <i-col span="3" style="margin-left: 230px">
+              <FormItem label="sid" prop="sid">
+                <Input v-model="asrParam.sid" placeholder="输入整数值" style="width: 200px"></Input>
+              </FormItem>
+            </i-col>
+          </row>
+
+          <FormItem label="confirm" prop="confirm">
+            <Input v-model="asrParam.confirm" placeholder="输入confirm" style="width: 480px"></Input>
           </FormItem>
+
+          <FormItem label="domains" prop="domains">
+            <Input v-model="domains" style="width: 480px" type="textarea" :autosize="{minRows: 2,maxRows: 4}"
+                   placeholder="请输入domains..."></Input>
+          </FormItem>
+
+          <FormItem label="StackDomain" prop="stack_domains">
+            <Input v-model="stack_domains" style="width: 480px;margin-left: 1px" type="textarea"
+                   :autosize="{minRows: 2,maxRows: 4}"
+                   placeholder="请输入stack_domains..."></Input>
+          </FormItem>
+
+          <FormItem label="extenOption" prop="extension_options">
+            <Input v-model="asrParam.extension_options" style="width: 480px" type="textarea"
+                   :autosize="{minRows: 2,maxRows: 4}"
+                   placeholder="Enter extension_options..."></Input>
+          </FormItem>
+
+          <row>
+            <i-col span="2" offset="0">
+              <div><label style="margin-bottom: 20px">Asr文件</label></div>
+            </i-col>
+            <i-col span="2" style="margin-left: 30px;margin-bottom: 15px">
+              <Upload action="//jsonplaceholder.typicode.com/posts/" :before-upload="handleUpload">
+                <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
+              </Upload>
+            </i-col>
+            <i-col span="6" offset="5" style="margin-top: 5px ;color: red; margin-left: 68px">
+              <div v-if="file !== null" style="width: 400px">{{ file.name }}</div>
+            </i-col>
+          </row>
+
+          <row>
+            <i-col span="2" offset="0">
+              <div><label style="">hotwords</label></div>
+            </i-col>
+            <i-col span="2" offset="0" style="margin-left: 30px">
+              <Monaco
+                height="200"
+                width="490"
+                theme="vs"
+                language="json"
+                style="border:1px;border-top-color: rgb(238, 238, 238);
+                      border-top-style: solid;
+                      border-top-width: 1px;
+                      border-right-color: rgb(238, 238, 238);
+                      border-right-style: solid;
+                      border-right-width: 1px;
+                      border-bottom-color: rgb(238, 238, 238);
+                      border-bottom-style: solid;
+                      border-bottom-width: 1px;
+                      border-left-color: rgb(238, 238, 238);
+                      border-left-style: solid;
+                      border-left-width: 1px;
+                      border-image-source: initial;
+                      border-image-slice: initial;
+                      border-image-width: initial;
+                      border-image-outset: initial;
+                      border-image-repeat: initial;"
+                :code="code"
+                :editorOptions="options"
+                @mounted="onMounted"
+                @codeChange="onCodeChange"
+              >
+              </Monaco>
+            </i-col>
+          </row>
+          <br><br>
+          <FormItem style="margin-left: 100px">
+            <Button type="primary" @click="handleSubmit('asrParam')" :loading="loading">Submit</Button>
+            <Button type="ghost" @click="handleReset('asrParam')" style="margin-left: 8px">Reset</Button>
+          </FormItem>
+
         </i-col>
-        <i-col span="3" offset="3">
-          <FormItem label="lang" prop="lang">
-            <Select v-model="asrParam.lang" placeholder="Select your lang" style="width: 200px" @on-change="selectLang">
-              <Option v-for="(item, idx) in lang" :value="item" :key="idx"></Option>
-            </Select>
-          </FormItem>
-        </i-col>
-        <i-col span="3" offset="3">
-          <FormItem label="codec" prop="codec">
-            <Select v-model="asrParam.codec" placeholder="Select your codec" style="width: 200px"
-                    @on-change="selectCodec">
-              <Option v-for="(item, idx) in codec" :value="item" :key="idx"></Option>
-            </Select>
-          </FormItem>
+        <!--<i-col span="1" style="margin-left: 100px">-->
+          <!--<div style="width:2px; height:830px; background-color:darkgrey;"></div>-->
+        <!--</i-col>-->
+        <i-col span="10">
+          <row>
+            <i-col span="7" offset="12">
+              <div><label style="font-size: 20px">ASR识别结果</label></div>
+            </i-col>
+          </row>
+          <br>
+          <row>
+            <i-col offset="4">
+              <Input v-model="retResult" style="width: 550px;margin-left: 10px" type="textarea"
+                     :autosize="{minRows: 25,maxRows: 40}"
+                     placeholder="执行结果"></Input>
+            </i-col>
+
+          </row>
         </i-col>
       </row>
 
-      <!--<FormItem label="lang" prop="lang">-->
-      <!--<Select v-model="asrParam.lang" placeholder="Select your lang" style="width: 200px" @on-change="selectLang">-->
-      <!--<Option v-for="(item, idx) in lang" :value="item" :key="idx"></Option>-->
-      <!--</Select>-->
-      <!--</FormItem>-->
-
-      <!--<FormItem label="codec" prop="codec">-->
-      <!--<Select v-model="asrParam.codec" placeholder="Select your codec" style="width: 200px" @on-change="selectCodec">-->
-      <!--<Option v-for="(item, idx) in codec" :value="item" :key="idx"></Option>-->
-      <!--</Select>-->
-      <!--</FormItem>-->
-      <row style="font-size: 12px; color: #495060;">
-        <i-col span="4" offset="1">
-          <FormItem label="id" prop="id">
-            <Input v-model="asrParam.id" placeholder="Enter your id" style="width: 200px"></Input>
-          </FormItem>
-        </i-col>
-        <i-col span="4" offset="2">
-          <FormItem label="vt" prop="vt">
-            <Input v-model="asrParam.vt" placeholder="Enter your vt" style="width: 200px"></Input>
-          </FormItem>
-        </i-col>
-        <i-col span="4" offset="2">
-          <FormItem label="sid" prop="sid">
-            <Input v-model="asrParam.sid" placeholder="Enter your sid" style="width: 200px"></Input>
-          </FormItem>
-        </i-col>
-      </row>
-
-
-      <FormItem label="confirm" prop="confirm" style="margin-left: 55px">
-        <Input v-model="asrParam.confirm" placeholder="Enter your confirm" style="width: 500px"></Input>
-      </FormItem>
-
-
-      <!--<FormItem label="vt" prop="vt">-->
-      <!--<Input v-model="asrParam.vt" placeholder="Enter your vt" style="width: 200px"></Input>-->
-      <!--</FormItem>-->
-
-      <!--<FormItem label="confirm" prop="confirm">-->
-      <!--<Input v-model="asrParam.confirm" placeholder="Enter your confirm" style="width: 200px"></Input>-->
-      <!--</FormItem>-->
-
-      <FormItem label="domains" prop="domains" style="margin-left: 55px">
-        <Input v-model="domains" style="width: 500px" type="textarea" :autosize="{minRows: 2,maxRows: 4}"
-               placeholder="Enter domains..."></Input>
-      </FormItem>
-
-      <FormItem label="StackDomain" prop="stack_domains" style="margin-left: 55px">
-        <Input v-model="stack_domains" style="width: 500px;margin-left: 1px" type="textarea"
-               :autosize="{minRows: 2,maxRows: 4}"
-               placeholder="Enter stack_domains..."></Input>
-      </FormItem>
-
-      <row style="margin-left: 40px">
-        <i-col span="2" offset="1">
-          <div><label style="margin-left: -25px">hotwords</label></div>
-        </i-col>
-        <i-col span="2" offset="0" style="margin-left: -65px">
-          <Monaco
-            height="200"
-            width="600"
-            language="json"
-            :code="code"
-            :editorOptions="options"
-            @mounted="onMounted"
-            @codeChange="onCodeChange"
-          >
-          </Monaco>
-        </i-col>
-      </row>
-      <br>
-      <FormItem style="margin-left: 100px">
-        <Button type="primary" @click="handleSubmit('asrParam')">Submit</Button>
-        <Button type="ghost" @click="handleReset('asrParam')" style="margin-left: 8px">Reset</Button>
-      </FormItem>
     </Form>
-
-    <!--<row>-->
-    <!--<i-col span="2" offset="1">-->
-    <!--<div style="line-height: 32px;"><label>期望结果：</label></div>-->
-    <!--</i-col>-->
-    <!--<i-col span="2" offset="0" style="margin-top: 7px">-->
-    <!--<div>-->
-    <!--<Monaco-->
-    <!--width="600"-->
-    <!--height="600"-->
-    <!--language="json"-->
-    <!--:code="asrParam.hotwords"-->
-    <!--theme="vs"-->
-    <!--@mounted="onMounted"-->
-    <!--@codeChange="onCodeChange"-->
-    <!--&gt;</Monaco>-->
-    <!--</div>-->
-    <!--</i-col>-->
-    <!--</row>-->
 
   </div>
 
@@ -131,6 +159,7 @@
   import Monaco from 'monaco-editor-forvue'
   // import MonacoEditor from 'vue-monaco-editor'
   import { Col, Row } from 'iview'
+  import $ from 'jquery'
 
   export default {
     components: {
@@ -140,39 +169,33 @@
     },
     data () {
       return {
+        loading: false,
+        url: window.nl + '/asrtest',
+        retResult: '',
+        extension_options: '',
         options: {
           selectOnLineNumbers: false
         },
-        code: '[\n' +
-        '    {\n' +
-        '    "domain" :"com.rokid.system.executer.release",\n' +
-        '    "slot" :"trigger",\n' +
-        '    "words": ["我回来了"]\n' +
-        '    }\n' +
-        ']',
+        code: '',
         lang: ['zh', 'en'],
         codec: ['pcm', 'opu2'],
         domains: '',
         stack_domains: '',
         asrParam: {
           test_server: 'asr-zh-tv',
-          id: null,
+          id: this.generateNum(),
           lang: 'zh',
           codec: 'pcm',
           vt: '',
-          sid: '',
+          sid: this.generateNum(),
           domains: [],
           stack_domains: [],
-          extension_options: {
-            result_type: 1,
-            tmp_result: 0,
-            vad_end_ms: 500,
-            auto_restart: 0,
-            voice_delay: 150
-          },
+          extension_options: '',
           hotwords: [],
           confirm: ''
         },
+        file: null,
+        loadingStatus: false,
         server: ['asr-zh-tv', 'asr-zh-pre', 'asr-zh', 'asr-zh-dev'],
         hotwordsObj: {
           domain: '',
@@ -181,48 +204,43 @@
         },
         ruleValidate: {
           test_server: [
-            {required: true, message: 'The name cannot be server', trigger: 'blur'}
+            {required: true, message: '请选择server', trigger: 'blur'}
           ],
-          confirm: [
-            {required: true, message: '请输入', trigger: 'blur'}
-          ],
-          id: [
-            {required: true, message: 'Please select the id', trigger: 'change'}
-          ],
-          vt: [
-            {required: true, message: 'Please select vt', trigger: 'change'}
-          ],
+          // id: [
+          //   {required: true, message: '请输入id', trigger: 'change'}
+          // ],
           codec: [
-            {required: true, message: 'Please select the codec', trigger: 'change'}
+            {required: true, message: '请选择codec', trigger: 'change'}
           ],
           lang: [
-            {required: true, message: 'Please select lang', trigger: 'change'}
-          ],
-          domains: [
-            {required: true, message: 'Please select domain', trigger: 'change'}
-          ],
-          sid: [
-            {required: true, message: 'Please enter a personal sid', trigger: 'blur'},
-            {type: 'string', min: 20, message: 'sid no less than 20 words', trigger: 'blur'}
+            {required: true, message: '请输入语言', trigger: 'change'}
           ]
         }
       }
     },
     mounted () {
-      // this.editor.setValue('test')
-      // this.editor.layout({
-      //   width: 600,
-      //   height: 200
-      // })
     },
     methods: {
+      generateNum () {
+        var num = ''
+        for (let i = 0; i < 7; i++) {
+          num = num + Math.floor(Math.random() * 10)
+        }
+        return num
+      },
+      uploading (event) {
+        this.file = event.target.files[0]
+      },
+      handleUpload (file) {
+        this.file = null
+        this.file = file
+        return false
+      },
       onMounted (editor) {
         this.editor = editor
-        // this.editor.setValue('test')
       },
       onCodeChange (editor) {
         this.asrParam.hotwords = this.editor.getValue()
-        console.log('editor: ' + JSON.parse(this.editor.getValue()).name)
       },
       selectCodec (codec) {
         this.asrParam.codec = codec
@@ -231,22 +249,56 @@
         this.asrParam.lang = lang
       },
       selectServer (server) {
-        console.log('server: ' + server)
         this.asrParam.test_server = server
       },
       handleSubmit (name) {
         this.$refs[name].validate((valid) => {
-          if (valid) {
-            this.$Message.success('Success!')
-          } else {
-            this.$Message.error('Fail!')
+          if (!valid) {
+            this.$Message.error('必填参数请全部输入!')
+            return
           }
+        })
+        this.domains = this.domains.replace(' ', '')
+        this.domains = this.domains.replace('\n', '')
+        this.stack_domains = this.stack_domains.replace(' ', '')
+        this.stack_domains = this.stack_domains.replace('\n', '')
+        if (this.domains.length > 0) {
+          this.asrParam.domains = this.domains.split(',')
+        }
+        if (this.stack_domains.length > 0) {
+          this.asrParam.stack_domains = this.stack_domains.split(',')
+        }
+        event.preventDefault()
+        let formData = new FormData()
+        formData.append('file', this.file)
+        formData.append('asrPara', JSON.stringify(this.asrParam))
+        this.$Message.info('开始执行，请等待')
+        this.loading = true
+        $.ajax({
+          url: this.url,
+          type: 'POST',
+          cache: false,
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: (result) => {
+            this.loading = false
+            this.retResult = result.toString().replace(/,/g, '\n')
+            this.$Message.success('Success')
+          },
+          error: (errorMsg) => {
+            this.$Message.error('failed')
+            this.loading = false
+            console.log(errorMsg)
+          }
+
         })
       },
       handleReset (name) {
-        console.log(name)
         this.$refs[name].resetFields()
       }
     }
   }
 </script>
+<style lang="less" rel="stylesheet/less">
+</style>
