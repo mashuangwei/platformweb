@@ -715,7 +715,6 @@
         }).then((res) => {
           res.json().then((json) => {
             this.projectIdList = []
-            console.log('list: ' + this.projectIdList)
             this.projectIdSelected = ''
             this.$nextTick(() => {
               this.projectIdList = json.result.data

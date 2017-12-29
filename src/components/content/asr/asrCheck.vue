@@ -2,7 +2,7 @@
   <div style="font-size: 12px; color: #495060;">
     <Form ref="asrParam" :model="asrParam" :rules="ruleValidate" :label-width="80">
       <row>
-        <i-col span="11" offset="0">
+        <i-col span="10" offset="0">
           <row>
             <i-col span="2">
               <FormItem label="server" prop="test_server">
@@ -129,23 +129,17 @@
           </FormItem>
 
         </i-col>
-        <!--<i-col span="1" style="margin-left: 100px">-->
-          <!--<div style="width:2px; height:830px; background-color:darkgrey;"></div>-->
-        <!--</i-col>-->
-        <i-col span="10">
+        <i-col span="10" offset="3">
           <row>
-            <i-col span="7" offset="12">
-              <div><label style="font-size: 20px">ASR识别结果</label></div>
-            </i-col>
-          </row>
-          <br>
-          <row>
-            <i-col offset="4">
-              <Input v-model="retResult" style="width: 550px;margin-left: 10px" type="textarea"
+            <Card>
+              <p slot="title">
+                <Icon type="ios-keypad"></Icon>
+                ASR执行结果
+              </p>
+              <Input v-model="retResult" type="textarea"
                      :autosize="{minRows: 25,maxRows: 40}"
                      placeholder="执行结果"></Input>
-            </i-col>
-
+            </Card>
           </row>
         </i-col>
       </row>
