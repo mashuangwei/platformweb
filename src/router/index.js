@@ -18,7 +18,8 @@ import login from '@/components/content/login.vue'
 import pressure from '@/components/content/pressureTest/pressure.vue'
 import opboss from '@/components/content/opboss/opbossdata.vue'
 import asrCheck from '@/components/content/asr/asrCheck.vue'
-import ttsSystemManage from '@/components/content/tts/SystemManage.vue'
+import MosTemplate from '@/components/content/tts/MosTemplate.vue'
+import mosGrade from '@/components/content/tts/mosGrade.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -112,9 +113,14 @@ export default new Router({
       component: asrCheck
     },
     {
-      path: '/ttsSystemManage',
-      name: 'ttsSystemManage',
-      component: ttsSystemManage
+      path: '/MosTemplate',
+      name: 'MosTemplate',
+      component: MosTemplate
+    },
+    {
+      path: '/mosGrade',
+      name: 'mosGrade',
+      component: mosGrade
     }
   ]
 })

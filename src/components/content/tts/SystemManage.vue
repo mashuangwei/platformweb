@@ -172,21 +172,22 @@
       width="400"
       title="上传语音文件&文本"
       okText="确定"
-      height="1200"
       v-model="upfileModal"
       :styles="{top: '20px'}">
       <Upload
         multiple
-        show-upload-list="true"
-        max-size="102400"
+        :show-upload-list="showUploadListFlag"
+        :max-size="maxSize"
+        :on-error="fileUpError"
+        :on-success="fileUpSuccess"
         :default-file-list="filelist"
         name="files"
+        style="margin-top: 5px"
         :action= "upfileurl">
         <Button type="ghost" icon="ios-cloud-upload-outline">选择文件</Button>
       </Upload>
-      <br>
-
     </Modal>
+
   </div>
 </template>
 <script>
@@ -214,6 +215,8 @@
         callback()
       }
       return {
+        showUploadListFlag: true,
+        maxSize: 102400,
         upfileurl: '',
         filelist: [],
         file: null,
@@ -337,18 +340,12 @@
       this.getAllSystem()
     },
     methods: {
-      // handleUpload (file) {
-      //   this.file = file
-      //   return false
-      // },
-      // upfileAction () {
-      //   this.loadingStatus = true
-      //   setTimeout(() => {
-      //     this.file = null
-      //     this.loadingStatus = false
-      //     this.$Message.success('Success')
-      //   }, 1500)
-      // },
+      fileUpError (error, file, fileList) {
+        this.$Message.error(file.name + '  上传失败，错误信息: ' + error)
+      },
+      fileUpSuccess (response, file, fileList) {
+        this.$Message.success(file.name + '  上传成功')
+      },
       cancelFileUpButton () {
         this.upfileModal = false
       },
@@ -405,7 +402,7 @@
         })
       },
       saveSystemParam () {
-        let url = window.myurl + '/mos/update'
+        let url = window.myurl + '/mos/updateSystem'
         $.ajax({
           type: 'PUT',
           async: true,

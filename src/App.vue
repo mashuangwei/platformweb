@@ -2,24 +2,30 @@
   a {
     color: #515767;
   }
+
   .active {
     color: #2d8cf0;
   }
+
   .pr {
     position: relative !important;
   }
+
   .ivu-menu-vertical .ivu-menu-item {
     padding: 0;
   }
+
   .ivu-menu li.ivu-menu-item a {
     display: block;
     padding: 14px 24px;
   }
+
   .ivu-menu li.ivu-menu-item a.db {
     padding: 0;
     display: inline-block;
     color: #fff;
   }
+
   .vertical-center-modal {
     display: flex;
     align-items: center;
@@ -132,6 +138,7 @@
     }
 
   }
+
   .ivu-col-span-20 {
     height: 100%;
   }
@@ -179,10 +186,10 @@
               </router-link>
             </Menu-item>
             <!--<Menu-item name="2">-->
-              <!--<router-link to="/test">-->
-                <!--<Icon type="heart"></Icon>-->
-                <!--用例管理-->
-              <!--</router-link>-->
+            <!--<router-link to="/test">-->
+            <!--<Icon type="heart"></Icon>-->
+            <!--用例管理-->
+            <!--</router-link>-->
             <!--</Menu-item>-->
             <Submenu name="3">
               <template slot="title">
@@ -196,29 +203,29 @@
                 </router-link>
               </Menu-item>
               <!--<Menu-item name="3-2">-->
-                <!--<router-link to="/asr">-->
-                  <!--<Icon type="crop"></Icon>-->
-                  <!--Asr报告-->
-                <!--</router-link>-->
+              <!--<router-link to="/asr">-->
+              <!--<Icon type="crop"></Icon>-->
+              <!--Asr报告-->
+              <!--</router-link>-->
               <!--</Menu-item>-->
             </Submenu>
             <!--<Menu-item name="3">-->
-              <!--<router-link to="/asr">-->
-                <!--<Icon type="android-globe"></Icon>-->
-                <!--Asr-->
-              <!--</router-link>-->
+            <!--<router-link to="/asr">-->
+            <!--<Icon type="android-globe"></Icon>-->
+            <!--Asr-->
+            <!--</router-link>-->
             <!--</Menu-item>-->
             <!--<Menu-item name="4">-->
-              <!--<router-link to="/speech">-->
-              <!--<Icon type="chatbubbles"></Icon>-->
-              <!--Speech-->
-              <!--</router-link>-->
+            <!--<router-link to="/speech">-->
+            <!--<Icon type="chatbubbles"></Icon>-->
+            <!--Speech-->
+            <!--</router-link>-->
             <!--</Menu-item>-->
             <Menu-item name="5">
               <router-link to="/nlp">
-              <Icon type="stats-bars"></Icon>
-              NLP
-            </router-link>
+                <Icon type="stats-bars"></Icon>
+                NLP
+              </router-link>
             </Menu-item>
 
             <Submenu name="6">
@@ -227,9 +234,15 @@
                 Tts
               </template>
               <Menu-item name="6-1">
-                <router-link to="/ttsSystemManage">
-                  <Icon type="funnel"></Icon>
-                  Tts系统管理
+                <router-link to="/MosTemplate">
+                  <Icon type="settings"></Icon>
+                  MOS任务管理
+                </router-link>
+              </Menu-item>
+              <Menu-item name="6-2">
+                <router-link to="/mosGrade">
+                  <Icon type="ios-settings-strong"></Icon>
+                  MOS任务评测
                 </router-link>
               </Menu-item>
               <!--<Menu-item name="3-2">-->
@@ -241,10 +254,10 @@
             </Submenu>
 
             <!--<Menu-item name="7">-->
-              <!--<router-link to="/skill">-->
-                <!--<Icon type="paper-airplane"></Icon>-->
-                <!--Skill模板-->
-              <!--</router-link>-->
+            <!--<router-link to="/skill">-->
+            <!--<Icon type="paper-airplane"></Icon>-->
+            <!--Skill模板-->
+            <!--</router-link>-->
             <!--</Menu-item>-->
 
             <Menu-item name="8">
@@ -255,17 +268,17 @@
             </Menu-item>
 
             <!--<Menu-item name="9">-->
-              <!--<router-link to="/monitor">-->
-                <!--<Icon type="star"></Icon>-->
-                <!--监控-->
-              <!--</router-link>-->
+            <!--<router-link to="/monitor">-->
+            <!--<Icon type="star"></Icon>-->
+            <!--监控-->
+            <!--</router-link>-->
             <!--</Menu-item>-->
 
             <!--<Menu-item name="10">-->
-              <!--<router-link to="/job">-->
-                <!--<Icon type="gear-b"></Icon>-->
-                <!--Job Manage-->
-              <!--</router-link>-->
+            <!--<router-link to="/job">-->
+            <!--<Icon type="gear-b"></Icon>-->
+            <!--Job Manage-->
+            <!--</router-link>-->
             <!--</Menu-item>-->
 
             <Menu-item name="11">
@@ -276,17 +289,17 @@
             </Menu-item>
 
             <!--<Menu-item name="12">-->
-              <!--<router-link to="/chartdemo">-->
-                <!--<Icon type="scissors"></Icon>-->
-                <!--动态图表-->
-              <!--</router-link>-->
+            <!--<router-link to="/chartdemo">-->
+            <!--<Icon type="scissors"></Icon>-->
+            <!--动态图表-->
+            <!--</router-link>-->
             <!--</Menu-item>-->
 
             <!--<Menu-item name="13">-->
-              <!--<router-link to="/highcharts">-->
-                <!--<Icon type="gear-b"></Icon>-->
-                <!--Highcharts-->
-              <!--</router-link>-->
+            <!--<router-link to="/highcharts">-->
+            <!--<Icon type="gear-b"></Icon>-->
+            <!--Highcharts-->
+            <!--</router-link>-->
             <!--</Menu-item>-->
 
             <Menu-item name="14">
@@ -335,7 +348,7 @@
           '/asr': '3',
           '/speech': '4',
           '/nlp': '5',
-          '/ttsSystemManage': '6',
+          '/MosTemplate': '6',
           '/skill': '7',
           '/task': '8',
           '/monitor': '9',
@@ -344,7 +357,8 @@
           '/chartdemo': '12',
           '/highcharts': '13',
           '/opboss': '14',
-          '/asrCheck': '15'
+          '/asrCheck': '15',
+          '/mosGrade': '16'
         }
       }
     },

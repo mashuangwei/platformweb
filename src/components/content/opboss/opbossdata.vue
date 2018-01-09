@@ -84,6 +84,7 @@
           {
             title: '时间',
             key: 'asrtime',
+            width: 150,
             align: 'center'
           },
           {
@@ -94,6 +95,7 @@
           {
             title: 'intent',
             key: 'intent',
+            width: 120,
             align: 'center'
           },
           {
@@ -107,7 +109,13 @@
             align: 'center'
           },
           {
+            title: 'tts',
+            key: 'tts',
+            align: 'center'
+          },
+          {
             title: 'OPU文件',
+            width: 100,
             key: 'codecfile',
             align: 'center',
             render: (h, params) => {
@@ -133,6 +141,7 @@
           {
             title: '语音文件',
             key: 'wavfile',
+            width: 250,
             align: 'center',
             render (h, data) {
               return h(audio, {
