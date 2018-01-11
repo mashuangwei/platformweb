@@ -289,10 +289,12 @@
           <Upload
             multiple
             :show-upload-list="showUploadListFlag"
-            :max-size="maxSize"
             :on-error="fileUpError"
             :on-success="fileUpSuccess"
             :default-file-list="filelist"
+            :format="fileFormat"
+            :max-size="10240"
+            :on-format-error="handleFormatError"
             name="files"
             style="margin-top: 5px"
             :action= "upfileurl">
@@ -333,6 +335,7 @@
       return {
         editdim: [],
         dim: [],
+        fileFormat: ['pcm', 'wav', 'mp3'],
         sysTableLoading: false,
         templateId: 1,
         editSystemModal: false,
@@ -543,11 +546,31 @@
                       this.parentShow = false
                       this.upfileModal = true
                       this.filelist = []
-                      this.upfileurl = window.myurl + '/mos/upfile/' + this.systemData[params.index].name
+                      this.fileFormat = ['pcm', 'wav', 'mp3']
+                      this.upfileurl = window.myurl + '/mos/upAudio/' + this.systemData[params.index].id
                       // this.editCase(params.index)
                     }
                   }
-                }, '上传语音&文本'),
+                }, '上传语音'),
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '7px'
+                  },
+                  on: {
+                    click: () => {
+                      this.parentShow = false
+                      this.upfileModal = true
+                      this.fileFormat = ['txt']
+                      this.filelist = []
+                      this.upfileurl = window.myurl + '/mos/upText/' + this.systemData[params.index].id
+                      // this.editCase(params.index)
+                    }
+                  }
+                }, '上传文本'),
                 h('Button', {
                   props: {
                     type: 'error',
@@ -570,6 +593,16 @@
       this.getAllTemplate()
     },
     methods: {
+      upfileError (error, file, fileList) {
+        this.$Message.error('上传失败')
+        console.log(error)
+      },
+      handleFormatError (file) {
+        this.$Notice.warning({
+          title: '上传文件失败',
+          desc: '格式不对'
+        })
+      },
       handleSubmitTemplate (name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
@@ -742,7 +775,10 @@
         })
       },
       fileUpError (error, file, fileList) {
-        this.$Message.error(file.name + '  上传失败，错误信息: ' + error)
+        this.$Notice.warning({
+          title: '上传文件失败！',
+          desc: '语音文件已上传！' + error
+        })
       },
       fileUpSuccess (response, file, fileList) {
         this.$Message.success(file.name + '  上传成功')

@@ -170,7 +170,7 @@
       @on-cancel="cancelFileUpButton"
       :mask-closable="false"
       width="400"
-      title="上传语音文件&文本"
+      title="上传语音"
       okText="确定"
       v-model="upfileModal"
       :styles="{top: '20px'}">
@@ -183,6 +183,9 @@
         :default-file-list="filelist"
         name="files"
         style="margin-top: 5px"
+        :format="fileFormat"
+        :max-size="10240"
+        :on-format-error="handleFormatError"
         :action= "upfileurl">
         <Button type="ghost" icon="ios-cloud-upload-outline">选择文件</Button>
       </Upload>
@@ -215,6 +218,7 @@
         callback()
       }
       return {
+        fileFormat: ['pcm', 'wav', 'mp3'],
         showUploadListFlag: true,
         maxSize: 102400,
         upfileurl: '',
@@ -313,11 +317,30 @@
                     click: () => {
                       this.upfileModal = true
                       this.filelist = []
-                      this.upfileurl = window.myurl + '/mos/upfile/' + this.systemData[params.index].name
+                      this.fileFormat = ['pcm', 'wav', 'mp3']
+                      this.upfileurl = window.myurl + '/mos/upAudio/' + this.systemData[params.index].id
                       // this.editCase(params.index)
                     }
                   }
-                }, '上传语音&文本'),
+                }, '上传语音'),
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '7px'
+                  },
+                  on: {
+                    click: () => {
+                      this.upfileModal = true
+                      this.filelist = []
+                      this.fileFormat = ['txt']
+                      this.upfileurl = window.myurl + '/mos/upText/' + this.systemData[params.index].id
+                      // this.editCase(params.index)
+                    }
+                  }
+                }, '上传文本'),
                 h('Button', {
                   props: {
                     type: 'error',

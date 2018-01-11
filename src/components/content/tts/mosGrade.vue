@@ -4,43 +4,26 @@
       <Card>
         <p slot="title">
           <Icon type="ios-plus-outline"></Icon>
-          评测任务创建
+          评测试卷创建
         </p>
         <Form :model="formItem" :label-width="80">
           <FormItem label="姓名">
-            <Input v-model="formItem.input" placeholder="输入评测人姓名" style="width: 200px"></Input>
+            <Input v-model="mosTaskParam.author" placeholder="输入评测人姓名" style="width: 200px"></Input>
           </FormItem>
           <FormItem label="性别">
-            <RadioGroup v-model="formItem.radio">
-              <Radio label="male">男</Radio>
-              <Radio label="female">女</Radio>
+            <RadioGroup v-model="mosTaskParam.gender">
+              <Radio label="男">男</Radio>
+              <Radio label="女">女</Radio>
             </RadioGroup>
           </FormItem>
-          <FormItem label="测试维度">
-            <CheckboxGroup v-model="formItem.checkbox">
-              <Checkbox label="音质"></Checkbox>
-              <Checkbox label="自然度"></Checkbox>
-              <Checkbox label="总体感觉"></Checkbox>
-            </CheckboxGroup>
-          </FormItem>
-          <FormItem label="测试系统">
-            <Transfer
-              :data="systemDataList"
-              :target-keys="targetKeys"
-              :list-style="listStyle"
-              :render-format="render3"
-              :operations="['向左','向右']"
-              filterable
-              :titles="testSystemTitles"
-              not-found-text="没有数据"
-              @on-change="handleChange3">
-              <div :style="{float: 'right', margin: '5px'}">
-                <Button type="ghost" size="small" @click="reloadMockData">刷新</Button>
-              </div>
-            </Transfer>
+
+          <FormItem label="试卷">
+            <Select v-model="mosTaskParam.templateId" style="width: 200px" @on-change="templateIdChange">
+              <Option v-for="item in templateList" :value="item.id" :key="item.name">{{ item.name }}</Option>
+            </Select>
           </FormItem>
           <FormItem>
-            <Button type="primary">Submit</Button>
+            <Button type="primary" @click="addMosTask">Submit</Button>
             <Button type="ghost" style="margin-left: 8px">Cancel</Button>
           </FormItem>
         </Form>
@@ -50,10 +33,10 @@
       <Card>
         <p slot="title">
           <Icon type="ios-list"></Icon>
-          已创建任务列表
+          评测试卷列表
         </p>
         <Table :loading="loading" :columns="mosTaskTable" :data="mosTaskData" :border="showBorder" no-data-text="没有数据"
-               :stripe="showStripe" style="margin-top: -7px;margin-left: -7px" height="180"
+               :stripe="showStripe" style="margin-top: -7px;margin-left: -7px" height="410"
                :show-header="showHeader" showIndex="true"></Table>
         <i-col span="14" offset="9" style="margin-top: 15px">
           <Page :total="pageHelp.totalNum" :current="pageHelp.curPage" :page-size="pageHelp.pageSize"
@@ -75,14 +58,12 @@
       okText="确定"
       v-model="scoreModal"
       :styles="{top: '20px'}">
-      <Card>
+      <Card v-if="scoreModal">
         <p slot="title">
           <Icon type="ios-keypad"></Icon>
-          第{{this.caseIndex}}题 &nbsp;&nbsp;&nbsp;&nbsp;  语音文本：{{this.caseParamList[this.caseIndex - 1].text}}     &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;答题状态：已答
+          第{{this.caseIndex}}题 &nbsp;&nbsp;&nbsp;&nbsp;  语音文本：{{this.caseParamList[this.caseIndex - 1].text}}     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;答题状态：{{this.caseParamList[this.caseIndex - 1].status ===1? '已答': '未答'}}
         </p>
-        <!--<div v-for="item in caselist" :key="item.index">-->
-          <!--<score-case :data="item"></score-case>-->
-        <!--</div>-->
+
         <div v-for="item in caseParamList[this.caseIndex - 1].param" :key="item.index">
           <score-case :data="item" @update="updateSystemScore"></score-case>
         </div>
@@ -104,7 +85,7 @@
         <row>
           <div style="margin-left: 220px">
             <Button type="success" style="" @click="selectPreCase">上一题</Button>
-            <Button type="primary" style="margin-left: 8px">Submit</Button>
+            <Button type="primary" style="margin-left: 8px" @click="submitCaseScore">Submit</Button>
             <Button type="success" style="margin-left: 8px" @click="selectNextCase">下一题</Button>
           </div>
         </row>
@@ -153,6 +134,7 @@
     },
     data () {
       return {
+        templateId: 0,
         reportModal: false,
         caseParam: {
           id: 0,
@@ -165,54 +147,6 @@
         },
         caseIndex: 1,
         caseParamList: [
-          {
-            id: 3,
-            task_id: 1,
-            status: 0,
-            index: 1,
-            text: '今天有什么好看的电影',
-            note: '',
-            param: [
-              {
-                id: 1,
-                naturalness: 4.5,
-                soundQuality: 2,
-                wholeFeel: 1,
-                url: 'http://rokidweb.oss-cn-hangzhou.aliyuncs.com/skills/%E5%90%AC%E6%AD%8C%E7%8C%9C%E7%94%B5%E5%BD%B1/80%E5%B9%B4%E4%BB%A3/%E8%B0%AD%E5%92%8F%E9%BA%9F%20-%20%E7%A5%9E%E7%9A%84%E4%BC%A0%E8%AF%B4.mp3'
-              },
-              {
-                id: 2,
-                naturalness: 2,
-                soundQuality: 3,
-                wholeFeel: 4,
-                url: window.myurl + '/mos/play' + '/A系统/1.mp3'
-              }
-            ]
-          },
-          {
-            id: 4,
-            task_id: 2,
-            status: 0,
-            index: 2,
-            text: '打开影视剧竞猜',
-            note: '',
-            param: [
-              {
-                id: 1,
-                naturalness: 3,
-                soundQuality: 5,
-                wholeFeel: 2,
-                url: 'http://rokidweb.oss-cn-hangzhou.aliyuncs.com/skills/%E5%90%AC%E6%AD%8C%E7%8C%9C%E7%94%B5%E5%BD%B1/80%E5%B9%B4%E4%BB%A3/%E8%B0%AD%E5%92%8F%E9%BA%9F%20-%20%E7%A5%9E%E7%9A%84%E4%BC%A0%E8%AF%B4.mp3'
-              },
-              {
-                id: 2,
-                naturalness: 5,
-                soundQuality: 3,
-                wholeFeel: 4,
-                url: 'http://rokidweb.oss-cn-hangzhou.aliyuncs.com/skills/%E5%90%AC%E6%AD%8C%E7%8C%9C%E7%94%B5%E5%BD%B1/80%E5%B9%B4%E4%BB%A3/%E8%B0%AD%E5%92%8F%E9%BA%9F%20-%20%E7%A5%9E%E7%9A%84%E4%BC%A0%E8%AF%B4.mp3'
-              }
-            ]
-          }
         ],
         systemParamList: [],
         note: '',
@@ -325,7 +259,7 @@
                   },
                   on: {
                     click: () => {
-                      this.scoreModal = true
+                      this.getAllCaseList(params.index)
                       // console.log('**** ', JSON.parse(JSON.stringify(this.caselist)))
                       // console.log(this.formItem.checkbox)
                       // this.editCase(params.index)
@@ -339,7 +273,7 @@
                   },
                   on: {
                     click: () => {
-                      this.remove(params.index)
+                      this.removeTask(params.index)
                     }
                   }
                 }, '删除')
@@ -347,19 +281,12 @@
             }
           }
         ],
-        mosTaskData: [{
-          id: '1',
-          author: 'msw',
-          gender: '男',
-          status: '未完成',
-          score: '12',
-          createTime: '2017-12-30 10:22:33',
-          updateTime: '2017-12-30 20:14:03'
-        }],
+        mosTaskData: [],
         mosTaskParam: {
           id: '',
+          templateId: 0,
           author: '',
-          gender: '',
+          gender: '男',
           status: '',
           score: '',
           createTime: '',
@@ -367,6 +294,7 @@
         },
         editMosTaskParam: {
           id: '',
+          templateId: 0,
           author: '',
           gender: '',
           status: '',
@@ -389,13 +317,117 @@
         listStyle: {
           width: '250px',
           height: '200px'
-        }
+        },
+        templateList: []
       }
     },
     created () {
-      this.getAllSystem()
+      this.getAllMosTask()
+      this.getAllMosTemplate()
     },
     methods: {
+      submitCaseScore () {
+        this.caseParamList[this.caseIndex - 1].status = 1
+        let url = window.myurl + '/mos/updateMosCaseScore'
+        $.ajax({
+          type: 'PUT',
+          async: true,
+          url: url,
+          contentType: 'application/json',
+          data: JSON.stringify(this.caseParamList[this.caseIndex - 1]),
+          dataType: 'json',
+          success: (result) => {
+            this.$Message.success('提交成功')
+          },
+          error: (errorMsg) => {
+            this.$Message.error('提交失败')
+            console.log(errorMsg)
+          }
+        })
+      },
+      getAllCaseList (index) {
+        let url = window.myurl + '/mos/getAllCase/' + this.mosTaskData[index].id
+        $.ajax({
+          type: 'GET',
+          async: true,
+          url: url,
+          dataType: 'json',
+          success: (result) => {
+            if (result.data.length > 0) {
+              this.caseParamList = result.data
+              this.scoreModal = true
+              return
+            }
+            this.$Message.info('当前考卷没有试题，请重新生成')
+          },
+          error: (errorMsg) => {
+            console.log(errorMsg)
+          }
+        })
+      },
+      removeTask (index) {
+        let url = window.myurl + '/mos/deleteTask/' + this.mosTaskData[index].id
+        $.ajax({
+          type: 'DELETE',
+          async: true,
+          url: url,
+          dataType: 'json',
+          success: (result) => {
+            this.$Message.success('删除成功')
+            this.getAllMosTask()
+          },
+          error: (errorMsg) => {
+            this.$Message.error('删除失败')
+            console.log(errorMsg)
+          }
+        })
+      },
+      addMosTask () {
+        let url = window.myurl + '/mos/addMosTask'
+        $.ajax({
+          type: 'POST',
+          async: true,
+          url: url,
+          contentType: 'application/json',
+          data: JSON.stringify(this.mosTaskParam),
+          dataType: 'json',
+          success: (result) => {
+            this.$Message.success('添加成功')
+            this.mosTaskParam = {
+              id: '',
+              templateId: 0,
+              author: '',
+              gender: '男',
+              status: '',
+              score: '',
+              createTime: '',
+              updateTime: ''
+            }
+            this.getAllMosTask()
+          },
+          error: (errorMsg) => {
+            this.$Message.error('添加失败')
+            console.log(errorMsg)
+          }
+        })
+      },
+      templateIdChange (id) {
+      },
+      getAllMosTemplate () {
+        let url = window.myurl + '/mos/getAllMosTemplate?pageSize=100'
+        $.ajax({
+          type: 'GET',
+          async: true,
+          url: url,
+          dataType: 'json',
+          success: (result) => {
+            this.templateList = result.data.list
+          },
+          error: (errorMsg) => {
+            console.log(errorMsg)
+          }
+        })
+      },
       updateSystemScore (childdata) {
         console.log('childdata: ', childdata)
         for (let i = 0; i < this.caseParamList[this.caseIndex - 1].param.length; i++) {
@@ -431,27 +463,20 @@
       },
       getPageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
-        // this.getAllSystem()
       },
       getPageSize (pageSize) {
         this.pageHelp.pageSize = pageSize
       },
-      getAllSystem () {
-        let url = window.myurl + '/mos/getAllSystem'
+      getAllMosTask () {
+        let url = window.myurl + '/mos/getAllTask'
         $.ajax({
           type: 'GET',
           async: false,
           url: url,
           dataType: 'json',
           success: (result) => {
-            this.selectModuleList = result.data.list
+            this.mosTaskData = result.data.list
             this.pageHelp.totalNum = result.data.total
-            for (let i = 0; i < this.selectModuleList.length; i++) {
-              this.systemDataList.push({
-                key: this.selectModuleList[i].id,
-                label: this.selectModuleList[i].name
-              })
-            }
           },
           error: (errorMsg) => {
             console.log(errorMsg)

@@ -53,6 +53,11 @@ module.exports = {
         pathRewrite: { '^/opboss': '' },
         target: "http://syslog-2:8000",
         changeOrigin: true
+      },
+      '/nielin': {
+        pathRewrite: { '^/nielin': '' },
+        target: "http://openrokid:50016",
+        changeOrigin: true
       }
     },
 
