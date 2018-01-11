@@ -23,7 +23,7 @@
             </Select>
           </FormItem>
           <FormItem>
-            <Button type="primary" @click="addMosTask">Submit</Button>
+            <Button type="primary" @click="addMosTask" :loading="addMoskLoading">Submit</Button>
             <Button type="ghost" style="margin-left: 8px">Cancel</Button>
           </FormItem>
         </Form>
@@ -52,6 +52,8 @@
 
     <!-- 评分对话框 -->
     <Modal
+      @on-ok="okScoreButton"
+      @on-cancel="cancleScoreButton"
       :mask-closable="false"
       width="800"
       title="评分"
@@ -64,7 +66,7 @@
           第{{this.caseIndex}}题 &nbsp;&nbsp;&nbsp;&nbsp;  语音文本：{{this.caseParamList[this.caseIndex - 1].text}}     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;答题状态：{{this.caseParamList[this.caseIndex - 1].status ===1? '已答': '未答'}}
         </p>
 
-        <div v-for="item in caseParamList[this.caseIndex - 1].param" :key="item.index">
+        <div v-for="item in caselist" :key="item.index">
           <score-case :data="item" @update="updateSystemScore"></score-case>
         </div>
         <br>
@@ -85,7 +87,7 @@
         <row>
           <div style="margin-left: 220px">
             <Button type="success" style="" @click="selectPreCase">上一题</Button>
-            <Button type="primary" style="margin-left: 8px" @click="submitCaseScore">Submit</Button>
+            <Button type="primary" style="margin-left: 8px" @click="submitCaseScore" :loading="submitScoreLoading">Submit</Button>
             <Button type="success" style="margin-left: 8px" @click="selectNextCase">下一题</Button>
           </div>
         </row>
@@ -134,6 +136,8 @@
     },
     data () {
       return {
+        submitScoreLoading: false,
+        addMoskLoading: false,
         templateId: 0,
         reportModal: false,
         caseParam: {
@@ -146,8 +150,7 @@
           param: ''
         },
         caseIndex: 1,
-        caseParamList: [
-        ],
+        caseParamList: [],
         systemParamList: [],
         note: '',
         demo: '',
@@ -156,24 +159,7 @@
           name: {name: 'hi boy'},
           age: {name: 'hi boy'}
         },
-        caselist: [
-          {
-            url: 'http://rokidweb.oss-cn-hangzhou.aliyuncs.com/skills/%E5%90%AC%E6%AD%8C%E7%8C%9C%E7%94%B5%E5%BD%B1/80%E5%B9%B4%E4%BB%A3/%E5%B0%8F%E8%B5%8F%E5%93%A5%20-%20%E9%9C%8D%E5%85%83%E7%94%B2%2B%E9%99%88%E7%9C%9F%2B%E5%86%8D%E5%90%91%E8%99%8E%E5%B1%B1%E8%A1%8C.mp3',
-            text: '第一题',
-            index: 1,
-            naturalness: 1,
-            soundQuality: 1,
-            wholeFeel: 1
-          },
-          {
-            url: 'http://rokidweb.oss-cn-hangzhou.aliyuncs.com/skills/%E5%90%AC%E6%AD%8C%E7%8C%9C%E7%94%B5%E5%BD%B1/80%E5%B9%B4%E4%BB%A3/%E5%B0%8F%E8%B5%8F%E5%93%A5%20-%20%E9%9C%8D%E5%85%83%E7%94%B2%2B%E9%99%88%E7%9C%9F%2B%E5%86%8D%E5%90%91%E8%99%8E%E5%B1%B1%E8%A1%8C.mp3',
-            text: '第2题',
-            index: 2,
-            naturalness: 1,
-            soundQuality: 1,
-            wholeFeel: 1
-          }
-        ],
+        caselist: typeof this.caseParamList === 'undefined' ? [] : this.caseParamList[this.caseIndex - 1].param,
         data: {
           url: 'http://rokidweb.oss-cn-hangzhou.aliyuncs.com/skills/%E5%90%AC%E6%AD%8C%E7%8C%9C%E7%94%B5%E5%BD%B1/80%E5%B9%B4%E4%BB%A3/%E5%B0%8F%E8%B5%8F%E5%93%A5%20-%20%E9%9C%8D%E5%85%83%E7%94%B2%2B%E9%99%88%E7%9C%9F%2B%E5%86%8D%E5%90%91%E8%99%8E%E5%B1%B1%E8%A1%8C.mp3',
           text: '第一题',
@@ -328,6 +314,7 @@
     methods: {
       submitCaseScore () {
         this.caseParamList[this.caseIndex - 1].status = 1
+        this.submitScoreLoading = true
         let url = window.myurl + '/mos/updateMosCaseScore'
         $.ajax({
           type: 'PUT',
@@ -338,9 +325,12 @@
           dataType: 'json',
           success: (result) => {
             this.$Message.success('提交成功')
+            this.submitScoreLoading = false
           },
           error: (errorMsg) => {
+            this.caseParamList[this.caseIndex - 1].status = 0
             this.$Message.error('提交失败')
+            this.submitScoreLoading = false
             console.log(errorMsg)
           }
         })
@@ -355,7 +345,13 @@
           success: (result) => {
             if (result.data.length > 0) {
               this.caseParamList = result.data
-              this.scoreModal = true
+              this.$nextTick(() => {
+                this.caselist = this.caseParamList[this.caseIndex - 1].param
+                this.$set(this.caselist, this.caseParamList[this.caseIndex - 1].param)
+                console.log(this.caselist)
+                this.scoreModal = true
+                // this.$Message.info('第' + this.caseIndex + '题')
+              })
               return
             }
             this.$Message.info('当前考卷没有试题，请重新生成')
@@ -384,6 +380,7 @@
       },
       addMosTask () {
         let url = window.myurl + '/mos/addMosTask'
+        this.addMoskLoading = true
         $.ajax({
           type: 'POST',
           async: true,
@@ -392,20 +389,12 @@
           data: JSON.stringify(this.mosTaskParam),
           dataType: 'json',
           success: (result) => {
+            this.addMoskLoading = false
             this.$Message.success('添加成功')
-            this.mosTaskParam = {
-              id: '',
-              templateId: 0,
-              author: '',
-              gender: '男',
-              status: '',
-              score: '',
-              createTime: '',
-              updateTime: ''
-            }
             this.getAllMosTask()
           },
           error: (errorMsg) => {
+            this.addMoskLoading = false
             this.$Message.error('添加失败')
             console.log(errorMsg)
           }
@@ -428,6 +417,12 @@
           }
         })
       },
+      okScoreButton () {
+        this.caseIndex = 1
+      },
+      cancleScoreButton () {
+        this.caseIndex = 1
+      },
       updateSystemScore (childdata) {
         console.log('childdata: ', childdata)
         for (let i = 0; i < this.caseParamList[this.caseIndex - 1].param.length; i++) {
@@ -447,7 +442,12 @@
           return
         }
         this.caseIndex = this.caseIndex + 1
-        this.$Message.info('第' + this.caseIndex + '题')
+        this.$nextTick(() => {
+          this.caselist = this.caseParamList[this.caseIndex - 1].param
+          this.$set(this.caselist, this.caseParamList[this.caseIndex - 1].param)
+          console.log(this.caselist)
+          this.$Message.info('第' + this.caseIndex + '题')
+        })
       },
       selectPreCase () {
         if (this.caseParamList.length === 0) {
@@ -459,7 +459,13 @@
           return
         }
         this.caseIndex = this.caseIndex - 1
-        this.$Message.info('第' + this.caseIndex + '题')
+        this.$nextTick(() => {
+          this.caselist = this.caseParamList[this.caseIndex - 1].param
+          this.$set(this.caselist, this.caseParamList[this.caseIndex - 1].param)
+          console.log(this.caselist)
+          this.$Message.info('第' + this.caseIndex + '题')
+        })
+        // this.$Message.info('第' + this.caseIndex + '题')
       },
       getPageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
