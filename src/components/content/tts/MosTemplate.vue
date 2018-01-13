@@ -138,6 +138,27 @@
     </row>
     <br>
     <br>
+    <!-- 报告图表话框 -->
+    <Modal
+      @on-ok="okReportButton"
+      @on-cancel="cancleReportButton"
+      :mask-closable="false"
+      width="700"
+      title="评测报告"
+      okText="确定"
+      v-model="reportModal"
+      :styles="{top: '20px'}">
+      <row v-if="reportModal">
+        <mosreport :data="reportData" @update="closeReportModal"></mosreport>
+      </row>
+      <br>
+      <br>
+      <!--<div class="border-bt editor-wrap">-->
+      <!--</div>-->
+      <!--<row>-->
+      <!--<mos-total-report></mos-total-report>-->
+      <!--</row>-->
+    </Modal>
 
     <Modal
       @on-ok="saveTemplateParam"
@@ -195,7 +216,6 @@
       title="配置MOS任务"
       okText="确定"
       v-model="sysModal"
-      v-show="parentShow"
       :styles="{top: '20px'}">
       <div>
         <row style="margin-top: -5px">
@@ -242,79 +262,80 @@
           </Card>
         </row>
 
-        <Modal
-          @on-ok="saveSystemParam"
-          @on-cancel="cancelEditSysButton"
-          :mask-closable="false"
-          width="400"
-          title="编辑"
-          okText="保存"
-          v-model="editModal"
-          :styles="{top: '20px'}">
-          <row>
-            <i-col span="4" offset="0">
-              <div style="line-height: 32px;"><label>系统名称：</label></div>
-            </i-col>
-            <i-col span="3" offset="1">
-              <div>
-                <Input v-model="editSystemParam.name" placeholder="请输入..." style="width: 250px"></Input>
-              </div>
-            </i-col>
-          </row>
-          <br>
-
-          <row>
-            <i-col span="4" offset="0">
-              <div style="line-height: 32px;"><label>系统描述：</label></div>
-            </i-col>
-            <i-col span="3" offset="1">
-              <div>
-                <Input v-model="editSystemParam.desc" placeholder="请输入..." style="width: 270px"></Input>
-              </div>
-            </i-col>
-          </row>
-          <br>
-          <br>
-        </Modal>
-        <!-- 上传语音文件和文本 -->
-        <Modal
-          @on-ok="okButton"
-          @on-cancel="cancelFileUpButton"
-          :mask-closable="false"
-          width="400"
-          title="上传语音文件&文本"
-          okText="确定"
-          v-model="upfileModal"
-          :styles="{top: '20px'}">
-          <Upload
-            multiple
-            :show-upload-list="showUploadListFlag"
-            :on-error="fileUpError"
-            :on-success="fileUpSuccess"
-            :default-file-list="filelist"
-            :format="fileFormat"
-            :max-size="10240"
-            :on-format-error="handleFormatError"
-            name="files"
-            style="margin-top: 5px"
-            :action= "upfileurl">
-            <Button type="ghost" icon="ios-cloud-upload-outline">选择文件</Button>
-          </Upload>
-        </Modal>
-
       </div>
 
     </Modal>
 
+    <Modal
+      @on-ok="saveSystemParam"
+      @on-cancel="cancelEditSysButton"
+      :mask-closable="false"
+      width="400"
+      title="编辑"
+      okText="保存"
+      v-model="editModal"
+      :styles="{top: '20px'}">
+      <row>
+        <i-col span="4" offset="0">
+          <div style="line-height: 32px;"><label>系统名称：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="editSystemParam.name" placeholder="请输入..." style="width: 250px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+
+      <row>
+        <i-col span="4" offset="0">
+          <div style="line-height: 32px;"><label>系统描述：</label></div>
+        </i-col>
+        <i-col span="3" offset="1">
+          <div>
+            <Input v-model="editSystemParam.desc" placeholder="请输入..." style="width: 270px"></Input>
+          </div>
+        </i-col>
+      </row>
+      <br>
+      <br>
+    </Modal>
+    <!-- 上传语音文件和文本 -->
+    <Modal
+      @on-ok="okButton"
+      @on-cancel="cancelFileUpButton"
+      :mask-closable="false"
+      width="400"
+      title="上传语音文件&文本"
+      okText="确定"
+      v-model="upfileModal"
+      :styles="{top: '20px'}">
+      <Upload
+        multiple
+        :show-upload-list="showUploadListFlag"
+        :on-error="fileUpError"
+        :on-success="fileUpSuccess"
+        :default-file-list="filelist"
+        :format="fileFormat"
+        :max-size="10240"
+        :on-format-error="handleFormatError"
+        name="files"
+        style="margin-top: 5px"
+        :action= "upfileurl">
+        <Button type="ghost" icon="ios-cloud-upload-outline">选择文件</Button>
+      </Upload>
+    </Modal>
 
   </div>
 </template>
 <script>
   import $ from 'jquery'
   import Card from 'iview/src/components/card/card'
+  import mosreport from './mosreport'
 
   export default {
     components: {
+      mosreport,
       Card,
       'name': 'mosTemplate'
     },
@@ -333,6 +354,8 @@
         callback()
       }
       return {
+        reportModal: false,
+        reportData: {categories: [], series: []},
         editdim: [],
         dim: [],
         fileFormat: ['pcm', 'wav', 'mp3'],
@@ -451,6 +474,21 @@
                 }, '配置'),
                 h('Button', {
                   props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '7px'
+                  },
+                  on: {
+                    click: () => {
+                      this.templateId = this.templateData[params.index].id
+                      this.getTemplateRoport(this.templateData[params.index].id)
+                    }
+                  }
+                }, '报告'),
+                h('Button', {
+                  props: {
                     type: 'error',
                     size: 'small'
                   },
@@ -464,7 +502,6 @@
             }
           }
         ],
-        parentShow: true,
         sysModal: false,
         templateData: [],
         showUploadListFlag: true,
@@ -527,7 +564,6 @@
                   },
                   on: {
                     click: () => {
-                      this.parentShow = false
                       this.editSystemParam = Object.assign({}, this.editSystemParam, this.systemData[params.index])
                       this.editModal = true
                     }
@@ -543,7 +579,6 @@
                   },
                   on: {
                     click: () => {
-                      this.parentShow = false
                       this.upfileModal = true
                       this.filelist = []
                       this.fileFormat = ['pcm', 'wav', 'mp3']
@@ -562,7 +597,6 @@
                   },
                   on: {
                     click: () => {
-                      this.parentShow = false
                       this.upfileModal = true
                       this.fileFormat = ['txt']
                       this.filelist = []
@@ -592,7 +626,43 @@
     created () {
       this.getAllTemplate()
     },
+    destroyed () {
+      console.log('task destoryed.....')
+    },
     methods: {
+      closeReportModal () {
+        this.$emit('update')
+      },
+      cancleReportButton () {
+        this.$emit('update')
+      },
+      okReportButton () {
+        this.reportModal = false
+      },
+      getTemplateRoport (templateId) {
+        let url = window.myurl + '/mos/getTaskReport/' + templateId
+        $.ajax({
+          type: 'GET',
+          async: true,
+          url: url,
+          dataType: 'json',
+          success: (result) => {
+            if (result.code === 400) {
+              this.$Message.error(result.message)
+              return
+            }
+            this.$set(this.reportData, 'categories', result.data.categories)
+            this.$set(this.reportData, 'series', result.data.series)
+            // this.reportData = result.data
+            console.log(this.reportData)
+            this.reportModal = true
+          },
+          error: (errorMsg) => {
+            this.$Message.error('查看报告失败')
+            console.log(errorMsg)
+          }
+        })
+      },
       upfileError (error, file, fileList) {
         this.$Message.error('上传失败')
         console.log(error)
@@ -744,7 +814,6 @@
         }
       },
       cancelEditSysButton () {
-        this.parentShow = true
       },
       getTemplatePageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
@@ -785,11 +854,9 @@
       },
       cancelFileUpButton () {
         this.upfileModal = false
-        this.parentShow = true
       },
       okButton () {
         this.upfileModal = false
-        this.parentShow = true
       },
       handleSuccess (res, file, fileList) {
         this.uploadShowFlag = false
@@ -824,7 +891,6 @@
           success: (result) => {
             if (result.code === 200) {
               this.$Message.success('保存成功')
-              this.parentShow = true
               this.getAllSystem()
             } else {
               this.$Message.error(result.message)
