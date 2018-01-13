@@ -99,24 +99,24 @@
     </Modal>
 
     <!-- 报告图表话框 -->
-    <Modal
-      :mask-closable="false"
-      width="700"
-      title="评测报告"
-      okText="确定"
-      v-model="reportModal"
-      :styles="{top: '20px'}">
-      <row>
-        <mosreport></mosreport>
-      </row>
-      <br>
-      <br>
-      <!--<div class="border-bt editor-wrap">-->
-      <!--</div>-->
-      <row>
-        <mos-total-report></mos-total-report>
-      </row>
-    </Modal>
+    <!--<Modal-->
+      <!--:mask-closable="false"-->
+      <!--width="700"-->
+      <!--title="评测报告"-->
+      <!--okText="确定"-->
+      <!--v-model="reportModal"-->
+      <!--:styles="{top: '20px'}">-->
+      <!--<row>-->
+        <!--<mosreport :data="reportData"></mosreport>-->
+      <!--</row>-->
+      <!--<br>-->
+      <!--<br>-->
+      <!--&lt;!&ndash;<div class="border-bt editor-wrap">&ndash;&gt;-->
+      <!--&lt;!&ndash;</div>&ndash;&gt;-->
+      <!--&lt;!&ndash;<row>&ndash;&gt;-->
+        <!--&lt;!&ndash;<mos-total-report></mos-total-report>&ndash;&gt;-->
+      <!--&lt;!&ndash;</row>&ndash;&gt;-->
+    <!--</Modal>-->
   </div>
 </template>
 
@@ -136,6 +136,7 @@
     },
     data () {
       return {
+        reportData: null,
         submitScoreLoading: false,
         addMoskLoading: false,
         templateId: 0,
@@ -219,22 +220,22 @@
             align: 'center',
             render: (h, params) => {
               return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '7px'
-                  },
-                  on: {
-                    click: () => {
-                      // this.mosTaskParam = Object.assign({}, this.editMosTaskParam, this.mosTaskData[params.index])
-                      // this.editModal = true
-                      this.reportModal = true
-                    }
-                  }
-                }, '报告'),
+                // h('Button', {
+                //   props: {
+                //     type: 'primary',
+                //     size: 'small'
+                //   },
+                //   style: {
+                //     marginRight: '7px'
+                //   },
+                //   on: {
+                //     click: () => {
+                //       // this.mosTaskParam = Object.assign({}, this.editMosTaskParam, this.mosTaskData[params.index])
+                //       // this.editModal = true
+                //       this.reportModal = true
+                //     }
+                //   }
+                // }, '报告'),
                 h('Button', {
                   props: {
                     type: 'primary',
@@ -313,8 +314,8 @@
     },
     methods: {
       submitCaseScore () {
-        this.caseParamList[this.caseIndex - 1].status = 1
         this.submitScoreLoading = true
+        this.caseParamList[this.caseIndex - 1].status = 1
         let url = window.myurl + '/mos/updateMosCaseScore'
         $.ajax({
           type: 'PUT',
@@ -324,11 +325,49 @@
           data: JSON.stringify(this.caseParamList[this.caseIndex - 1]),
           dataType: 'json',
           success: (result) => {
-            this.$Message.success('提交成功')
+            let notFinshedNum = 0
+            for (let i = 0; i < this.caseParamList.length; i++) {
+              if (this.caseParamList[i].status === 0) {
+                notFinshedNum = notFinshedNum + 1
+              }
+            }
+            if (notFinshedNum === 0) {
+              this.submitTaskReport(this.caseParamList[this.caseIndex - 1].taskId)
+            } else {
+              if (result.code === 1015) {
+                this.$Message.error(result.message)
+                this.caseParamList[this.caseIndex - 1].status = 0
+              } else {
+                this.$Message.success('提交成功')
+              }
+              this.submitScoreLoading = false
+            }
+          },
+          error: (errorMsg) => {
+            console.log(errorMsg)
+            this.$Message.error(errorMsg.responseJSON.message)
+            this.caseParamList[this.caseIndex - 1].status = 0
+            this.submitScoreLoading = false
+          }
+        })
+      },
+      submitTaskReport (taskId) {
+        let url = window.myurl + '/mos/updateTaskScore/' + taskId
+        $.ajax({
+          type: 'PUT',
+          async: true,
+          url: url,
+          contentType: 'application/json',
+          dataType: 'json',
+          success: (result) => {
+            if (result.code === 400) {
+              this.$Message.info('该试卷已作答完毕，不能再次提交')
+            } else {
+              this.$Message.success('所有的题都已提交成功')
+            }
             this.submitScoreLoading = false
           },
           error: (errorMsg) => {
-            this.caseParamList[this.caseIndex - 1].status = 0
             this.$Message.error('提交失败')
             this.submitScoreLoading = false
             console.log(errorMsg)
@@ -389,6 +428,11 @@
           data: JSON.stringify(this.mosTaskParam),
           dataType: 'json',
           success: (result) => {
+            if (result.code === 400) {
+              this.addMoskLoading = false
+              this.$Message.error(result.message)
+              return
+            }
             this.addMoskLoading = false
             this.$Message.success('添加成功')
             this.getAllMosTask()

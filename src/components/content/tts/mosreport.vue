@@ -15,6 +15,9 @@
     components: {
       HighCharts
     },
+    props: {
+      data: Object
+    },
     data () {
       return {
         option: {
@@ -25,7 +28,7 @@
             text: '测试系统各项得分统计'
           },
           xAxis: {
-            categories: ['维度1', '维度2', '维度3']
+            categories: this.data.categories
           },
           yAxis: {
             title: ''
@@ -43,16 +46,7 @@
               }
             }
           },
-          series: [{
-            name: 'A系统',
-            data: [5, 3, 4]
-          }, {
-            name: 'B系统',
-            data: [2, 6, 8]
-          }, {
-            name: 'C系统',
-            data: [3, 4, 4]
-          }]
+          series: this.data.series
         }
       }
     },

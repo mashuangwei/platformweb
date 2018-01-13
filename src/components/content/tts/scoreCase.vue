@@ -10,7 +10,7 @@
           <div style="margin-top: 7px; text-align: right; "><label style="color: black">语音：</label></div>
         </i-col>
         <i-col span="4" style="margin-left: 15px;width: 250px">
-          <audio :src="data.url" controls="controls" >
+          <audio :src="'http://test-57:8000/audio/' + data.url" controls="controls" >
           </audio>
         </i-col>
       </row>
@@ -22,9 +22,12 @@
         </i-col>
         <i-col span="4" style="margin-left: 15px">
           <div>
-            <Select v-model="data.naturalness" @on-change="selectNaturalness" style="width: 200px">
-              <Option v-for="item in scoreOptions"  :key="item.value" :value="item.value">{{item.value}}</Option>
-            </Select>
+            <!--<Select v-model="data.naturalness" @on-change="selectNaturalness" style="width: 200px">-->
+              <!--<Option v-for="item in scoreOptions"  :key="item.value" :value="item.value">{{item.value}}</Option>-->
+            <!--</Select>-->
+            <Rate show-text allow-half v-model="data.naturalness" @on-change="selectNaturalness" style="width: 230px">
+              <span style="color: #f5a623">{{ data.naturalness }}</span>
+            </Rate>
           </div>
         </i-col>
       </row>
@@ -35,9 +38,12 @@
         </i-col>
         <i-col span="4" style="margin-left: 15px">
           <div>
-            <Select v-model="data.soundQuality" @on-change="selectSoundQuality" style="width: 200px">
-              <Option v-for="item in scoreOptions"  :key="item.value" :value="item.value">{{item.value}}</Option>
-            </Select>
+            <!--<Select v-model="data.soundQuality" @on-change="selectSoundQuality" style="width: 200px">-->
+              <!--<Option v-for="item in scoreOptions"  :key="item.value" :value="item.value">{{item.value}}</Option>-->
+            <!--</Select>-->
+            <Rate show-text allow-half v-model="data.soundQuality" @on-change="selectSoundQuality" style="width: 230px">
+              <span style="color: #f5a623">{{ data.soundQuality }}</span>
+            </Rate>
           </div>
         </i-col>
       </row>
@@ -49,9 +55,12 @@
         </i-col>
         <i-col span="4" style="margin-left: 15px">
           <div>
-            <Select v-model="data.wholeFeel" @on-change="selectWholeFeel" style="width: 200px">
-              <Option v-for="item in scoreOptions"  :key="item.value" :value="item.value">{{item.value}}</Option>
-            </Select>
+            <!--<Select v-model="data.wholeFeel" @on-change="selectWholeFeel" style="width: 200px">-->
+              <!--<Option v-for="item in scoreOptions"  :key="item.value" :value="item.value">{{item.value}}</Option>-->
+            <!--</Select>-->
+            <Rate show-text allow-half v-model="data.wholeFeel" @on-change="selectWholeFeel" style="width: 230px">
+              <span style="color: #f5a623">{{ data.wholeFeel }}</span>
+            </Rate>
           </div>
         </i-col>
       </row>

@@ -184,7 +184,7 @@
         name="files"
         style="margin-top: 5px"
         :format="fileFormat"
-        :max-size="10240"
+        :max-size="102400"
         :on-format-error="handleFormatError"
         :action= "upfileurl">
         <Button type="ghost" icon="ios-cloud-upload-outline">选择文件</Button>
