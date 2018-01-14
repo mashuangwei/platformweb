@@ -84,7 +84,7 @@
     <!--</i-col>-->
     <!--</Row>-->
     <!--<br>-->
-    <row style="margin-top: -5px">
+    <!--<row style="margin-top: -5px">-->
       <Card>
         <p slot="title">
           <Icon type="ios-plus-outline"></Icon>
@@ -92,9 +92,9 @@
         </p>
         <Form ref="templateParam" :model="templateParam" :rules="ruleCustom" :label-width="80">
           <FormItem label="任务名称" prop="name">
-            <Input v-model="templateParam.name" style="width: 20%"></Input>
+            <Input v-model="templateParam.name" style="width: 270px"></Input>
           </FormItem>
-          <FormItem label="任务描述" prop="desc" style="width: 25%">
+          <FormItem label="任务描述" prop="desc" style="width: 350px">
             <Input v-model="templateParam.desc"></Input>
           </FormItem>
           <FormItem label="测试维度">
@@ -112,12 +112,12 @@
         </Form>
 
       </Card>
-    </row>
+    <!--</row>-->
 
     <!--<div class="border-bt editor-wrap">-->
     <!--</div>-->
     <!--<br>-->
-    <row style="margin-top: 5px">
+    <!--<row style="margin-top: 5px">-->
       <Card>
         <p slot="title">
           <Icon type="ios-keypad"></Icon>
@@ -135,7 +135,7 @@
         <br>
         <br>
       </Card>
-    </row>
+    <!--</row>-->
     <br>
     <br>
     <!-- 报告图表话框 -->
@@ -212,8 +212,8 @@
     <!-- 添加测试系统对话框 -->
     <Modal
       :mask-closable="false"
-      width="1200"
-      title="配置MOS任务"
+      width="1000"
+      title="MOS任务添加TTS模型"
       okText="确定"
       v-model="sysModal"
       :styles="{top: '20px'}">
@@ -226,9 +226,9 @@
             </p>
             <Form ref="systemParam" :model="systemParam" :rules="ruleCustom" :label-width="80">
               <FormItem label="系统名称" prop="name">
-                <Input v-model="systemParam.name" style="width: 20%"></Input>
+                <Input v-model="systemParam.name" style="width: 30%"></Input>
               </FormItem>
-              <FormItem label="系统描述" prop="desc" style="width: 25%">
+              <FormItem label="系统描述" prop="desc" style="width: 337px">
                 <Input v-model="systemParam.desc"></Input>
               </FormItem>
               <FormItem>
@@ -436,6 +436,7 @@
             title: '操作',
             key: 'action',
             align: 'center',
+            width: 220,
             render: (h, params) => {
               return h('div', [
                 h('Button', {
@@ -552,6 +553,7 @@
             title: '操作',
             key: 'action',
             align: 'center',
+            width: 290,
             render: (h, params) => {
               return h('div', [
                 h('Button', {
@@ -678,6 +680,9 @@
           if (valid) {
             if (this.dim.length > 0) {
               this.templateParam.dim = this.dim.toString()
+            } else {
+              this.$Message.error('测试维度至少选择一个')
+              return
             }
             let url = window.myurl + '/mos/addMosTemplate'
             $.ajax({
@@ -754,6 +759,9 @@
         let url = window.myurl + '/mos/updateMosTemplate'
         if (this.editdim.length > 0) {
           this.$set(this.editTemplateParam, 'dim', this.editdim.toString())
+        } else {
+          this.$Message.error('测试维度至少选择一个')
+          return
         }
         // this.editdim = this.editTemplateParam.split(',')
 

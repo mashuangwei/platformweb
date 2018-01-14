@@ -202,7 +202,18 @@
           {
             title: '状态',
             key: 'status',
-            align: 'center'
+            align: 'center',
+            render: (h, params) => {
+              const row = params.row
+              const color = row.status === 0 ? 'blue' : 'green'
+              const text = row.status === 0 ? '未完成' : '已完成'
+              return h('Tag', {
+                props: {
+                  type: 'dot',
+                  color: color
+                }
+              }, text)
+            }
           },
           {
             title: '创建时间',
