@@ -194,7 +194,7 @@
             <Submenu name="3">
               <template slot="title">
                 <Icon type="ios-analytics"></Icon>
-                Asr
+                ASR
               </template>
               <Menu-item name="3-1">
                 <router-link to="/asrCheck">
@@ -231,18 +231,24 @@
             <Submenu name="6">
               <template slot="title">
                 <Icon type="fireball"></Icon>
-                Tts
+                TTS
               </template>
               <Menu-item name="6-1">
                 <router-link to="/MosTemplate">
                   <Icon type="settings"></Icon>
-                  MOS任务管理
+                  模板管理
                 </router-link>
               </Menu-item>
               <Menu-item name="6-2">
                 <router-link to="/mosGrade">
                   <Icon type="ios-settings-strong"></Icon>
-                  MOS任务评测
+                  MOS评测
+                </router-link>
+              </Menu-item>
+              <Menu-item name="6-3">
+                <router-link to="/abTestGrade">
+                  <Icon type="ios-browsers"></Icon>
+                  ABX评测
                 </router-link>
               </Menu-item>
               <!--<Menu-item name="3-2">-->
@@ -358,7 +364,8 @@
           '/highcharts': '13',
           '/opboss': '14',
           '/asrCheck': '15',
-          '/mosGrade': '16'
+          '/mosGrade': '16',
+          '/abTestGrade': '17'
         }
       }
     },

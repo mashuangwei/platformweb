@@ -66,10 +66,110 @@
           第{{this.caseIndex}}题 &nbsp;&nbsp;&nbsp;&nbsp;  语音文本：{{this.caseParamList[this.caseIndex - 1].text}}     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;答题状态：{{this.caseParamList[this.caseIndex - 1].status ===1? '已答': '未答'}}
         </p>
 
-        <div v-for="item in caselist" :key="item.index">
-          <score-case :data="item" @update="updateSystemScore"></score-case>
+        <!--<div v-for="item in caselist" :key="item.index">-->
+          <!--<ab-test-case :data="item" @update="updateSystemScore"></ab-test-case>-->
+        <!--</div>-->
+        <br>
+        <row>
+          <i-col span="3" offset="1">
+            <div style="margin-top: 7px; text-align: right; "><label style="color: black">A系统：</label></div>
+          </i-col>
+          <i-col span="4" style="margin-left: 15px;width: 250px">
+            <audio :src="'http://test-57:8000/audio/' + caselist[0].url" controls="controls" >
+            </audio>
+          </i-col>
+        </row>
+        <br>
+        <row>
+          <i-col span="3" offset="1">
+            <div style="margin-top: 7px; text-align: right; "><label style="color: black">B系统：</label></div>
+          </i-col>
+          <i-col span="4" style="margin-left: 15px;width: 250px">
+            <audio :src="'http://test-57:8000/audio/' + caselist[1].url" controls="controls" >
+            </audio>
+          </i-col>
+        </row>
+        <br>
+        <row v-if="abDim.naturalness !== undefined">
+          <i-col span="3" offset="1">
+            <div style="margin-top: 7px; text-align: right;"><label style="color: black">自然度：</label></div>
+          </i-col>
+          <i-col span="11" style="margin-left: 15px">
+            <div>
+              <RadioGroup v-model="abNaturalnessScore" @on-change="changeNaturalness">
+                <Radio label="A好">
+                  <!--<Icon type="social-dropbox"></Icon>-->
+                  <span>A好</span>
+                </Radio>
+                <Radio label="一样好">
+                  <!--<Icon type="ios-body-outline"></Icon>-->
+                  <span>一样好</span>
+                </Radio>
+                <Radio label="B好">
+                  <!--<Icon type="social-dropbox-outline"></Icon>-->
+                  <span>B好</span>
+                </Radio>
+              </RadioGroup>
+            </div>
+          </i-col>
+        </row>
+        <br>
+
+        <row v-if="abDim.soundQuality !== undefined">
+          <i-col span="3" offset="1">
+            <div style="margin-top: 7px; text-align: right;"><label style="color: black">音质：</label></div>
+          </i-col>
+          <i-col span="11" style="margin-left: 15px">
+            <div>
+              <RadioGroup v-model="abSoundQualityScore" @on-change="changeSoundQuality">
+                <Radio label="A好">
+                  <!--<Icon type="social-dropbox"></Icon>-->
+                  <span>A好</span>
+                </Radio>
+                <Radio label="一样好">
+                  <!--<Icon type="ios-body-outline"></Icon>-->
+                  <span>一样好</span>
+                </Radio>
+                <Radio label="B好">
+                  <!--<Icon type="social-dropbox-outline"></Icon>-->
+                  <span>B好</span>
+                </Radio>
+              </RadioGroup>
+            </div>
+
+          </i-col>
+        </row>
+        <br>
+
+        <row v-if="abDim.wholeFeel !== undefined">
+          <i-col span="3" offset="1">
+            <div style="margin-top: 7px; text-align: right;"><label style="color: black">总体感觉：</label></div>
+          </i-col>
+          <i-col span="11" style="margin-left: 15px">
+            <div>
+              <RadioGroup v-model="abWholeFeelScore" @on-change="changeWholeFeel">
+                <Radio label="A好">
+                  <!--<Icon type="social-dropbox"></Icon>-->
+                  <span>A好</span>
+                </Radio>
+                <Radio label="一样好">
+                  <!--<Icon type="ios-body-outline"></Icon>-->
+                  <span>一样好</span>
+                </Radio>
+                <Radio label="B好">
+                  <!--<Icon type="social-dropbox-outline"></Icon>-->
+                  <span>B好</span>
+                </Radio>
+              </RadioGroup>
+            </div>
+          </i-col>
+        </row>
+        <br>
+        <div class="border-bt editor-wrap">
         </div>
         <br>
+
+      <br>
         <row>
           <i-col span="3" offset="1">
             <div style="margin-top: 7px; text-align: right;"><label style="color: black">备注：</label></div>
@@ -122,7 +222,7 @@
 
 <script>
   import $ from 'jquery'
-  import scoreCase from './scoreCase'
+  import abTestCase from './abTestCase'
   import mosreport from './mosreport'
   import mosTotalReport from './mosTotalReport'
   import Row from 'iview/src/components/grid/row'
@@ -131,11 +231,19 @@
     components: {
       Row,
       mosTotalReport,
-      scoreCase,
+      abTestCase,
       mosreport
     },
     data () {
       return {
+        abDim: {
+          naturalness: 0,
+          soundQuality: 0,
+          wholeFeel: 0
+        },
+        abNaturalnessScore: '一样好',
+        abSoundQualityScore: '一样好',
+        abWholeFeelScore: '一样好',
         reportData: null,
         submitScoreLoading: false,
         addMoskLoading: false,
@@ -183,6 +291,7 @@
         showHeader: true,
         fixedHeader: true,
         editModal: false,
+        taskIndex: 0,
         mosTaskTable: [
           {
             type: 'index',
@@ -257,6 +366,7 @@
                   },
                   on: {
                     click: () => {
+                      this.taskIndex = params.index
                       this.getAllCaseList(params.index)
                       // console.log('**** ', JSON.parse(JSON.stringify(this.caselist)))
                       // console.log(this.formItem.checkbox)
@@ -283,7 +393,7 @@
         mosTaskParam: {
           id: '',
           templateId: 0,
-          sysType: 0,
+          sysType: 1,
           author: '',
           gender: '男',
           status: '',
@@ -294,7 +404,7 @@
         editMosTaskParam: {
           id: '',
           templateId: 0,
-          sysType: 0,
+          sysType: 1,
           author: '',
           gender: '',
           status: '',
@@ -326,6 +436,66 @@
       this.getAllMosTemplate()
     },
     methods: {
+      changeWholeFeel () {
+        switch (this.abWholeFeelScore) {
+          case 'A好': {
+            this.caselist[0].wholeFeel = 2
+            this.caselist[1].wholeFeel = 0
+            break
+          }
+          case '一样好': {
+            this.caselist[0].wholeFeel = 1
+            this.caselist[1].wholeFeel = 1
+            break
+          }
+          case 'B好': {
+            this.caselist[0].wholeFeel = 0
+            this.caselist[1].wholeFeel = 2
+            break
+          }
+        }
+        this.caseParamList[this.caseIndex - 1].param = this.caselist
+      },
+      changeSoundQuality () {
+        switch (this.abSoundQualityScore) {
+          case 'A好': {
+            this.caselist[0].soundQuality = 2
+            this.caselist[1].soundQuality = 0
+            break
+          }
+          case '一样好': {
+            this.caselist[0].soundQuality = 1
+            this.caselist[1].soundQuality = 1
+            break
+          }
+          case 'B好': {
+            this.caselist[0].soundQuality = 0
+            this.caselist[1].soundQuality = 2
+            break
+          }
+        }
+        this.caseParamList[this.caseIndex - 1].param = this.caselist
+      },
+      changeNaturalness () {
+        switch (this.abNaturalnessScore) {
+          case 'A好': {
+            this.caselist[0].naturalness = 2
+            this.caselist[1].naturalness = 0
+            break
+          }
+          case '一样好': {
+            this.caselist[0].naturalness = 1
+            this.caselist[1].naturalness = 1
+            break
+          }
+          case 'B好': {
+            this.caselist[0].naturalness = 0
+            this.caselist[1].naturalness = 2
+            break
+          }
+        }
+        this.caseParamList[this.caseIndex - 1].param = this.caselist
+      },
       submitCaseScore () {
         this.submitScoreLoading = true
         this.caseParamList[this.caseIndex - 1].status = 1
@@ -375,6 +545,7 @@
             if (result.code === 400) {
               this.$Message.info('该试卷已作答完毕，不能再次提交')
             } else {
+              this.mosTaskData[this.taskIndex].status = 1
               this.$Message.success('所有的题都已提交成功')
             }
             this.submitScoreLoading = false
@@ -399,7 +570,27 @@
               this.$nextTick(() => {
                 this.caselist = this.caseParamList[this.caseIndex - 1].param
                 this.$set(this.caselist, this.caseParamList[this.caseIndex - 1].param)
-                console.log(this.caselist)
+                if (this.caselist[0].naturalness === 2) {
+                  this.abNaturalnessScore = 'A好'
+                } else if (this.caselist[0].naturalness === 0 && this.caselist[1].naturalness === 2) {
+                  this.abNaturalnessScore = 'B好'
+                } else if (this.caselist[0].naturalness === this.caselist[1].naturalness) {
+                  this.abNaturalnessScore = '一样好'
+                }
+                if (this.caselist[0].soundQuality === 2) {
+                  this.abSoundQualityScore = 'A好'
+                } else if (this.caselist[0].soundQuality === 0 && this.caselist[1].soundQuality === 2) {
+                  this.abSoundQualityScore = 'B好'
+                } else if (this.caselist[0].soundQuality === this.caselist[1].soundQuality) {
+                  this.abSoundQualityScore = '一样好'
+                }
+                if (this.caselist[0].wholeFeel === 2) {
+                  this.abWholeFeelScore = 'A好'
+                } else if (this.caselist[0].wholeFeel === 0 && this.caselist[1].wholeFeel === 2) {
+                  this.abWholeFeelScore = 'B好'
+                } else if (this.caselist[0].wholeFeel === this.caselist[1].wholeFeel) {
+                  this.abWholeFeelScore = '一样好'
+                }
                 this.scoreModal = true
                 // this.$Message.info('第' + this.caseIndex + '题')
               })
@@ -501,8 +692,29 @@
         this.$nextTick(() => {
           this.caselist = this.caseParamList[this.caseIndex - 1].param
           this.$set(this.caselist, this.caseParamList[this.caseIndex - 1].param)
-          console.log(this.caselist)
           this.$Message.info('第' + this.caseIndex + '题')
+
+          if (this.caselist[0].naturalness === 2) {
+            this.abNaturalnessScore = 'A好'
+          } else if (this.caselist[0].naturalness === 0 && this.caselist[1].naturalness === 2) {
+            this.abNaturalnessScore = 'B好'
+          } else if (this.caselist[0].naturalness === this.caselist[1].naturalness) {
+            this.abNaturalnessScore = '一样好'
+          }
+          if (this.caselist[0].soundQuality === 2) {
+            this.abSoundQualityScore = 'A好'
+          } else if (this.caselist[0].soundQuality === 0 && this.caselist[1].soundQuality === 2) {
+            this.abSoundQualityScore = 'B好'
+          } else if (this.caselist[0].soundQuality === this.caselist[1].soundQuality) {
+            this.abSoundQualityScore = '一样好'
+          }
+          if (this.caselist[0].wholeFeel === 2) {
+            this.abWholeFeelScore = 'A好'
+          } else if (this.caselist[0].wholeFeel === 0 && this.caselist[1].wholeFeel === 2) {
+            this.abWholeFeelScore = 'B好'
+          } else if (this.caselist[0].wholeFeel === this.caselist[1].wholeFeel) {
+            this.abWholeFeelScore = '一样好'
+          }
         })
       },
       selectPreCase () {
@@ -518,7 +730,28 @@
         this.$nextTick(() => {
           this.caselist = this.caseParamList[this.caseIndex - 1].param
           this.$set(this.caselist, this.caseParamList[this.caseIndex - 1].param)
-          console.log(this.caselist)
+
+          if (this.caselist[0].naturalness === 2) {
+            this.abNaturalnessScore = 'A好'
+          } else if (this.caselist[0].naturalness === 0 && this.caselist[1].naturalness === 2) {
+            this.abNaturalnessScore = 'B好'
+          } else if (this.caselist[0].naturalness === this.caselist[1].naturalness) {
+            this.abNaturalnessScore = '一样好'
+          }
+          if (this.caselist[0].soundQuality === 2) {
+            this.abSoundQualityScore = 'A好'
+          } else if (this.caselist[0].soundQuality === 0 && this.caselist[1].soundQuality === 2) {
+            this.abSoundQualityScore = 'B好'
+          } else if (this.caselist[0].soundQuality === this.caselist[1].soundQuality) {
+            this.abSoundQualityScore = '一样好'
+          }
+          if (this.caselist[0].wholeFeel === 2) {
+            this.abWholeFeelScore = 'A好'
+          } else if (this.caselist[0].wholeFeel === 0 && this.caselist[1].wholeFeel === 2) {
+            this.abWholeFeelScore = 'B好'
+          } else if (this.caselist[0].wholeFeel === this.caselist[1].wholeFeel) {
+            this.abWholeFeelScore = '一样好'
+          }
           this.$Message.info('第' + this.caseIndex + '题')
         })
         // this.$Message.info('第' + this.caseIndex + '题')
@@ -530,7 +763,7 @@
         this.pageHelp.pageSize = pageSize
       },
       getAllMosTask () {
-        let url = window.myurl + '/mos/getAllTask'
+        let url = window.myurl + '/mos/getAllTask?sysType=1'
         $.ajax({
           type: 'GET',
           async: false,

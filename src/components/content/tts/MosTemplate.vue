@@ -88,13 +88,13 @@
       <Card>
         <p slot="title">
           <Icon type="ios-plus-outline"></Icon>
-          MOS评测任务添加
+          评测模板添加
         </p>
         <Form ref="templateParam" :model="templateParam" :rules="ruleCustom" :label-width="80">
-          <FormItem label="任务名称" prop="name">
+          <FormItem label="模板名称" prop="name">
             <Input v-model="templateParam.name" style="width: 270px"></Input>
           </FormItem>
-          <FormItem label="任务描述" prop="desc" style="width: 350px">
+          <FormItem label="模板描述" prop="desc" style="width: 350px">
             <Input v-model="templateParam.desc"></Input>
           </FormItem>
           <FormItem label="测试维度">
@@ -121,7 +121,7 @@
       <Card>
         <p slot="title">
           <Icon type="ios-keypad"></Icon>
-          MOS任务列表
+          评测模板列表
         </p>
         <Table :loading="loading" :columns="templateTable" :data="templateData" :border="showBorder" no-data-text="没有数据"
                :stripe="showStripe" style="margin-top: -7px;margin-left: -7px" height="400"
@@ -213,7 +213,7 @@
     <Modal
       :mask-closable="false"
       width="1000"
-      title="MOS任务添加TTS模型"
+      title="评测模板添加TTS模型"
       okText="确定"
       v-model="sysModal"
       :styles="{top: '20px'}">
@@ -222,13 +222,13 @@
           <Card>
             <p slot="title">
               <Icon type="ios-plus-outline"></Icon>
-              测试系统添加
+              TTS模型添加
             </p>
             <Form ref="systemParam" :model="systemParam" :rules="ruleCustom" :label-width="80">
-              <FormItem label="系统名称" prop="name">
+              <FormItem label="模型名称" prop="name">
                 <Input v-model="systemParam.name" style="width: 30%"></Input>
               </FormItem>
-              <FormItem label="系统描述" prop="desc" style="width: 337px">
+              <FormItem label="模型描述" prop="desc" style="width: 337px">
                 <Input v-model="systemParam.desc"></Input>
               </FormItem>
               <FormItem>
@@ -246,7 +246,7 @@
           <Card>
             <p slot="title">
               <Icon type="ios-keypad"></Icon>
-              已添加测试系统列表
+              已添加TTS模型列表
             </p>
             <Table :loading="sysTableLoading" :columns="systemTable" :data="systemData" :border="showBorder" no-data-text="没有数据"
                    :stripe="showStripe" style="margin-top: -7px;margin-left: -7px" height="450"
@@ -277,7 +277,7 @@
       :styles="{top: '20px'}">
       <row>
         <i-col span="4" offset="0">
-          <div style="line-height: 32px;"><label>系统名称：</label></div>
+          <div style="line-height: 32px;"><label>模型名称：</label></div>
         </i-col>
         <i-col span="3" offset="1">
           <div>
@@ -289,7 +289,7 @@
 
       <row>
         <i-col span="4" offset="0">
-          <div style="line-height: 32px;"><label>系统描述：</label></div>
+          <div style="line-height: 32px;"><label>模型描述：</label></div>
         </i-col>
         <i-col span="3" offset="1">
           <div>
@@ -306,7 +306,7 @@
       @on-cancel="cancelFileUpButton"
       :mask-closable="false"
       width="400"
-      title="上传语音文件&文本"
+      title="上传文件"
       okText="确定"
       v-model="upfileModal"
       :styles="{top: '20px'}">
@@ -413,12 +413,12 @@
             align: 'center'
           },
           {
-            title: '任务名称',
+            title: '模板名称',
             key: 'name',
             align: 'center'
           },
           {
-            title: '任务描述',
+            title: '模板描述',
             key: 'desc',
             align: 'center'
           },
@@ -535,7 +535,7 @@
             align: 'center'
           },
           {
-            title: '系统名称',
+            title: '模型名称',
             key: 'name',
             align: 'center'
           },
