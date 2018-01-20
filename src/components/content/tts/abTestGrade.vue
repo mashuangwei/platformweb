@@ -24,7 +24,7 @@
           </FormItem>
           <FormItem>
             <Button type="primary" @click="addMosTask" :loading="addMoskLoading">Submit</Button>
-            <Button type="ghost" style="margin-left: 8px">Cancel</Button>
+            <Button type="ghost" style="margin-left: 8px" @click="resetParams">Reset</Button>
           </FormItem>
         </Form>
       </Card>
@@ -436,6 +436,9 @@
       this.getAllMosTemplate()
     },
     methods: {
+      resetParams () {
+        this.mosTaskParam.author = ''
+      },
       changeWholeFeel () {
         switch (this.abWholeFeelScore) {
           case 'A好': {

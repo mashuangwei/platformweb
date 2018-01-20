@@ -146,9 +146,8 @@
 <template>
   <div class="layout">
 
-    <Menu mode="horizontal" theme="primary" active-name="1">
+    <Menu mode="horizontal" theme="dark" active-name="1">
       <div class="layout-nav">
-
         <Menu-item name="11">
           <Icon type="home"></Icon>
           首页
@@ -159,26 +158,25 @@
         </Menu-item>
         <Menu-item name="13">
           <Icon type="ios-analytics"></Icon>
-          <a href="http://test-35:11000/jenkins/login?" class="db" target="_Blank">Jekins</a>
+          <a href="http://test-35:11000/jenkins/login?" class="db" target="_Blank">Jenkins</a>
         </Menu-item>
         <Menu-item name="14">
           <Icon type="ios-paper"></Icon>
           <a href="https://sonar.rokid-inc.com" class="db" target="_Blank">Sonar</a>
         </Menu-item>
 
-        <div v-if="isLogined" class="username">ab.xyz</div>
-        <div v-else class="username">
-          <Button type="primary" @click.stop.prevent="login">登录</Button>
-        </div>
-
+        <!--<div v-if="isLogined" class="username">ab.xyz</div>-->
+        <!--<div v-else class="username">-->
+          <!--<Button type="primary" @click.stop.prevent="login">登录</Button>-->
+        <!--</div>-->
       </div>
     </Menu>
-
 
     <div class="layout-content" height="760px">
       <Row>
         <i-col span="4">
           <Menu :active-name="activeMenu[$route.path]" theme="light" width="auto">
+
             <Menu-item name="1">
               <router-link to="/api">
                 <Icon type="chatbubbles"></Icon>
@@ -251,14 +249,32 @@
                   ABX评测
                 </router-link>
               </Menu-item>
-              <!--<Menu-item name="3-2">-->
-              <!--<router-link to="/asr">-->
-              <!--<Icon type="crop"></Icon>-->
-              <!--Asr报告-->
-              <!--</router-link>-->
-              <!--</Menu-item>-->
             </Submenu>
 
+            <Submenu name="7">
+              <template slot="title">
+                <Icon type="social-windows"></Icon>
+                HttpGw
+              </template>
+              <Menu-item name="7-1">
+                <router-link to="/httpgw">
+                  <Icon type="social-twitter-outline"></Icon>
+                  配置中心
+                </router-link>
+              </Menu-item>
+              <!--<Menu-item name="7-2">-->
+                <!--<router-link to="/mosGrade">-->
+                  <!--<Icon type="ios-settings-strong"></Icon>-->
+                  <!--dev-->
+                <!--</router-link>-->
+              <!--</Menu-item>-->
+              <!--<Menu-item name="7-3">-->
+                <!--<router-link to="/abTestGrade">-->
+                  <!--<Icon type="ios-browsers"></Icon>-->
+                  <!--线上-->
+                <!--</router-link>-->
+              <!--</Menu-item>-->
+            </Submenu>
             <!--<Menu-item name="7">-->
             <!--<router-link to="/skill">-->
             <!--<Icon type="paper-airplane"></Icon>-->
@@ -333,6 +349,7 @@
       </row>
     </div>
   </div>
+
 </template>
 <script>
   import { Col, Row } from 'iview'
@@ -365,7 +382,8 @@
           '/opboss': '14',
           '/asrCheck': '15',
           '/mosGrade': '16',
-          '/abTestGrade': '17'
+          '/abTestGrade': '17',
+          '/httpgw': '18'
         }
       }
     },

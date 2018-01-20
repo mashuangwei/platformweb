@@ -32,31 +32,30 @@ module.exports = {
     //
     // },
 
-    //本地调试
     proxyTable: {
       '/api': {
         pathRewrite: { '^/api': '' },
-        target: "http://10.88.128.140:8080",
+        target: 'http://10.88.128.140:8080',
         changeOrigin: false
       },
       '/msw': {
         pathRewrite: { '^/msw': '' },
-        target: "http://127.0.0.1:8000",
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true
       },
       '/account': {
         pathRewrite: { '^/account': '' },
-        target: "http://127.0.0.1:8081",
+        target: 'http://127.0.0.1:8081',
         changeOrigin: true
       },
       '/opboss': {
         pathRewrite: { '^/opboss': '' },
-        target: "http://syslog-2:8000",
+        target: 'http://syslog-2:8000',
         changeOrigin: true
       },
       '/nielin': {
         pathRewrite: { '^/nielin': '' },
-        target: "http://openrokid:50016",
+        target: 'http://openrokid:50016',
         changeOrigin: true
       }
     },

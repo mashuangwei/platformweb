@@ -21,6 +21,7 @@ import asrCheck from '@/components/content/asr/asrCheck.vue'
 import MosTemplate from '@/components/content/tts/MosTemplate.vue'
 import mosGrade from '@/components/content/tts/mosGrade.vue'
 import abTestGrade from '@/components/content/tts/abTestGrade.vue'
+import httpgw from '@/components/content/httpgw/httpgw.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -127,6 +128,11 @@ export default new Router({
       path: '/abTestGrade',
       name: 'abTestGrade',
       component: abTestGrade
+    },
+    {
+      path: '/httpgw',
+      name: 'httpgw',
+      component: httpgw
     }
   ]
 })
