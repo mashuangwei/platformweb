@@ -249,6 +249,12 @@
                   ABX评测
                 </router-link>
               </Menu-item>
+              <Menu-item name="6-3">
+                <router-link to="/ttsaudio">
+                  <Icon type="ios-videocam-outline"></Icon>
+                  TTS语音
+                </router-link>
+              </Menu-item>
             </Submenu>
 
             <Submenu name="7">
@@ -383,7 +389,8 @@
           '/asrCheck': '15',
           '/mosGrade': '16',
           '/abTestGrade': '17',
-          '/httpgw': '18'
+          '/httpgw': '18',
+          '/ttsaudio': '19'
         }
       }
     },

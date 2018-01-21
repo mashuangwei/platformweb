@@ -20,6 +20,7 @@ import opboss from '@/components/content/opboss/opbossdata.vue'
 import asrCheck from '@/components/content/asr/asrCheck.vue'
 import MosTemplate from '@/components/content/tts/MosTemplate.vue'
 import mosGrade from '@/components/content/tts/mosGrade.vue'
+import ttsaudio from '@/components/content/tts/ttsaudio.vue'
 import abTestGrade from '@/components/content/tts/abTestGrade.vue'
 import httpgw from '@/components/content/httpgw/httpgw.vue'
 Vue.use(Router)
@@ -133,6 +134,11 @@ export default new Router({
       path: '/httpgw',
       name: 'httpgw',
       component: httpgw
+    },
+    {
+      path: '/ttsaudio',
+      name: 'ttsaudio',
+      component: ttsaudio
     }
   ]
 })
