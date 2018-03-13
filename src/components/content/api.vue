@@ -453,14 +453,8 @@
           },
           {
             title: '用例描述',
-            width: 230,
+            width: 200,
             key: 'description',
-            align: 'center'
-          },
-          {
-            title: '接口名称',
-            width: 150,
-            key: 'apiname',
             align: 'center'
           },
           {

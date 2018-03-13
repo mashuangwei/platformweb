@@ -4,32 +4,48 @@
       <i-col span="2" offset="0" style="font-size: 12px; color: #495060;">
         <div style="line-height: 32px;"><label>日期时间：</label></div>
       </i-col>
-      <i-col span="2" offset="0" style="font-size: 12px; color: #495060; margin-left: -20px">
+      <i-col span="2" offset="0" style="font-size: 12px; color: #495060; margin-left: 0px" >
         <div>
           <DatePicker type="datetimerange" placeholder="请选择日期时间" style="width: 300px"
                       @on-change="dateChange"></DatePicker>
         </div>
       </i-col>
-      <i-col span="3" offset="4">
-        <Input v-model="deviceid" placeholder="请输入deviceid"
-               style="width: 200px"></Input>
+
+      <i-col span="2" offset="10" style="font-size: 12px; color: #495060;">
+        <div style="line-height: 32px;"><label>AppId：</label></div>
       </i-col>
-      <i-col span="3" offset="1">
-        <Input v-model="appId" placeholder="请输入appId"
-               style="width: 250px"></Input>
-      </i-col>
-      <i-col span="3" offset="2">
-        <Input v-model="intent" placeholder="请输入intent"
-               style="width: 200px"></Input>
-      </i-col>
-      <i-col span="1" offset="2">
-        <Button type="primary" icon="ios-search" @click="searchByDateAndDeviceid">搜索</Button>
+      <i-col span="3" offset="4" style="margin-left: 0px">
+        <Input v-model="appId" placeholder="请输入appId" clearable
+               style="width: 300px"></Input>
       </i-col>
     </Row>
+    <row>
+      <i-col span="2" offset="0" style="font-size: 12px; color: #495060;">
+        <div style="line-height: 32px;"><label>deviceid：</label></div>
+      </i-col>
+      <i-col span="2" offset="4" style="margin-left: 0px">
+        <Input v-model="deviceid" placeholder="请输入deviceid" clearable
+               style="width: 300px"></Input>
+      </i-col>
+      <i-col span="2" offset="10" style="font-size: 12px; color: #495060;">
+        <div style="line-height: 32px;"><label>Intent：</label></div>
+      </i-col>
+      <i-col span="2" offset="4" style="margin-left: 0px">
+        <Input v-model="intent" placeholder="请输入intent" clearable
+               style="width: 300px"></Input>
 
+      </i-col>
+
+    </row>
+    <br/>
+    <row>
+      <i-col span="1" offset="9">
+        <Button type="primary" icon="ios-search" @click="searchByDateAndDeviceid" style="width: 200px">搜索</Button>
+      </i-col>
+    </row>
     <br>
     <row>
-      <Table :columns="column" :data="data" :border="showBorder" :loading="loading" :height="660"
+      <Table :columns="column" :data="data" :border="showBorder" :loading="loading" height="570"
              :stripe="showStripe"
              :show-header="showHeader" :showIndex="true" :no-data-text="nodataContent"></Table>
     </row>
@@ -48,6 +64,8 @@
 <script>
   import audio from './audio.vue'
   import $ from 'jquery'
+  import Row from 'iview/src/components/grid/row'
+  import expandRow from './table-expand-data.vue'
 
   var today = new Date()
 
@@ -66,8 +84,10 @@
   }
 
   export default {
+    components: {Row, expandRow},
     data () {
       return {
+        clearable: true,
         loading: false,
         searchDate: [],
         nodataContent: '暂无数据',
@@ -82,22 +102,33 @@
         },
         column: [
           {
-            title: '时间',
-            key: 'asrtime',
-            width: 150,
-            align: 'center'
+            type: 'expand',
+            width: 50,
+            render: (h, params) => {
+              return h(expandRow, {
+                props: {
+                  row: params.row
+                }
+              })
+            }
           },
+          // {
+          //   title: '时间',
+          //   key: 'asrtime',
+          //   width: 150,
+          //   align: 'center'
+          // },
           {
             title: 'appId',
             key: 'app_id',
             align: 'center'
           },
-          {
-            title: 'intent',
-            key: 'intent',
-            width: 120,
-            align: 'center'
-          },
+          // {
+          //   title: 'intent',
+          //   key: 'intent',
+          //   width: 120,
+          //   align: 'center'
+          // },
           {
             title: 'deviceId',
             key: 'asrdeviceid',

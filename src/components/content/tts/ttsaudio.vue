@@ -47,39 +47,58 @@
       :mask-closable="false"
       width="800"
       title="添加"
-      okText="确定"
+      ok-text="关闭"
       v-model="addModal"
       :styles="{top: '20px'}">
       <Form :model="caseParam" :label-width="80">
         <FormItem label="text">
-          <Input v-model="caseParam.text" type="textarea" :autosize="{minRows: 1,maxRows: 4}" placeholder="请输入tts文本"></Input>
+          <Input v-model="caseParam.text" type="textarea" :autosize="{minRows: 1,maxRows: 4}"
+                 placeholder="请输入tts文本"></Input>
         </FormItem>
-        <FormItem label="采样率">
-          <RadioGroup v-model="caseParam.sampleRate">
-            <Radio label="24000">24000</Radio>
-            <Radio label="16000">16000</Radio>
+        <FormItem label="请求类型">
+          <RadioGroup v-model="caseParam.service" style="margin-top: -5px">
+            <Radio label="SpeechGW">SpeechGW</Radio>
+            <Radio label="直连">直连</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="语言">
-          <RadioGroup v-model="caseParam.lang">
+          <RadioGroup v-model="caseParam.lang" style="margin-top: -5px">
             <Radio label="zh">zh</Radio>
             <Radio label="en">en</Radio>
             <Radio label="xmly">xmly</Radio>
             <Radio label="e2e">e2e</Radio>
+            <Radio label="c1">c1</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="采样率">
+          <RadioGroup v-model="caseParam.sampleRate" style="margin-top: -5px">
+            <Radio label="24000">24000</Radio>
+            <Radio label="16000">16000</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="编码格式">
+          <RadioGroup v-model="caseParam.codec" style="margin-top: -5px">
+            <Radio label="opu2">opu2</Radio>
+            <Radio label="opu">opu</Radio>
+            <Radio label="pcm">pcm</Radio>
+            <Radio label="mp3">mp3</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="测试环境">
-          <RadioGroup v-model="caseParam.environment">
+          <RadioGroup v-model="caseParam.environment" style="margin-top: -5px">
             <Radio label="线上">线上</Radio>
             <Radio label="dev">dev</Radio>
             <Radio label="daily">daily</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem>
-          <Button type="primary" @click="addCase" :loading="addLoading">Submit</Button>
-          <Button type="ghost" style="margin-left: 8px" @click="resetParamForm">Reset</Button>
+          <Button type="primary" @click="addCase" :loading="addLoading">添加</Button>
+          <Button type="primary" style="margin-left: 8px" @click="resetParamForm">重置</Button>
         </FormItem>
       </Form>
+      <!--<div slot="footer">-->
+      <!--<Button @click="addCase" :loading="addLoading"></Button>-->
+      <!--</div>-->
     </Modal>
 
     <!-- 保存case话框 -->
@@ -87,37 +106,53 @@
       :mask-closable="false"
       width="800"
       title="编辑"
-      okText="确定"
+      okText="关闭"
       v-model="editModal"
       :styles="{top: '20px'}">
       <Form :model="caseParam" :label-width="80">
         <FormItem label="text">
-          <Input v-model="caseParam.text" type="textarea" :autosize="{minRows: 1,maxRows: 4}" placeholder="请输入tts文本"></Input>
+          <Input v-model="caseParam.text" type="textarea" :autosize="{minRows: 1,maxRows: 4}"
+                 placeholder="请输入tts文本"></Input>
         </FormItem>
-        <FormItem label="采样率">
-          <RadioGroup v-model="caseParam.sampleRate">
-            <Radio label="24000">24000</Radio>
-            <Radio label="16000">16000</Radio>
+        <FormItem label="请求类型">
+          <RadioGroup v-model="caseParam.service" style="margin-top: -5px">
+            <Radio label="SpeechGW">SpeechGW</Radio>
+            <Radio label="直连">直连</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="语言">
-          <RadioGroup v-model="caseParam.lang">
+          <RadioGroup v-model="caseParam.lang" style="margin-top: -5px">
             <Radio label="zh">zh</Radio>
             <Radio label="en">en</Radio>
             <Radio label="xmly">xmly</Radio>
             <Radio label="e2e">e2e</Radio>
+            <Radio label="c1">c1</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="采样率">
+          <RadioGroup v-model="caseParam.sampleRate" style="margin-top: -5px">
+            <Radio label="24000">24000</Radio>
+            <Radio label="16000">16000</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="编码格式">
+          <RadioGroup v-model="caseParam.codec" style="margin-top: -5px">
+            <Radio label="opu2">opu2</Radio>
+            <Radio label="opu">opu</Radio>
+            <Radio label="pcm">pcm</Radio>
+            <Radio label="mp3">mp3</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="测试环境">
-          <RadioGroup v-model="caseParam.environment">
+          <RadioGroup v-model="caseParam.environment" style="margin-top: -5px">
             <Radio label="线上">线上</Radio>
             <Radio label="dev">dev</Radio>
             <Radio label="daily">daily</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem>
-          <Button type="primary" @click="editCase" :loading="editLoading">Submit</Button>
-          <Button type="ghost" style="margin-left: 8px" @click="resetParamForm">Reset</Button>
+          <Button type="primary" @click="editCase" :loading="editLoading">保存</Button>
+          <Button type="primary" style="margin-left: 8px" @click="resetParamForm">重置</Button>
         </FormItem>
       </Form>
     </Modal>
@@ -128,13 +163,34 @@
   import $ from 'jquery'
   import Row from 'iview/src/components/grid/row'
   import audio from './audio.vue'
+  import expandRow from './table-expand-data.vue'
 
+  import axios from 'axios'
+  import JSZip from 'jszip'
+  import FileSaver from 'file-saver'
+
+  const getFile = url => {
+    return new Promise((resolve, reject) => {
+      axios({
+        method: 'get',
+        url,
+        responseType: 'arraybuffer'
+      }).then(data => {
+        resolve(data.data)
+      }).catch(error => {
+        reject(error.toString())
+      })
+    })
+  }
   export default {
     components: {
-      Row
+      Row,
+      expandRow
     },
     data () {
       return {
+        editMaskClose: true,
+        addMaskClose: true,
         editModal: false,
         formItem: {
           input: '',
@@ -152,10 +208,11 @@
         caseParam: {
           id: null,
           text: '',
-          environment: 'dev',
+          environment: '线上',
           codec: 'mp3',
           lang: 'zh',
-          sampleRate: 24000,
+          sampleRate: '24000',
+          service: '直连',
           url: ''
         },
         pageSizeOptions: [10, 20, 30, 50, 100],
@@ -172,61 +229,91 @@
         fixedHeader: true,
         caseTable: [
           {
-            type: 'index',
-            width: 60,
-            align: 'center'
-          },
-          {
-            title: '文本',
-            key: 'text',
-            width: 220,
-            align: 'center'
-          },
-          {
-            title: 'lang',
-            key: 'lang',
-            align: 'center'
+            type: 'expand',
+            width: 50,
+            render: (h, params) => {
+              return h(expandRow, {
+                props: {
+                  row: params.row
+                }
+              })
+            }
           },
           // {
-          //   title: 'codec',
-          //   key: 'codec',
+          //   type: 'index',
+          //   width: 50,
           //   align: 'center'
           // },
           {
-            title: '采样率',
-            key: 'sampleRate',
-            align: 'center'
+            title: '文本',
+            key: 'text',
+            align: 'center',
+            ellipsis: true,
+            render: (h, params) => {
+              return h('Poptip', {
+                props: {
+                  trigger: 'hover',
+                  title: '',
+                  placement: 'bottom'
+                }
+              }, [
+                h('div', params.row.text),
+                h('div', {
+                  slot: 'content'
+                }, [
+                  h('div', params.row.text)
+                ])
+              ])
+            }
           },
+          // {
+          //   title: 'lang',
+          //   key: 'lang',
+          //   align: 'center'
+          // },
           {
-            title: '环境',
-            key: 'environment',
+            title: 'codec',
+            key: 'codec',
+            width: 75,
             align: 'center'
           },
-          {
-            title: '创建时间',
-            key: 'createTime',
-            width: 150,
-            align: 'center'
-          },
+          // {
+          //   title: '采样率',
+          //   key: 'sampleRate',
+          //   align: 'center'
+          // },
+          // {
+          //   title: '环境',
+          //   key: 'environment',
+          //   align: 'center'
+          // },
+          // {
+          //   title: '创建时间',
+          //   key: 'createTime',
+          //   width: 150,
+          //   align: 'center'
+          // },
           {
             title: '语音',
-            key: 'wavfile',
+            key: 'url',
             width: 250,
             align: 'center',
-            render (h, data) {
-              return h(audio, {
-                props: {
-                  src: 'http://rokidweb.oss-cn-hangzhou.aliyuncs.com/skills/%E5%90%AC%E6%AD%8C%E7%8C%9C%E7%94%B5%E5%BD%B1/80%E5%B9%B4%E4%BB%A3/%E6%99%93%E8%8A%B1%20-%20%E7%88%B1%E6%B1%9F%E5%B1%B1%E6%9B%B4%E7%88%B1%E7%BE%8E%E4%BA%BA.mp3',
-                  name: 'wav文件'
-                }
-              })
+            render: (h, params) => {
+              return h('div', [
+                h(audio, {
+                  props: {
+                    src: 'http://test-57:8000/audio/' + this.caseTableData[params.index].url,
+                    name: 'wav文件'
+                  }
+                })
+              ])
             }
           },
           {
             title: '操作',
             key: 'action',
             align: 'center',
-            width: 200,
+            width: 220,
             render: (h, params) => {
               return h('div', [
                 h('Button', {
@@ -240,13 +327,14 @@
                   on: {
                     click: () => {
                       this.editModal = true
-                      // this.caseParam = this.caseTableData[params.index]
                       this.$set(this.caseParam, 'id', this.caseTableData[params.index].id)
                       this.$set(this.caseParam, 'text', this.caseTableData[params.index].text)
                       this.$set(this.caseParam, 'url', this.caseTableData[params.index].url)
                       this.$set(this.caseParam, 'lang', this.caseTableData[params.index].lang)
                       this.$set(this.caseParam, 'sampleRate', this.caseTableData[params.index].sampleRate)
                       this.$set(this.caseParam, 'environment', this.caseTableData[params.index].environment)
+                      this.$set(this.caseParam, 'codec', this.caseTableData[params.index].codec)
+                      this.$set(this.caseParam, 'service', this.caseTableData[params.index].service)
                     }
                   }
                 }, '编辑'),
@@ -283,14 +371,35 @@
             }
           }
         ],
-        caseTableData: [
-        ]
+        caseTableData: []
       }
     },
     created () {
+      // this.caseParam.sampleRate = '24000'
       this.getAllCaseList()
     },
     methods: {
+      handleBatchDownload () {
+        const data = ['各类地址1', '各类地址2'] // 需要下载打包的路径, 可以是本地相对路径, 也可以是跨域的全路径
+        const zip = new JSZip()
+        const cache = {}
+        const promises = []
+        data.forEach(item => {
+          const promise = getFile(item).then(data => { // 下载文件, 并存成ArrayBuffer对象
+            const arrName = item.split('/')
+            const fileName = arrName[arrName.length - 1] // 获取文件名
+            zip.file(fileName, data, { binary: true }) // 逐个添加文件
+            cache[fileName] = data
+          })
+          promises.push(promise)
+        })
+
+        Promise.all(promises).then(() => {
+          zip.generateAsync({type: 'blob'}).then(content => { // 生成二进制流
+            FileSaver.saveAs(content, '打包下载.zip') // 利用file-saver保存文件
+          })
+        })
+      },
       repeatGenerateAudio (index) {
         this.addLoading = true
         let url = window.myurl + '/tts/repeatGenerate'
@@ -343,15 +452,17 @@
         this.caseParam = {
           id: null,
           text: '',
-          environment: 'dev',
+          environment: '线上',
           codec: 'mp3',
           lang: 'zh',
-          sampleRate: 24000,
-          url: ''
+          sampleRate: '24000',
+          url: '',
+          service: '直连'
         }
       },
       editCase () {
         this.editLoading = true
+        // this.editModal = false
         let url = window.myurl + '/tts/updateAudioCase/'
         $.ajax({
           type: 'PUT',
@@ -361,10 +472,9 @@
           data: JSON.stringify(this.caseParam),
           dataType: 'json',
           success: (result) => {
-            this.editLoading = false
             if (result.code === 200) {
               this.$Message.success('更新成功')
-              this.resetParamForm()
+              this.editLoading = false
               this.getAllCaseList()
             } else {
               this.$Message.error(result.message)
@@ -378,6 +488,7 @@
         })
       },
       addCase () {
+        // this.addModal = false
         this.addLoading = true
         let url = window.myurl + '/tts/addAudioCase/'
         $.ajax({
@@ -391,13 +502,14 @@
             this.addLoading = false
             if (result.code === 200) {
               this.$Message.success('添加成功')
-              this.resetParamForm()
+              // this.resetParamForm()
               this.getAllCaseList()
             } else {
               this.$Message.error(result.message)
             }
           },
           error: (errorMsg) => {
+            // this.onOkloading = false
             this.addLoading = false
             this.$Message.error(errorMsg)
             console.log(errorMsg)
@@ -405,6 +517,7 @@
         })
       },
       addCaseClick () {
+        this.resetParamForm()
         this.addModal = true
       },
       searchCase () {
@@ -451,9 +564,11 @@
       },
       getPageIndex (pageIndex) {
         this.pageHelp.curPage = pageIndex
+        this.getAllCaseList()
       },
       getPageSize (pageSize) {
         this.pageHelp.pageSize = pageSize
+        this.getAllCaseList()
       }
     }
   }

@@ -78,14 +78,14 @@
         </Select>
       </i-col>
       <i-col span="2" offset="1">
-        <Button type="primary" @click="addTaskData" style="margin-bottom:15px;">新增</Button>
+        <Button type="primary" @click="addTaskData" style="margin-bottom:15px;margin-left: 40px">新增</Button>
       </i-col>
       <i-col span="3" offset="10">
         <Input v-model="condition" icon="ios-search-strong" placeholder="请输入..."
                style="width: 200px"></Input>
       </i-col>
       <i-col span="1" offset="1">
-        <Button type="primary" icon="ios-search" @click="searchTask">搜索</Button>
+        <Button type="primary" icon="ios-search" @click="searchTask" style="margin-left: 40px">搜索</Button>
       </i-col>
     </Row>
 

@@ -5,14 +5,13 @@
         <Button type="primary" @click="addPlatformCase" style="margin-bottom:15px;">新增</Button>
       </i-col>
 
-      <i-col span="2" offset="4">
+      <i-col span="2" offset="3">
         <div style="margin-top: 7px">
-          <label style="color: black; text-align: right;">DomainName：</label>
+          <label style="color: black; text-align: right;">DomainName</label>
         </div>
-
       </i-col>
 
-      <i-col span="4">
+      <i-col span="4" offset="1">
         <div>
           <Select v-model="domainName"  @on-change="selectDomainName">
             <Option v-for="(item, idx) in domainNameList" :value="item" :key="idx">{{item}}</Option>
@@ -20,10 +19,10 @@
         </div>
       </i-col>
 
-      <i-col span="2" offset="1">
-        <div style="margin-top: 7px; text-align: right;"><label style="color: black">ProjectId：</label></div>
+      <i-col span="2" offset="0">
+        <div style="margin-top: 7px; text-align: right;"><label style="color: black">ProjectId</label></div>
       </i-col>
-      <i-col span="4">
+      <i-col span="4" offset="1">
         <div>
           <Select v-model="projectIdSelected" @on-change="selectProjectId">
             <Option v-for="(item, idx) in projectIdList" :value="item.id" :key="idx">{{item.projectName}}</Option>
@@ -326,7 +325,7 @@
 
 <script>
   //  /* eslint-disable no-unused-vars */
-  //  import $ from 'jquery'
+  import $ from 'jquery'
   import { Col, Row } from 'iview'
   import Monaco from 'monaco-editor-forvue'
   import expandRow from './table-expand.vue'
@@ -1199,21 +1198,39 @@
         })
       },
       editCaseFunction () {
-        fetch(window.serverurl + '/case/save', {
-          method: 'POST',
-          body: 'name=' + this.addcase.name + '&description=' + this.addcase.description + '&author=' + this.addcase.author + '&domainName=' + this.addcase.moduleName + '&projectId=' + this.addcase.projectId + '&switchType=' + this.addcase.switchType + '&id=' + this.addcase.caseId,
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }).then((res) => {
-          res.json().then((json) => {
-//            console.log('editcase: ' + JSON.stringify(json))
+        $.ajax({
+          type: 'POST',
+          async: true,
+          url: window.serverurl + '/case/save',
+          contentType: 'application/json',
+          data: 'name=' + this.addcase.name + '&description=' + this.addcase.description + '&author=' + this.addcase.author + '&domainName=' + this.addcase.moduleName + '&projectId=' + this.addcase.projectId + '&switchType=' + this.addcase.switchType + '&id=' + this.addcase.caseId,
+          dataType: 'application/x-www-form-urlencoded',
+          success: (result) => {
+            this.$Message.success('查询成功')
+            // this.queryResult = JSON.stringify(result).replace(/,/g, '\n')
             this.getCase()
-          })
-        }).catch((e) => {
-          e.toString()
+          },
+          error: (errorMsg) => {
+            this.$Message.error('保存失败')
+          }
         })
+//         fetch(window.serverurl + '/case/save', {
+//           method: 'POST',
+//           body: 'name=' + this.addcase.name + '&description=' + this.addcase.description + '&author=' + this.addcase.author + '&domainName=' + this.addcase.moduleName + '&projectId=' + this.addcase.projectId + '&switchType=' + this.addcase.switchType + '&id=' + this.addcase.caseId,
+//           headers: {
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/x-www-form-urlencoded'
+//           }
+//         }).then((res) => {
+//           res.json().then((json) => {
+// //            console.log('editcase: ' + JSON.stringify(json))
+// //             console.log(json)
+//             this.getCase()
+//           })
+//         }).catch((e) => {
+//           this.$Message.error('保存失败')
+//           e.toString()
+//         })
       },
       addStepCancel () {
         this.editAndAddFlag = false
