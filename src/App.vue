@@ -167,7 +167,7 @@
 
         <!--<div v-if="isLogined" class="username">ab.xyz</div>-->
         <!--<div v-else class="username">-->
-          <!--<Button type="primary" @click.stop.prevent="login">登录</Button>-->
+        <!--<Button type="primary" @click.stop.prevent="login">登录</Button>-->
         <!--</div>-->
       </div>
     </Menu>
@@ -200,31 +200,44 @@
                   Asr验证
                 </router-link>
               </Menu-item>
-              <!--<Menu-item name="3-2">-->
-              <!--<router-link to="/asr">-->
-              <!--<Icon type="crop"></Icon>-->
-              <!--Asr报告-->
+              <Menu-item name="3-2">
+                <router-link to="/trace">
+                  <Icon type="ios-search-strong"></Icon>
+                  Trace查询
+                </router-link>
+              </Menu-item>
+            </Submenu>
+
+            <Submenu name="5">
+              <template slot="title">
+                <Icon type="stats-bars"></Icon>
+                NLP
+              </template>
+              <Menu-item name="5-1">
+                <router-link to="/nlp">
+                  <Icon type="briefcase"></Icon>
+                  用例
+                </router-link>
+              </Menu-item>
+              <Menu-item name="5-2">
+                <router-link to="/nlpconfig">
+                  <Icon type="wrench"></Icon>
+                  配置
+                </router-link>
+              </Menu-item>
+              <!--<Menu-item name="7-2">-->
+              <!--<router-link to="/mosGrade">-->
+              <!--<Icon type="ios-settings-strong"></Icon>-->
+              <!--dev-->
+              <!--</router-link>-->
+              <!--</Menu-item>-->
+              <!--<Menu-item name="7-3">-->
+              <!--<router-link to="/abTestGrade">-->
+              <!--<Icon type="ios-browsers"></Icon>-->
+              <!--线上-->
               <!--</router-link>-->
               <!--</Menu-item>-->
             </Submenu>
-            <!--<Menu-item name="3">-->
-            <!--<router-link to="/asr">-->
-            <!--<Icon type="android-globe"></Icon>-->
-            <!--Asr-->
-            <!--</router-link>-->
-            <!--</Menu-item>-->
-            <!--<Menu-item name="4">-->
-            <!--<router-link to="/speech">-->
-            <!--<Icon type="chatbubbles"></Icon>-->
-            <!--Speech-->
-            <!--</router-link>-->
-            <!--</Menu-item>-->
-            <Menu-item name="5">
-              <router-link to="/nlp">
-                <Icon type="stats-bars"></Icon>
-                NLP
-              </router-link>
-            </Menu-item>
 
             <Submenu name="6">
               <template slot="title">
@@ -255,6 +268,12 @@
                   TTS语音
                 </router-link>
               </Menu-item>
+              <Menu-item name="6-4">
+                <router-link to="/autotest">
+                  <Icon type="compose"></Icon>
+                  语音标注
+                </router-link>
+              </Menu-item>
             </Submenu>
 
             <Submenu name="7">
@@ -269,16 +288,16 @@
                 </router-link>
               </Menu-item>
               <!--<Menu-item name="7-2">-->
-                <!--<router-link to="/mosGrade">-->
-                  <!--<Icon type="ios-settings-strong"></Icon>-->
-                  <!--dev-->
-                <!--</router-link>-->
+              <!--<router-link to="/mosGrade">-->
+              <!--<Icon type="ios-settings-strong"></Icon>-->
+              <!--dev-->
+              <!--</router-link>-->
               <!--</Menu-item>-->
               <!--<Menu-item name="7-3">-->
-                <!--<router-link to="/abTestGrade">-->
-                  <!--<Icon type="ios-browsers"></Icon>-->
-                  <!--线上-->
-                <!--</router-link>-->
+              <!--<router-link to="/abTestGrade">-->
+              <!--<Icon type="ios-browsers"></Icon>-->
+              <!--线上-->
+              <!--</router-link>-->
               <!--</Menu-item>-->
             </Submenu>
             <!--<Menu-item name="7">-->
@@ -390,7 +409,10 @@
           '/mosGrade': '16',
           '/abTestGrade': '17',
           '/httpgw': '18',
-          '/ttsaudio': '19'
+          '/ttsaudio': '19',
+          '/autotest': '20',
+          '/trace': '21',
+          '/nlpconfig': '22'
         }
       }
     },

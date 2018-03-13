@@ -4,10 +4,11 @@ import api from '@/components/content/api.vue'
 import test from '@/components/content/test.vue'
 import report from '@/components/content/report.vue'
 // import environment from '@/components/content/charts/environment.vue'
-import nlp from '@/components/content/nlp.vue'
+import nlp from '@/components/content/nlp/nlp.vue'
+import nlpconfig from '@/components/content/nlp/config.vue'
 import highcharts from '@/components/content/highcharts.vue'
 import asr from '@/components/content/asr.vue'
-// import tts from '@/components/content/tts.vue'
+import trace from '@/components/content/asr/trace.vue'
 import skill from '@/components/content/skill.vue'
 import speech from '@/components/content/speech.vue'
 import task from '@/components/content/task.vue'
@@ -22,6 +23,7 @@ import MosTemplate from '@/components/content/tts/MosTemplate.vue'
 import mosGrade from '@/components/content/tts/mosGrade.vue'
 import ttsaudio from '@/components/content/tts/ttsaudio.vue'
 import abTestGrade from '@/components/content/tts/abTestGrade.vue'
+import autotest from '@/components/content/tts/autotest.vue'
 import httpgw from '@/components/content/httpgw/httpgw.vue'
 Vue.use(Router)
 
@@ -139,6 +141,21 @@ export default new Router({
       path: '/ttsaudio',
       name: 'ttsaudio',
       component: ttsaudio
+    },
+    {
+      path: '/autotest',
+      name: 'autotest',
+      component: autotest
+    },
+    {
+      path: '/trace',
+      name: 'trace',
+      component: trace
+    },
+    {
+      path: '/nlpconfig',
+      name: 'nlpconfig',
+      component: nlpconfig
     }
   ]
 })
