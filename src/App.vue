@@ -225,18 +225,12 @@
                   配置
                 </router-link>
               </Menu-item>
-              <!--<Menu-item name="7-2">-->
-              <!--<router-link to="/mosGrade">-->
-              <!--<Icon type="ios-settings-strong"></Icon>-->
-              <!--dev-->
-              <!--</router-link>-->
-              <!--</Menu-item>-->
-              <!--<Menu-item name="7-3">-->
-              <!--<router-link to="/abTestGrade">-->
-              <!--<Icon type="ios-browsers"></Icon>-->
-              <!--线上-->
-              <!--</router-link>-->
-              <!--</Menu-item>-->
+              <Menu-item name="5-3">
+                <router-link to="/casemanage">
+                  <Icon type="ios-cloud-upload-outline"></Icon>
+                  用例上传
+                </router-link>
+              </Menu-item>
             </Submenu>
 
             <Submenu name="6">
@@ -356,6 +350,25 @@
               </router-link>
             </Menu-item>
 
+            <Submenu name="15">
+              <template slot="title">
+                <Icon type="paper-airplane"></Icon>
+                SpeechGW
+              </template>
+              <Menu-item name="15-1">
+                <router-link to="/speechgwcase">
+                  <Icon type="android-list"></Icon>
+                  用例
+                </router-link>
+              </Menu-item>
+              <Menu-item name="15-2">
+                <router-link to="/speechgwtask">
+                  <Icon type="social-codepen-outline"></Icon>
+                  任务
+                </router-link>
+              </Menu-item>
+            </Submenu>
+
           </Menu>
         </i-col>
         <i-col span="20">
@@ -412,13 +425,16 @@
           '/ttsaudio': '19',
           '/autotest': '20',
           '/trace': '21',
-          '/nlpconfig': '22'
+          '/nlpconfig': '22',
+          '/speechgwcase': '23',
+          '/speechgwtask': '24',
+          '/casemanage': '25'
         }
       }
     },
     methods: {
       login () {
-        this.$router.push('/login')
+        // this.$router.push('/login')
       }
 
     }

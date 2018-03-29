@@ -362,6 +362,12 @@
             align: 'center'
           },
           {
+            title: '实际结果',
+            width: 200,
+            key: 'actualResult',
+            align: 'center'
+          },
+          {
             title: 'name',
             width: 160,
             key: 'name',

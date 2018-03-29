@@ -5,6 +5,7 @@ import test from '@/components/content/test.vue'
 import report from '@/components/content/report.vue'
 // import environment from '@/components/content/charts/environment.vue'
 import nlp from '@/components/content/nlp/nlp.vue'
+import casemanage from '@/components/content/nlp/casemanage.vue'
 import nlpconfig from '@/components/content/nlp/config.vue'
 import highcharts from '@/components/content/highcharts.vue'
 import asr from '@/components/content/asr.vue'
@@ -25,6 +26,8 @@ import ttsaudio from '@/components/content/tts/ttsaudio.vue'
 import abTestGrade from '@/components/content/tts/abTestGrade.vue'
 import autotest from '@/components/content/tts/autotest.vue'
 import httpgw from '@/components/content/httpgw/httpgw.vue'
+import speechgwcase from '@/components/content/speech/speechgwcase.vue'
+import speechgwtask from '@/components/content/speech/speechgwtask.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -156,6 +159,21 @@ export default new Router({
       path: '/nlpconfig',
       name: 'nlpconfig',
       component: nlpconfig
+    },
+    {
+      path: '/speechgwcase',
+      name: 'speechgwcase',
+      component: speechgwcase
+    },
+    {
+      path: '/speechgwtask',
+      name: 'speechgwtask',
+      component: speechgwtask
+    },
+    {
+      path: '/casemanage',
+      name: 'casemanage',
+      component: casemanage
     }
   ]
 })
