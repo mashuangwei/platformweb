@@ -45,20 +45,25 @@
     <br>
     <Row>
       <i-col span="6">
-        <span class="expand-key">voiceextra：</span>
-        <span class="expand-value">{{ row.voiceextra}}</span>
-      </i-col>
-      <i-col span="6">
-        <span class="expand-key">fileurl：</span>
-        <span class="expand-value">{{ row.fileurl}}</span>
-      </i-col>
-      <i-col span="6">
         <span class="expand-key">result：</span>
         <span class="expand-value">{{ row.result }}</span>
       </i-col>
       <i-col span="6">
+        <span class="expand-key">voiceextra：</span>
+        <span class="expand-value">{{ row.voiceextra}}</span>
+      </i-col>
+
+      <i-col span="12">
         <span class="expand-key">expect：</span>
         <span class="expand-value">{{ row.expect }}</span>
+      </i-col>
+
+    </Row>
+    <br>
+    <Row>
+      <i-col span="24">
+        <span class="expand-key">fileurl：</span>
+        <span class="expand-value">{{ row.fileurl}}</span>
       </i-col>
     </Row>
   </div>

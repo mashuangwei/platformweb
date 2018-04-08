@@ -55,51 +55,75 @@
         <FormItem label="用例名称">
           <Input v-model="caseParam.name" placeholder="请输入用例名称"></Input>
         </FormItem>
-        <FormItem label="用例描述">
-          <Input v-model="caseParam.desc" placeholder="请输入用例描述"></Input>
+        <FormItem label="测试环境">
+          <Select v-model="caseParam.environment" style="width:200px">
+            <Option v-for="item in envlist" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
-        <FormItem label="vadmode">
-          <RadioGroup v-model="caseParam.vadmode" style="margin-top: -5px">
-            <Radio label="cloud">cloud</Radio>
-            <Radio label="local">local</Radio>
-          </RadioGroup>
-        </FormItem>
-        <FormItem label="codec">
-          <RadioGroup v-model="caseParam.codec" style="margin-top: -5px">
-            <Radio label="pcm">pcm</Radio>
-            <Radio label="wav">wav</Radio>
-          </RadioGroup>
-        </FormItem>
-        <FormItem label="nonlp">
-          <RadioGroup v-model="caseParam.nonlp" style="margin-top: -5px">
-            <Radio label="true">true</Radio>
-            <Radio label="false">false</Radio>
-          </RadioGroup>
-        </FormItem>
-        <FormItem label="Asr返回">
-          <RadioGroup v-model="caseParam.nointermediateasr" style="margin-top: -5px">
-            <Radio label="true">true</Radio>
-            <Radio label="false">false</Radio>
-          </RadioGroup>
-        </FormItem>
-        <!--<FormItem label="语言">-->
-          <!--<RadioGroup v-model="caseParam.lang" style="margin-top: -5px">-->
-            <!--<Radio label="zh">zh</Radio>-->
-            <!--<Radio label="en">en</Radio>-->
-            <!--<Radio label="xmly">xmly</Radio>-->
-            <!--<Radio label="e2e">e2e</Radio>-->
-            <!--<Radio label="c1">c1</Radio>-->
-          <!--</RadioGroup>-->
+        <!--<FormItem label="用例描述">-->
+        <!--<Input v-model="caseParam.desc" placeholder="请输入用例描述"></Input>-->
         <!--</FormItem>-->
-        <FormItem label="激活词">
-          <Input v-model="caseParam.voicetrigger" placeholder="请输入激活词"></Input>
-        </FormItem>
-        <FormItem label="vendtimeout">
-          <Input v-model="caseParam.vendtimeout" placeholder="请输入vad超时时间"></Input>
-        </FormItem>
-        <FormItem label="voicepower">
-          <Input v-model="caseParam.voicepower" placeholder="请输入音量值"></Input>
-        </FormItem>
+
+        <!--<FormItem label="codec">-->
+        <!--<RadioGroup v-model="caseParam.codec" style="margin-top: -5px">-->
+        <!--<Radio label="pcm">pcm</Radio>-->
+        <!--<Radio label="wav">wav</Radio>-->
+        <!--</RadioGroup>-->
+        <!--</FormItem>-->
+        <row>
+          <i-col span="8">
+            <FormItem label="云端模式">
+              <RadioGroup v-model="caseParam.vadmode" style="margin-top: -5px">
+                <Radio label="cloud">云端</Radio>
+                <Radio label="local">本地</Radio>
+              </RadioGroup>
+            </FormItem>
+          </i-col>
+          <i-col span="8">
+            <FormItem label="NLP返回">
+              <RadioGroup v-model="caseParam.nonlp" style="margin-top: -5px">
+                <Radio label="true">返回</Radio>
+                <Radio label="false">为空</Radio>
+              </RadioGroup>
+            </FormItem>
+          </i-col>
+          <i-col span="8">
+            <FormItem label="ASR返回">
+              <RadioGroup v-model="caseParam.nointermediateasr" style="margin-top: -5px">
+                <Radio label="true">实时</Radio>
+                <Radio label="false">全部</Radio>
+              </RadioGroup>
+            </FormItem>
+          </i-col>
+        </row>
+
+        <!--<FormItem label="语言">-->
+        <!--<RadioGroup v-model="caseParam.lang" style="margin-top: -5px">-->
+        <!--<Radio label="zh">zh</Radio>-->
+        <!--<Radio label="en">en</Radio>-->
+        <!--<Radio label="xmly">xmly</Radio>-->
+        <!--<Radio label="e2e">e2e</Radio>-->
+        <!--<Radio label="c1">c1</Radio>-->
+        <!--</RadioGroup>-->
+        <!--</FormItem>-->
+        <row>
+          <i-col span="8">
+            <FormItem label="激活词">
+              <Input v-model="caseParam.voicetrigger" placeholder="请输入激活词"></Input>
+            </FormItem>
+          </i-col>
+          <i-col span="8">
+            <FormItem label="vadtimeout">
+              <Input v-model="caseParam.vendtimeout" placeholder="请输入vad超时时间"></Input>
+            </FormItem>
+          </i-col>
+          <i-col span="8">
+            <FormItem label="power">
+              <Input v-model="caseParam.voicepower" placeholder="请输入音量值"></Input>
+            </FormItem>
+          </i-col>
+        </row>
+
         <FormItem label="voiceextra">
           <Input v-model="caseParam.voiceextra" placeholder="请输入voiceextra...."></Input>
         </FormItem>
@@ -133,7 +157,7 @@
         </FormItem>
         <FormItem label="语音文件">
           <Upload :action="upfileUrl" :on-error="fileUpError"
-                  :on-success="fileUpSuccess" >
+                  :on-success="fileUpSuccess">
             <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
           </Upload>
         </FormItem>
@@ -193,19 +217,35 @@
           lang: 'zh',
           vadmode: 'cloud',
           voicetrigger: '若琪',
+          vendtimeout: 500,
           nonlp: 'true',
           result: '',
-          expect: '{\n' +
-          '　　"extra":"accept",\n' +
-          '　　"type":"finish,asr_finish"\n' +
-          '}',
+          expect: '{"extra":"accept","type":"finish,asr_finish"}',
           nointermediateasr: 'true',
           voiceextra: '',
           voicepower: '',
           createTime: null,
-          environment: 'dev',
+          environment: 'wss://apigwws-dev.open.rokid.com/api',
           fileurl: ''
         },
+        envlist: [
+          {
+            value: 'wss://apigwws-dev.open.rokid.com/api',
+            label: 'dev'
+          },
+          {
+            value: 'wss://apigwws.open.rokid.com/api',
+            label: '线上'
+          },
+          {
+            value: 'wss://apigwws-pre.open.rokid.com/api',
+            label: 'pre'
+          },
+          {
+            value: 'wss://apigwws-daily.open.rokid.com/api',
+            label: 'daily'
+          }
+        ],
         pageSizeOptions: [10, 20, 30, 50, 100],
         pageHelp: {
           totalNum: 0,
@@ -239,6 +279,7 @@
             title: '用例名称',
             key: 'name',
             align: 'center',
+            width: 300,
             ellipsis: true,
             render: (h, params) => {
               return h('Poptip', {
@@ -256,12 +297,6 @@
                 ])
               ])
             }
-          },
-          {
-            title: 'codec',
-            key: 'codec',
-            width: 75,
-            align: 'center'
           },
           {
             title: 'vadmode',
@@ -286,7 +321,40 @@
           {
             title: 'result',
             key: 'result',
-            align: 'center'
+            align: 'center',
+            render: (h, params) => {
+              const row = params.row
+              var color = 'yellow'
+              var text = '未执行'
+              var type = 'primary'
+              if (row.result === '1') {
+                text = '执行中'
+                color = 'blue'
+                type = 'warning'
+              }
+              if (row.result === '0') {
+                text = '成功'
+                color = 'green'
+                type = 'success'
+              }
+              if (row.result === '2') {
+                text = '失败'
+                color = 'red'
+                type = 'error'
+              }
+              var cloading = false
+              if (row.result === '1') {
+                cloading = true
+              }
+              return h('Button', {
+                props: {
+                  type: type,
+                  size: 'small',
+                  color: color,
+                  loading: cloading
+                }
+              }, text)
+            }
           },
           // {
           //   title: '创建时间',
@@ -320,7 +388,7 @@
                       this.caseParam = Object.assign({}, this.caseTableData[params.index])
                       this.editor.layout({
                         width: 690,
-                        height: 260
+                        height: 200
                       })
                     }
                   }
@@ -339,6 +407,7 @@
                         title: '用例开始执行。。。。',
                         desc: '用例执行一般需要几秒时间，请耐心等待'
                       })
+                      this.caseTableData[params.index].result = '1'
                       this.execute(params.index)
                     }
                   }
@@ -392,10 +461,12 @@
               this.$Message.success('执行用例成功')
               this.getAllCaseList()
             } else {
+              this.caseTableData[index].result = '2'
               this.$Message.error(result.message)
             }
           },
           error: (errorMsg) => {
+            this.caseTableData[index].result = '2'
             this.$Message.error(errorMsg.responseText)
             console.log(errorMsg)
           }
@@ -434,13 +505,12 @@
           voicetrigger: '若琪',
           nonlp: 'true',
           result: '',
-          expect: '{\n' +
-          '　　"extra":"accept",\n' +
-          '　　"type":"finish,asr_finish"\n' +
-          '}',
+          expect: '{"extra":"accept","type":"finish,asr_finish"}',
           nointermediateasr: 'true',
           voiceextra: '',
           voicepower: '0',
+          vendtimeout: 500,
+          environment: 'wss://apigwws-dev.open.rokid.com/api',
           createTime: null,
           fileurl: ''
         }
@@ -506,13 +576,13 @@
         this.okText = '添加'
         this.titleText = '添加用例'
         this.editor.setValue('{\n' +
-          '　　"extra":"accept",\n' +
-          '　　"type":"finish,asr_finish"\n' +
+          '  "extra":"accept",\n' +
+          '  "type":"finish,asr_finish"\n' +
           '}')
         this.resetParamForm()
         this.editor.layout({
           width: 690,
-          height: 260
+          height: 200
         })
       },
       searchCase () {
