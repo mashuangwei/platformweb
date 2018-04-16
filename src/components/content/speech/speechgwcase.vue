@@ -220,7 +220,11 @@
           vendtimeout: 500,
           nonlp: 'true',
           result: '',
-          expect: '{"extra":"accept","type":"finish,asr_finish"}',
+          expect: '{\n' +
+          '  "extra":"accept",\n' +
+          '  "type":"INTERMEDIATE,finish,ASR_FINISH",\n' +
+          '  "asr":""\n' +
+          '}',
           nointermediateasr: 'true',
           voiceextra: '',
           voicepower: '',
@@ -505,7 +509,11 @@
           voicetrigger: '若琪',
           nonlp: 'true',
           result: '',
-          expect: '{"extra":"accept","type":"finish,asr_finish"}',
+          expect: '{\n' +
+          '  "extra":"accept",\n' +
+          '  "type":"INTERMEDIATE,finish,ASR_FINISH",\n' +
+          '  "asr":""\n' +
+          '}',
           nointermediateasr: 'true',
           voiceextra: '',
           voicepower: '0',
@@ -577,7 +585,8 @@
         this.titleText = '添加用例'
         this.editor.setValue('{\n' +
           '  "extra":"accept",\n' +
-          '  "type":"finish,asr_finish"\n' +
+          '  "type":"INTERMEDIATE,finish,ASR_FINISH",\n' +
+          '  "asr":""\n' +
           '}')
         this.resetParamForm()
         this.editor.layout({

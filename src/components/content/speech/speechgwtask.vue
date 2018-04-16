@@ -460,7 +460,7 @@
       this.getAllCaseList()
       this.intervalTmp = setInterval(() => {
         this.getAllCaseList()
-      }, 5000)
+      }, 10000)
     },
     methods: {
       selectChange (value) {
